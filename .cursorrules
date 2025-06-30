@@ -1,0 +1,190 @@
+# Cursor Rules for Anemi Project
+
+## Build Rules (Specific - Robots Must Obey)
+
+### Component Organization
+- **R01**: Every new component goes in `src/components/*`.
+- **R02**: No function > 50 lines; split into helpers.
+- **R03**: Stylelint must reject hard-coded hex colors (#123abc); use design tokens.
+- **R04**: `npm run test` coverage ≥ 30% MVP; raise to 80% after launch.
+
+### Security & Configuration
+- **R05**: API keys live in `.env.local` and Vercel dashboard; never in code.
+- **R06**: Use Row-Level Security (RLS) policies for all user data models.
+- **R07**: Implement soft deletes for user-generated content (deletedAt field).
+- **R08**: Use PostGIS GIN indexes for location-based queries when possible.
+
+## General Coding Standards
+
+### Code Style
+- Use consistent indentation (2 spaces for most languages, 4 for Python)
+- Follow language-specific style guides (PEP 8 for Python, ESLint for JavaScript/TypeScript)
+- Use meaningful variable and function names
+- Keep functions small and focused on a single responsibility
+- Add comments for complex logic, but prefer self-documenting code
+
+### File Organization
+- Group related files in appropriate directories
+- Use clear, descriptive file names
+- Keep files under 500 lines when possible
+- Separate concerns (models, views, controllers, etc.)
+
+### Documentation
+- Write clear README files for each major component
+- Document public APIs and interfaces
+- Include usage examples in documentation
+- Keep documentation up-to-date with code changes
+
+## Security Guidelines
+
+### Data Protection
+- Never commit sensitive data (API keys, passwords, tokens)
+- Use environment variables for configuration
+- Validate and sanitize all user inputs
+- Implement proper authentication and authorization
+- Use HTTPS for all external communications
+
+### Code Security
+- Avoid SQL injection by using parameterized queries
+- Prevent XSS attacks by escaping user input
+- Use secure random number generators
+- Implement rate limiting for APIs
+- Regular security audits of dependencies
+
+## Testing Requirements
+
+### Test Coverage
+- Aim for at least 80% code coverage
+- Write unit tests for all public functions
+- Include integration tests for critical workflows
+- Test edge cases and error conditions
+- Use mocking for external dependencies
+
+### Test Quality
+- Tests should be fast, reliable, and maintainable
+- Use descriptive test names that explain the scenario
+- Follow the Arrange-Act-Assert pattern
+- Avoid testing implementation details
+
+## Performance Guidelines
+
+### Optimization
+- Profile code before optimizing
+- Use appropriate data structures and algorithms
+- Implement caching where beneficial
+- Minimize database queries
+- Use async/await for I/O operations
+
+### Monitoring
+- Add logging for debugging and monitoring
+- Implement health checks
+- Monitor application performance metrics
+- Set up alerting for critical issues
+
+## Git Workflow
+
+### Commit Standards
+- Write clear, descriptive commit messages
+- Use conventional commit format when possible
+- Keep commits focused and atomic
+- Reference issue numbers in commit messages
+
+### Branch Strategy
+- Use feature branches for new development
+- Keep main/master branch stable
+- Require code review before merging
+- Delete branches after merging
+
+## Language-Specific Rules
+
+### Python
+- Use type hints for function parameters and return values
+- Follow PEP 8 style guide
+- Use virtual environments for dependency management
+- Prefer list comprehensions over explicit loops when readable
+- Use context managers for resource management
+
+### JavaScript/TypeScript
+- Use strict mode
+- Prefer const over let, avoid var
+- Use async/await over promises when possible
+- Implement proper error handling
+- Use TypeScript for type safety
+
+### Database
+- Use migrations for schema changes
+- Index frequently queried columns
+- Use transactions for data consistency
+- Implement proper backup strategies
+- Monitor query performance
+
+## Code Review Guidelines
+
+### Review Process
+- Review for functionality, security, and performance
+- Check for code style and consistency
+- Ensure proper error handling
+- Verify test coverage
+- Look for potential security vulnerabilities
+
+### Feedback
+- Be constructive and specific
+- Suggest improvements rather than just pointing out issues
+- Consider the developer's experience level
+- Focus on the code, not the person
+
+## Deployment and DevOps
+
+### Environment Management
+- Use separate environments for development, staging, and production
+- Implement blue-green deployments when possible
+- Use infrastructure as code
+- Automate deployment processes
+- Monitor application health in production
+
+### Configuration
+- Use environment-specific configuration files
+- Never hardcode environment-specific values
+- Use secrets management for sensitive data
+- Implement proper logging levels per environment
+
+## Accessibility and UX
+
+### User Experience
+- Design for accessibility (WCAG guidelines)
+- Provide clear error messages
+- Implement proper loading states
+- Use consistent UI patterns
+- Test with real users when possible
+
+### Internationalization
+- Support multiple languages when required
+- Use proper date/time formatting
+- Handle different text directions
+- Consider cultural differences in UI design
+
+## Maintenance and Technical Debt
+
+### Code Quality
+- Refactor code regularly to improve maintainability
+- Remove dead code and unused dependencies
+- Update dependencies regularly
+- Address technical debt in a timely manner
+- Use static analysis tools
+
+### Documentation Updates
+- Update documentation when changing APIs
+- Keep README files current
+- Document breaking changes
+- Maintain changelog for releases
+
+## Emergency Procedures
+
+### Incident Response
+- Have a plan for handling production issues
+- Implement proper monitoring and alerting
+- Document rollback procedures
+- Maintain communication channels for emergencies
+- Learn from incidents to prevent future issues
+
+Remember: These rules are guidelines to help maintain code quality and consistency. Use judgment to apply them appropriately to your specific situation. 

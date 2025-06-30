@@ -18,18 +18,13 @@ export function Footer() {
             <h4 className="text-sm font-semibold">Platform</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/meetups" className="text-muted-foreground hover:text-foreground">
-                  Meetups
+                <Link href="/create" className="text-muted-foreground hover:text-foreground">
+                  Create Meetup
                 </Link>
               </li>
               <li>
-                <Link href="/coffee-shops" className="text-muted-foreground hover:text-foreground">
-                  Coffee Shops
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground">
-                  About
+                <Link href="/" className="text-muted-foreground hover:text-foreground">
+                  Home
                 </Link>
               </li>
             </ul>
@@ -39,14 +34,14 @@ export function Footer() {
             <h4 className="text-sm font-semibold">Support</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/help" className="text-muted-foreground hover:text-foreground">
-                  Help Center
-                </Link>
+                <a href="mailto:team@anemimeets.com" className="text-muted-foreground hover:text-foreground">
+                  Contact Us
+                </a>
               </li>
               <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground">
-                  Contact Us
-                </Link>
+                <a href="/api/health" className="text-muted-foreground hover:text-foreground">
+                  System Status
+                </a>
               </li>
             </ul>
           </div>
@@ -55,12 +50,12 @@ export function Footer() {
             <h4 className="text-sm font-semibold">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-foreground">
+                <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-foreground">
+                <Link href="/legal/terms" className="text-muted-foreground hover:text-foreground">
                   Terms of Service
                 </Link>
               </li>

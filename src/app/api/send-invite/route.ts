@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendInviteEmail } from '@/lib/email'
 import { randomUUID } from 'crypto'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting (5 requests per minute for email sending)
+    const rateLimitResult = await rateLimit(request, 5, 60000)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many invite requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     const { cafe, formData, dates } = await request.json()
 
     // Generate a unique token for the invite

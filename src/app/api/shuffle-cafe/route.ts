@@ -1,9 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { rateLimit } from '@/lib/rate-limit'
+import { shuffleCafeSchema } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceRange, city } = await request.json()
+    // Apply rate limiting (10 requests per 10 seconds)
+    const rateLimitResult = await rateLimit(request, 10, 10000)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
+    const body = await request.json()
+    
+    // Validate input
+    const validationResult = shuffleCafeSchema.safeParse(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input data', details: validationResult.error.errors },
+        { status: 400 }
+      )
+    }
+
+    const { priceRange, city } = validationResult.data
 
     // Build where clause
     const whereClause: any = {

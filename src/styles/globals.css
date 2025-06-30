@@ -147,11 +147,17 @@
   }
   
   .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
+    /* Use design tokens for background and border */
+    background: hsla(var(--card) / 0.9);
+    border: 1px solid hsla(var(--border) / 0.2);
+    backdrop-filter: blur(12px);
   }
   
   .glass-dark {
-    @apply bg-black/10 backdrop-blur-md border border-white/10;
+    /* Use design tokens for background and border */
+    background: hsla(var(--card-foreground) / 0.7);
+    border: 1px solid hsla(var(--border) / 0.1);
+    backdrop-filter: blur(12px);
   }
   
   .animate-fadeIn {

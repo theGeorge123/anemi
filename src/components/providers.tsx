@@ -1,81 +1,45 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { createContext, useContext } from 'react';
 
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
+// Simple context for the Tiny-MVP
+interface AppContextType {
+  // Add any app-wide state here if needed
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  loading: true,
-  signOut: async () => {},
-});
+const AppContext = createContext<AppContextType>({});
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+export const useApp = () => {
+  const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useApp must be used within an AppProvider');
   }
   return context;
 };
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-
-    getInitialSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
+export function AppProvider({ children }: { children: React.ReactNode }) {
   const value = {
-    user,
-    session,
-    loading,
-    signOut,
+    // Add any app-wide state here if needed
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AppContext.Provider value={value}>
       {children}
-    </AuthContext.Provider>
+    </AppContext.Provider>
   );
+}
+
+// Simple Toaster Provider
+function ToasterProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
+    <ToasterProvider>
+      <AppProvider>
+        {children}
+      </AppProvider>
+    </ToasterProvider>
   );
 } 

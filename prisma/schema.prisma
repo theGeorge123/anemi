@@ -58,6 +58,8 @@ model User {
   coffeePreferences CoffeePreference[]
   reviews       Review[]
   favorites     Favorite[]
+  photos        Photo[]
+  comments      Comment[]
 }
 
 model VerificationToken {
@@ -93,6 +95,8 @@ model Meetup {
   deletedAt   DateTime? // Soft delete for cancelled events
   createdBy   String
   createdByUser User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  coffeeShopId String?
+  coffeeShop   CoffeeShop? @relation(fields: [coffeeShopId], references: [id], onDelete: SetNull)
 
   participants Participant[]
   invitations  Invitation[]
@@ -149,6 +153,29 @@ model Invitation {
 
 /// @policy read_public      public:true
 /// @policy write_own        user_id = auth.uid()
+model MeetupInvite {
+  id              String    @id @default(cuid())
+  token           String    @unique
+  organizerName   String
+  organizerEmail  String
+  cafeId          String
+  availableDates  String[]  // Array of ISO date strings
+  chosenDate      String?   // ISO date string
+  status          String    @default("pending") // pending, confirmed, expired
+  expiresAt       DateTime
+  confirmedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime? // Soft delete
+
+  cafe CoffeeShop @relation(fields: [cafeId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([deletedAt])
+}
+
 model CoffeeShop {
   id          String   @id @default(cuid())
   name        String
@@ -171,6 +198,7 @@ model CoffeeShop {
   meetups     Meetup[]
   reviews     Review[]
   favorites   Favorite[]
+  meetupInvites MeetupInvite[]
 
   @@index([latitude, longitude]) // Consider PostGIS GIN index for "cafés near me" queries
   @@index([rating])

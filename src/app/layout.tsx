@@ -3,8 +3,6 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 import '@/styles/globals.css';
 
 const inter = Inter({
@@ -24,7 +22,7 @@ export const metadata: Metadata = {
     default: 'Anemi Meets - Coffee Shop Meetups & Community',
     template: '%s | Anemi Meets',
   },
-  description: 'Discover local coffee shops and join meaningful meetups in your community. Connect with like-minded people over coffee and build lasting relationships.',
+  description: 'Create coffee meetups and discover great local spots with friends.',
   keywords: [
     'coffee shop meetups',
     'local community',
@@ -50,7 +48,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: '/',
     title: 'Anemi Meets - Coffee Shop Meetups & Community',
-    description: 'Discover local coffee shops and join meaningful meetups in your community.',
+    description: 'Create coffee meetups and discover great local spots with friends.',
     siteName: 'Anemi Meets',
     images: [
       {
@@ -64,7 +62,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Anemi Meets - Coffee Shop Meetups & Community',
-    description: 'Discover local coffee shops and join meaningful meetups in your community.',
+    description: 'Create coffee meetups and discover great local spots with friends.',
     images: ['/og-image.png'],
     creator: '@anemi_meets',
   },
@@ -109,11 +107,9 @@ export default function RootLayout({
       >
         <Providers>
           <div className="min-h-screen bg-background">
-            <Header />
             <main className="flex-1">
               {children}
             </main>
-            <Footer />
           </div>
           <Toaster />
           <Analytics />

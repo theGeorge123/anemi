@@ -23,6 +23,20 @@ export interface WelcomeEmail {
   userName: string;
 }
 
+export interface InviteEmailData {
+  to: string;
+  cafe: {
+    name: string;
+    address: string;
+    priceRange: string;
+    rating: number;
+    openHours: string;
+  };
+  dates: string[];
+  token: string;
+  organizerName: string;
+}
+
 /**
  * Send a generic email using Resend
  */
@@ -193,6 +207,65 @@ export async function sendMeetupCancellation(
   return sendEmail({
     to,
     subject: `☕ Cancelled: ${meetupTitle}`,
+    html,
+  });
+}
+
+/**
+ * Send invite email for Tiny-MVP
+ */
+export async function sendInviteEmail(data: InviteEmailData) {
+  const inviteUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/invite/${data.token}`;
+  
+  const datesList = data.dates.map(date => {
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }).join(', ');
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #f59e0b;">☕ Coffee Meetup Invite</h2>
+      
+      <p>Hi there!</p>
+      
+      <p><strong>${data.organizerName}</strong> invited you for coffee at this great spot:</p>
+      
+      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin: 0 0 10px 0; color: #92400e;">${data.cafe.name}</h3>
+        <p style="margin: 5px 0;"><strong>📍 Address:</strong> ${data.cafe.address}</p>
+        <p style="margin: 5px 0;"><strong>⏰ Hours:</strong> ${data.cafe.openHours}</p>
+        <p style="margin: 5px 0;"><strong>⭐ Rating:</strong> ${data.cafe.rating}/5</p>
+        <p style="margin: 5px 0;"><strong>💰 Price:</strong> ${data.cafe.priceRange === 'cheap' ? '$' : data.cafe.priceRange === 'normal' ? '$$' : '$$$'}</p>
+      </div>
+      
+      <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4 style="margin: 0 0 10px 0; color: #0369a1;">Available Dates:</h4>
+        <p style="margin: 0;">${datesList}</p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${inviteUrl}" 
+           style="background-color: #f59e0b; color: white; padding: 12px 24px; 
+                  text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+          Choose Date & Confirm
+        </a>
+      </div>
+      
+      <p style="color: #6b7280; font-size: 14px;">
+        This invite expires in 7 days. Looking forward to seeing you there!<br>
+        ☕ Anemi Meets
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: data.to,
+    subject: `☕ Coffee at ${data.cafe.name}?`,
     html,
   });
 } 

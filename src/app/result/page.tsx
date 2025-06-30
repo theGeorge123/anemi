@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +19,7 @@ interface Cafe {
   description?: string
 }
 
-export default function ResultPage() {
+function ResultPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -198,48 +198,46 @@ export default function ResultPage() {
           </Button>
         </div>
 
-        {/* Selected Dates and Times */}
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Meetup Details:</h3>
-          <div className="space-y-4">
-            {Object.entries(formData.dateTimePreferences || {}).map(([date, times]) => {
-              const dateObj = new Date(date)
-              const timeArray = Array.isArray(times) ? times : []
-              return (
-                <div
-                  key={date}
-                  className="p-4 bg-white border border-gray-200 rounded-md"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="font-medium text-sm">
-                      {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    <span className="font-medium">Times:</span> {timeArray.join(', ')}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-          
-          {/* Form Summary */}
-          <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-            <h4 className="font-semibold text-gray-900 mb-3">Meetup Summary:</h4>
-            <div className="space-y-2 text-sm text-gray-700">
-              <p><strong>Name:</strong> {formData.name}</p>
-              <p><strong>Email:</strong> {formData.email}</p>
-              <p><strong>City:</strong> {formData.city}</p>
-              <p><strong>Dates:</strong> {formData.dates.length} selected</p>
-              <p><strong>Times:</strong> {formData.times.length} available</p>
-              <p><strong>Budget:</strong> {formData.priceRange}</p>
+        {/* Meetup Details */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="text-lg">Meetup Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Organizer:</span>
+              <span className="font-medium">{formData.name}</span>
             </div>
-          </div>
-        </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Price Range:</span>
+              <span className="font-medium">{getPriceDisplay(formData.priceRange)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">City:</span>
+              <span className="font-medium">{formData.city}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Available Dates:</span>
+              <span className="font-medium">{formData.dates.length} dates selected</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
+  )
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading your perfect match...</p>
+        </div>
+      </div>
+    }>
+      <ResultPageContent />
+    </Suspense>
   )
 } 

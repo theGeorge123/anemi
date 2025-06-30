@@ -135,6 +135,9 @@
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "browserslist": {
     "production": [
       ">0.2%",

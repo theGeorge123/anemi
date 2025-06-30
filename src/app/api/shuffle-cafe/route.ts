@@ -3,32 +3,32 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceRange } = await request.json()
+    const { priceRange, city } = await request.json()
 
-    // Map frontend price range to Prisma enum values
-    const mapPriceRange = (range: string) => {
-      switch (range) {
-        case 'cheap': return 'BUDGET'
-        case 'normal': return 'MODERATE'
-        case 'expensive': return 'EXPENSIVE'
-        default: return 'MODERATE'
-      }
+    // Build where clause
+    const whereClause: any = {
+      isVerified: true,
+      deletedAt: null
     }
 
-    const mappedPriceRange = mapPriceRange(priceRange)
+    // Add price range filter if provided
+    if (priceRange) {
+      whereClause.priceRange = priceRange
+    }
 
-    // Get count of cafes with the specified price range
+    // Add city filter if provided
+    if (city) {
+      whereClause.city = city
+    }
+
+    // Get count of cafes with the specified criteria
     const count = await prisma.coffeeShop.count({
-      where: {
-        priceRange: mappedPriceRange,
-        isVerified: true,
-        deletedAt: null
-      }
+      where: whereClause
     })
 
     if (count === 0) {
       return NextResponse.json(
-        { error: 'No coffee shops found for this price range' },
+        { error: `No coffee shops found in ${city || 'this area'} for your criteria` },
         { status: 404 }
       )
     }
@@ -37,15 +37,12 @@ export async function POST(request: NextRequest) {
     const randomSkip = Math.floor(Math.random() * count)
     
     const cafe = await prisma.coffeeShop.findFirst({
-      where: {
-        priceRange: mappedPriceRange,
-        isVerified: true,
-        deletedAt: null
-      },
+      where: whereClause,
       skip: randomSkip,
       select: {
         id: true,
         name: true,
+        city: true,
         address: true,
         priceRange: true,
         rating: true,
@@ -62,17 +59,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Map the price range back to frontend format
-    const mapPriceRangeBack = (range: string) => {
-      switch (range) {
-        case 'BUDGET': return 'cheap'
-        case 'MODERATE': return 'normal'
-        case 'EXPENSIVE': return 'expensive'
-        case 'LUXURY': return 'expensive'
-        default: return 'normal'
-      }
-    }
-
     // Format hours for display
     const formatHours = (hours: any) => {
       if (!hours) return 'Hours not available'
@@ -86,7 +72,6 @@ export async function POST(request: NextRequest) {
 
     const responseCafe = {
       ...cafe,
-      priceRange: mapPriceRangeBack(cafe.priceRange),
       openHours: formatHours(cafe.hours)
     }
 

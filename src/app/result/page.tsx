@@ -50,7 +50,10 @@ export default function ResultPage() {
       const response = await fetch('/api/shuffle-cafe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceRange: formData.priceRange })
+        body: JSON.stringify({ 
+          priceRange: formData.priceRange,
+          city: formData.city 
+        })
       })
       
       if (response.ok) {
@@ -95,9 +98,10 @@ export default function ResultPage() {
 
   const getPriceDisplay = (priceRange: string) => {
     switch (priceRange) {
-      case 'cheap': return '$'
-      case 'normal': return '$$'
-      case 'expensive': return '$$$'
+      case 'BUDGET': return '$'
+      case 'MODERATE': return '$$'
+      case 'EXPENSIVE': return '$$$'
+      case 'LUXURY': return '$$$$'
       default: return '$$'
     }
   }
@@ -194,26 +198,45 @@ export default function ResultPage() {
           </Button>
         </div>
 
-        {/* Selected Dates */}
+        {/* Selected Dates and Times */}
         <div className="mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Selected Dates:</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {formData.dates.map((date: string) => {
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">Meetup Details:</h3>
+          <div className="space-y-4">
+            {Object.entries(formData.dateTimePreferences || {}).map(([date, times]) => {
               const dateObj = new Date(date)
+              const timeArray = Array.isArray(times) ? times : []
               return (
                 <div
                   key={date}
-                  className="p-3 bg-white border border-gray-200 rounded-md text-center"
+                  className="p-4 bg-white border border-gray-200 rounded-md"
                 >
-                  <div className="font-medium text-sm">
-                    {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-medium text-sm">
+                      {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  <div className="text-xs text-gray-600">
+                    <span className="font-medium">Times:</span> {timeArray.join(', ')}
                   </div>
                 </div>
               )
             })}
+          </div>
+          
+          {/* Form Summary */}
+          <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <h4 className="font-semibold text-gray-900 mb-3">Meetup Summary:</h4>
+            <div className="space-y-2 text-sm text-gray-700">
+              <p><strong>Name:</strong> {formData.name}</p>
+              <p><strong>Email:</strong> {formData.email}</p>
+              <p><strong>City:</strong> {formData.city}</p>
+              <p><strong>Dates:</strong> {formData.dates.length} selected</p>
+              <p><strong>Times:</strong> {formData.times.length} available</p>
+              <p><strong>Budget:</strong> {formData.priceRange}</p>
+            </div>
           </div>
         </div>
       </div>

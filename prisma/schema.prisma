@@ -180,6 +180,7 @@ model CoffeeShop {
   id          String   @id @default(cuid())
   name        String
   description String?  @db.Text
+  city        String   // Amsterdam or Rotterdam
   address     String
   latitude    Float
   longitude   Float
@@ -203,6 +204,7 @@ model CoffeeShop {
   @@index([latitude, longitude]) // Consider PostGIS GIN index for "cafés near me" queries
   @@index([rating])
   @@index([priceRange])
+  @@index([city])
 }
 
 model CoffeePreference {

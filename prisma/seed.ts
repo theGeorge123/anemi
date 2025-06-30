@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PriceRange } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,7 @@ const cafes = [
     longitude: 4.898,
     description: 'Specialty coffee with a focus on quality beans and brewing methods.',
     features: ['wifi', 'outdoor seating', 'pet friendly'],
-    priceRange: 'MODERATE',
+    priceRange: PriceRange.MODERATE,
     isVerified: true,
   },
   {
@@ -23,7 +23,7 @@ const cafes = [
     longitude: 4.892,
     description: 'Cozy café with great coffee and homemade cakes.',
     features: ['wifi', 'vegan options'],
-    priceRange: 'BUDGET',
+    priceRange: PriceRange.BUDGET,
     isVerified: true,
   },
   {
@@ -34,7 +34,7 @@ const cafes = [
     longitude: 4.875,
     description: 'Artisan coffee roasters with a passion for quality.',
     features: ['wifi', 'parking', 'outdoor seating'],
-    priceRange: 'MODERATE',
+    priceRange: PriceRange.MODERATE,
     isVerified: true,
   },
   {
@@ -45,7 +45,7 @@ const cafes = [
     longitude: 4.870,
     description: 'Minimalist coffee bar with expertly crafted drinks.',
     features: ['wifi', 'pet friendly'],
-    priceRange: 'EXPENSIVE',
+    priceRange: PriceRange.EXPENSIVE,
     isVerified: true,
   },
   {
@@ -56,7 +56,7 @@ const cafes = [
     longitude: 4.895,
     description: 'Japanese-inspired café with great coffee and food.',
     features: ['wifi', 'outdoor seating'],
-    priceRange: 'BUDGET',
+    priceRange: PriceRange.BUDGET,
     isVerified: true,
   },
 
@@ -69,7 +69,7 @@ const cafes = [
     longitude: 4.468,
     description: 'Local favorite with excellent coffee and friendly atmosphere.',
     features: ['wifi', 'outdoor seating', 'pet friendly'],
-    priceRange: 'BUDGET',
+    priceRange: PriceRange.BUDGET,
     isVerified: true,
   },
   {
@@ -80,7 +80,7 @@ const cafes = [
     longitude: 4.490,
     description: 'Modern café with a focus on specialty coffee.',
     features: ['wifi', 'vegan options', 'pet friendly'],
-    priceRange: 'MODERATE',
+    priceRange: PriceRange.MODERATE,
     isVerified: true,
   },
   {
@@ -91,7 +91,7 @@ const cafes = [
     longitude: 4.485,
     description: 'Artisan coffee shop in the heart of Rotterdam.',
     features: ['wifi', 'parking'],
-    priceRange: 'EXPENSIVE',
+    priceRange: PriceRange.EXPENSIVE,
     isVerified: true,
   },
   {
@@ -102,7 +102,7 @@ const cafes = [
     longitude: 4.480,
     description: 'Urban coffee bar with a modern vibe.',
     features: ['wifi', 'outdoor seating', 'parking'],
-    priceRange: 'MODERATE',
+    priceRange: PriceRange.MODERATE,
     isVerified: true,
   },
   {
@@ -113,7 +113,7 @@ const cafes = [
     longitude: 4.482,
     description: 'Healthy coffee spot with great vibes.',
     features: ['wifi', 'vegan options'],
-    priceRange: 'BUDGET',
+    priceRange: PriceRange.BUDGET,
     isVerified: true,
   },
 ];

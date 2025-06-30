@@ -7,8 +7,7 @@ export async function POST(request: NextRequest) {
 
     // Build where clause
     const whereClause: any = {
-      isVerified: true,
-      deletedAt: null
+      isVerified: true
     }
 
     // Add price range filter if provided

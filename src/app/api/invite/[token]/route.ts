@@ -24,7 +24,7 @@ export async function GET(
             address: true,
             priceRange: true,
             rating: true,
-            openHours: true,
+            hours: true,
             isVerified: true,
             description: true
           }
@@ -39,11 +39,24 @@ export async function GET(
       )
     }
 
-    // Format the response
+    // Format hours for display
+    const formatHours = (hours: any) => {
+      if (!hours) return 'Hours not available'
+      if (typeof hours === 'string') return hours
+      if (typeof hours === 'object') {
+        return 'Open daily'
+      }
+      return 'Hours not available'
+    }
+
+    // Format the response with openHours
     const response = {
       id: invite.id,
       token: invite.token,
-      cafe: invite.cafe,
+      cafe: {
+        ...invite.cafe,
+        openHours: formatHours(invite.cafe.hours)
+      },
       formData: {
         name: invite.organizerName,
         email: invite.organizerEmail,

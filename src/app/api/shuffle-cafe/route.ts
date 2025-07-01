@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     if (count === 0) {
       return NextResponse.json(
-        { error: `No coffee shops found in ${city || 'this area'} for your criteria` },
+        { error: `No coffee shops found in ${city || 'this area'} for your criteria`, debug: { whereClause } },
         { status: 404 }
       )
     }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     if (!cafe) {
       return NextResponse.json(
-        { error: 'Failed to find a coffee shop' },
+        { error: 'Failed to find a coffee shop', debug: { whereClause, randomSkip, count } },
         { status: 404 }
       )
     }
@@ -99,9 +99,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(responseCafe)
   } catch (error) {
+    // Enhanced error logging for Vercel
     console.error('Error in shuffle-cafe:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : error, stack: error instanceof Error ? error.stack : undefined },
       { status: 500 }
     )
   }

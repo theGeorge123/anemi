@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
 
 export function Header() {
   return (
@@ -9,7 +10,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">Anemi Meets</span>
+            <Logo size="lg" showText />
           </Link>
         </div>
         

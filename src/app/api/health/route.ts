@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    // Check database connectivity
-    await prisma.$queryRaw`SELECT 1`
-    
     return NextResponse.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -18,7 +14,7 @@ export async function GET() {
       {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        error: 'Database connection failed'
+        error: 'Service unavailable'
       },
       { status: 503 }
     )

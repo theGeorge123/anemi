@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { sendInviteEmail } from '@/lib/email'
 import { randomUUID } from 'crypto'
 import { rateLimit } from '@/lib/rate-limit'
@@ -16,6 +15,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const { prisma } = await import('@/lib/prisma')
     const { cafe, formData, dates } = await request.json()
 
     // Generate a unique token for the invite

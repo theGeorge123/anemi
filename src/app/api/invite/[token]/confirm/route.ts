@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { token: string } }
 ) {
   try {
+    const { prisma } = await import('@/lib/prisma')
     const { token } = params
     const { chosenDate } = await request.json()
 

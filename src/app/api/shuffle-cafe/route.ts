@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { rateLimit } from '@/lib/rate-limit'
 import { shuffleCafeSchema } from '@/lib/validation'
 
@@ -26,6 +25,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const { prisma } = await import('@/lib/prisma')
     const { priceRange, city } = validationResult.data
 
     // Build where clause

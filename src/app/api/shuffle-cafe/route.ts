@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     const responseCafe = {
       ...cafe,
-      openHours: formatHours(cafe.hours)
+      hours: formatHours(cafe.hours)
     }
 
     return NextResponse.json(responseCafe)

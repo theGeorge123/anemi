@@ -1,0 +1,69 @@
+{
+  "name": "Anemi Meets",
+  "short_name": "Anemi Meets",
+  "description": "Create coffee meetups and discover great local spots with friends",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["social", "lifestyle", "food"],
+  "icons": [
+    {
+      "src": "/logo-simple.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "120x120",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Meetup",
+      "short_name": "Create",
+      "description": "Start a new coffee meetup",
+      "url": "/create",
+      "icons": [
+        {
+          "src": "/logo-simple.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Discover Cafes",
+      "short_name": "Discover",
+      "description": "Find coffee shops",
+      "url": "/discover",
+      "icons": [
+        {
+          "src": "/logo-simple.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+} 

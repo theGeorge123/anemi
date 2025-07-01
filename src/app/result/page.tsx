@@ -14,7 +14,7 @@ interface Cafe {
   address: string
   priceRange: string
   rating: number
-  openHours: string
+  hours: string
   isVerified: boolean
   description?: string
 }
@@ -152,7 +152,7 @@ function ResultPageContent() {
             
             <div className="flex items-center gap-2 text-gray-600">
               <Clock className="w-4 h-4" />
-              <span>{cafe.openHours}</span>
+              <span>{cafe.hours}</span>
             </div>
             
             <div className="flex items-center gap-2">

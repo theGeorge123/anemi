@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendInviteEmail } from '@/lib/email'
 import { randomUUID } from 'crypto'
-import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const { rateLimit } = await import('@/lib/rate-limit')
+    const { sendInviteEmail } = await import('@/lib/email')
+    
     // Apply rate limiting (5 requests per minute for email sending)
     const rateLimitResult = await rateLimit(request, 5, 60000)
     

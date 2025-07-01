@@ -1,6 +1,13 @@
-import { Resend } from 'resend';
+// Dynamic import to avoid build-time issues
+let resend: any = null;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+async function getResend() {
+  if (!resend) {
+    const { Resend } = await import('resend');
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export interface EmailOptions {
   to: string;
@@ -42,7 +49,8 @@ export interface InviteEmailData {
  */
 export async function sendEmail(options: EmailOptions) {
   try {
-    const { data, error } = await resend.emails.send({
+    const resendInstance = await getResend();
+    const { data, error } = await resendInstance.emails.send({
       from: options.from || process.env.EMAIL_FROM || 'noreply@anemi-meets.com',
       to: options.to,
       subject: options.subject,

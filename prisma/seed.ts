@@ -14,6 +14,10 @@ const cafes = [
     features: ['wifi', 'outdoor seating', 'pet friendly'],
     priceRange: PriceRange.MODERATE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Back to Black',
@@ -25,6 +29,10 @@ const cafes = [
     features: ['wifi', 'vegan options'],
     priceRange: PriceRange.BUDGET,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Lot Sixty One',
@@ -36,6 +44,10 @@ const cafes = [
     features: ['wifi', 'parking', 'outdoor seating'],
     priceRange: PriceRange.MODERATE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'White Label Coffee',
@@ -47,6 +59,10 @@ const cafes = [
     features: ['wifi', 'pet friendly'],
     priceRange: PriceRange.EXPENSIVE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Toki',
@@ -58,6 +74,10 @@ const cafes = [
     features: ['wifi', 'outdoor seating'],
     priceRange: PriceRange.BUDGET,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'
+    ],
   },
 
   // Rotterdam
@@ -71,6 +91,10 @@ const cafes = [
     features: ['wifi', 'outdoor seating', 'pet friendly'],
     priceRange: PriceRange.BUDGET,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Gulden Koffie',
@@ -82,6 +106,10 @@ const cafes = [
     features: ['wifi', 'vegan options', 'pet friendly'],
     priceRange: PriceRange.MODERATE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Hopper Coffee',
@@ -93,6 +121,10 @@ const cafes = [
     features: ['wifi', 'parking'],
     priceRange: PriceRange.EXPENSIVE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Urban Espresso Bar',
@@ -104,6 +136,10 @@ const cafes = [
     features: ['wifi', 'outdoor seating', 'parking'],
     priceRange: PriceRange.MODERATE,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=800&h=600&fit=crop'
+    ],
   },
   {
     name: 'Coffee & Coconuts',
@@ -115,6 +151,10 @@ const cafes = [
     features: ['wifi', 'vegan options'],
     priceRange: PriceRange.BUDGET,
     isVerified: true,
+    photos: [
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop'
+    ],
   },
 ];
 

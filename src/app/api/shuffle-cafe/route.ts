@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
         rating: true,
         hours: true,
         isVerified: true,
-        description: true
+        description: true,
+        photos: true
       }
     })
 

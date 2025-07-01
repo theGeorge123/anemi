@@ -17,6 +17,7 @@ interface Cafe {
   hours: string
   isVerified: boolean
   description?: string
+  photos?: string[]
 }
 
 function ResultPageContent() {
@@ -144,6 +145,24 @@ function ResultPageContent() {
               )}
             </div>
           </CardHeader>
+          
+          {/* Cafe Photos */}
+          {cafe.photos && cafe.photos.length > 0 && (
+            <div className="px-6 pb-4">
+              <div className="grid grid-cols-2 gap-3">
+                {cafe.photos.slice(0, 2).map((photo, index) => (
+                  <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
+                    <img
+                      src={photo}
+                      alt={`${cafe.name} - Photo ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2 text-gray-600">
               <MapPin className="w-4 h-4" />

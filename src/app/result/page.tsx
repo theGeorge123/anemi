@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Coffee, MapPin, Clock, Star, Shuffle, Send, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface Cafe {
   id: string
@@ -120,7 +121,7 @@ function ResultPageContent() {
           
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Perfect Match!</h1>
-            <p className="text-gray-600">Here's your coffee shop for the meetup</p>
+            <p className="text-gray-600">Here&apos;s your coffee shop for the meetup</p>
           </div>
         </div>
 
@@ -152,9 +153,11 @@ function ResultPageContent() {
               <div className="grid grid-cols-2 gap-3">
                 {cafe.photos.slice(0, 2).map((photo, index) => (
                   <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
-                    <img
+                    <Image
                       src={photo}
                       alt={`${cafe.name} - Photo ${index + 1}`}
+                      fill
+                      style={{ objectFit: 'cover' }}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />

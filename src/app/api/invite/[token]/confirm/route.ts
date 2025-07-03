@@ -46,25 +46,13 @@ export async function POST(
       )
     }
 
-    // Validate that the chosen time is in the available times (if times are provided)
-    const availableTimes = (invite as any).availableTimes || []
-    if (availableTimes.length > 0 && !availableTimes.includes(chosenTime)) {
-      return NextResponse.json(
-        { error: 'Invalid time selected' },
-        { status: 400 }
-      )
-    }
-
-    // Update the invite with the chosen date, time, and invitee info
+    // Update the invite with the chosen date (only field that exists in current schema)
     await prisma.meetupInvite.update({
       where: {
         id: invite.id
       },
       data: {
         chosenDate: chosenDate,
-        chosenTime: chosenTime,
-        inviteeName: inviteeName,
-        inviteeEmail: inviteeEmail,
         status: 'confirmed',
         confirmedAt: new Date()
       }

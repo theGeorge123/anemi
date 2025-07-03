@@ -46,7 +46,7 @@ export function StepContent({
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">👋 Nice to meet you!</h3>
-              <p className="text-gray-600">Let's start with your details</p>
+              <p className="text-gray-600">Let&apos;s get started by entering your details.</p>
             </div>
             <NameInput 
               value={formData.name}
@@ -56,6 +56,7 @@ export function StepContent({
               value={formData.email}
               onChange={(email) => onFormDataChange({ email })}
             />
+            <p className="text-gray-600">Don&apos;t worry, you can change this later.</p>
           </div>
         )
       
@@ -126,8 +127,8 @@ export function StepContent({
         return (
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">💰 What's your budget?</h3>
-              <p className="text-gray-600">We'll find the perfect spot for you</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">💰 What&apos;s your budget?</h3>
+              <p className="text-gray-600">We&apos;ll find the perfect spot for you</p>
             </div>
             <PriceSelector 
               value={formData.priceRange}
@@ -140,7 +141,7 @@ export function StepContent({
         return (
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">🎉 You're all set!</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">🎉 You&apos;re all set!</h3>
               <p className="text-gray-600">Ready to find your perfect coffee spot?</p>
             </div>
             <div className="bg-amber-50 p-6 rounded-lg border border-amber-200">

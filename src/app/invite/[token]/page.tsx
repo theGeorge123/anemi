@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle, User, Mail } from 'lucide-react'
+import Image from 'next/image'
 
 interface InviteData {
   id: string
@@ -143,7 +144,7 @@ export default function InvitePage() {
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Meetup Confirmed!</h1>
           <p className="text-gray-600 mb-6">
-            You've already confirmed this meetup for {inviteData.chosenDate && new Date(inviteData.chosenDate).toLocaleDateString()}.
+            You&apos;ve already confirmed this meetup for {inviteData.chosenDate && new Date(inviteData.chosenDate).toLocaleDateString()}.
           </p>
           <Button onClick={() => router.push('/confirmed')}>
             View Details
@@ -191,9 +192,11 @@ export default function InvitePage() {
               <div className="grid grid-cols-2 gap-3">
                 {inviteData.cafe.photos.slice(0, 2).map((photo, index) => (
                   <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
-                    <img
+                    <Image
                       src={photo}
                       alt={`${inviteData.cafe.name} - Photo ${index + 1}`}
+                      fill
+                      style={{ objectFit: 'cover' }}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />

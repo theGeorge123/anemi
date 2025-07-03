@@ -42,7 +42,7 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Limitation of Liability</h2>
               <p className="text-gray-700 mb-4">
-                Anemi Meets is provided "as is" without warranties of any kind. 
+                Anemi Meets is provided &quot;as is&quot; without warranties of any kind. 
                 We are not responsible for any issues that may arise during meetups 
                 or interactions between users.
               </p>

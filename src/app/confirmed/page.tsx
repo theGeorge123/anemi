@@ -56,10 +56,10 @@ export default function ConfirmedPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-green-600" />
-              What's Next?
+              What&apos;s Next?
             </CardTitle>
             <CardDescription>
-              We've sent confirmation emails to both participants with all the details.
+              We&apos;ve sent confirmation emails to both participants with all the details.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -138,7 +138,7 @@ export default function ConfirmedPage() {
             <li>• Arrive 5 minutes early to secure a good spot</li>
             <li>• Have your phone charged for easy communication</li>
             <li>• Consider bringing a book or laptop as conversation starters</li>
-            <li>• Don't forget to enjoy the coffee and conversation!</li>
+            <li>• Don&apos;t forget to enjoy the coffee and conversation!</li>
           </ul>
         </div>
       </div>

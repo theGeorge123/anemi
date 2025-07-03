@@ -16,7 +16,7 @@ export function PriceSelector({ value, onChange }: PriceSelectorProps) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        What's your budget? 💰
+        What&apos;s your budget? 💰
       </label>
       <div className="space-y-3">
         {priceOptions.map((option) => (
@@ -40,6 +40,7 @@ export function PriceSelector({ value, onChange }: PriceSelectorProps) {
           </button>
         ))}
       </div>
+      <span className="ml-2">Can&apos;t decide?</span>
     </div>
   )
 } 

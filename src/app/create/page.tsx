@@ -69,7 +69,7 @@ export default function CreatePage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">☕ Create a Meetup</h1>
-          <p className="text-gray-600">Let's find you the perfect coffee spot!</p>
+          <p className="text-gray-600">Let&apos;s find you the perfect coffee spot!</p>
         </div>
 
         <Card className="shadow-lg animate-bounceIn">

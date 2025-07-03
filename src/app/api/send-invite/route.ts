@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Generate a unique token for the invite
     const token = randomUUID()
 
-    // Create the invite record (temporarily without availableTimes until migration is applied)
+    // Create the invite record
     const invite = await prisma.meetupInvite.create({
       data: {
         token: token,
@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
         organizerEmail: formData.email,
         cafeId: cafe.id,
         availableDates: dates,
+        availableTimes: times || [],
         status: 'pending',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }

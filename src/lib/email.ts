@@ -40,8 +40,20 @@ export interface InviteEmailData {
     openHours: string;
   };
   dates: string[];
+  times?: string[];
   token: string;
+  inviteLink?: string;
   organizerName: string;
+}
+
+export interface CalendarInviteData {
+  to: string;
+  eventTitle: string;
+  eventDescription: string;
+  eventLocation: string;
+  eventStartTime: string;
+  eventEndTime: string;
+  attendeeName: string;
 }
 
 /**
@@ -223,7 +235,7 @@ export async function sendMeetupCancellation(
  * Send invite email for Tiny-MVP
  */
 export async function sendInviteEmail(data: InviteEmailData) {
-  const inviteUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/invite/${data.token}`;
+  const inviteUrl = data.inviteLink || `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/invite/${data.token}`;
   
   const datesList = data.dates.map(date => {
     const dateObj = new Date(date);
@@ -274,6 +286,63 @@ export async function sendInviteEmail(data: InviteEmailData) {
   return sendEmail({
     to: data.to,
     subject: `☕ Coffee at ${data.cafe.name}?`,
+    html,
+  });
+}
+
+/**
+ * Send calendar invite email
+ */
+export async function sendCalendarInvite(data: CalendarInviteData) {
+  const startDate = new Date(data.eventStartTime)
+  const endDate = new Date(data.eventEndTime)
+  
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #f59e0b;">☕ Coffee Meetup Confirmed!</h2>
+      
+      <p>Hi ${data.attendeeName},</p>
+      
+      <p>Great news! Your coffee meetup has been confirmed. Here are the details:</p>
+      
+      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="margin: 0 0 10px 0; color: #92400e;">${data.eventTitle}</h3>
+        <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${startDate.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}</p>
+        <p style="margin: 5px 0;"><strong>⏰ Time:</strong> ${startDate.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit' 
+        })} - ${endDate.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit' 
+        })}</p>
+        <p style="margin: 5px 0;"><strong>📍 Location:</strong> ${data.eventLocation}</p>
+        <p style="margin: 5px 0;"><strong>📝 Description:</strong> ${data.eventDescription}</p>
+      </div>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0D%0AVERSION:2.0%0D%0ABEGIN:VEVENT%0D%0ADTSTART:${data.eventStartTime.replace(/[-:]/g, '').split('.')[0]}Z%0D%0ADTEND:${data.eventEndTime.replace(/[-:]/g, '').split('.')[0]}Z%0D%0ASUMMARY:${encodeURIComponent(data.eventTitle)}%0D%0ADESCRIPTION:${encodeURIComponent(data.eventDescription)}%0D%0ALOCATION:${encodeURIComponent(data.eventLocation)}%0D%0AEND:VEVENT%0D%0AEND:VCALENDAR" 
+           style="background-color: #f59e0b; color: white; padding: 12px 24px; 
+                  text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;"
+           download="meetup.ics">
+          📅 Add to Calendar
+        </a>
+      </div>
+      
+      <p style="color: #6b7280; font-size: 14px;">
+        We've also sent you a calendar invite. Looking forward to seeing you there!<br>
+        ☕ Anemi Meets
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: data.to,
+    subject: `☕ Confirmed: ${data.eventTitle}`,
     html,
   });
 } 

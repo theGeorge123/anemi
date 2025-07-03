@@ -6,8 +6,9 @@ export async function POST(
 ) {
   try {
     const { prisma } = await import('@/lib/prisma')
+    const { sendCalendarInvite } = await import('@/lib/email')
     const { token } = params
-    const { chosenDate } = await request.json()
+    const { chosenDate, chosenTime, inviteeName, inviteeEmail } = await request.json()
 
     // Validate the invite exists and is not expired
     const invite = await prisma.meetupInvite.findFirst({
@@ -17,6 +18,9 @@ export async function POST(
           gt: new Date()
         },
         deletedAt: null
+      },
+      include: {
+        cafe: true
       }
     })
 
@@ -42,21 +46,75 @@ export async function POST(
       )
     }
 
-    // Update the invite with the chosen date
+    // Validate that the chosen time is in the available times
+    if (invite.availableTimes.length > 0 && !invite.availableTimes.includes(chosenTime)) {
+      return NextResponse.json(
+        { error: 'Invalid time selected' },
+        { status: 400 }
+      )
+    }
+
+    // Update the invite with the chosen date, time, and invitee info
     await prisma.meetupInvite.update({
       where: {
         id: invite.id
       },
       data: {
         chosenDate: chosenDate,
+        chosenTime: chosenTime,
+        inviteeName: inviteeName,
+        inviteeEmail: inviteeEmail,
         status: 'confirmed',
         confirmedAt: new Date()
       }
     })
 
+    // Create the event date by combining chosen date and time
+    const eventDateTime = new Date(chosenDate)
+    if (chosenTime) {
+      const [hours, minutes] = chosenTime.split(':').map(Number)
+      eventDateTime.setHours(hours, minutes, 0, 0)
+    } else {
+      // Default to 2 PM if no time specified
+      eventDateTime.setHours(14, 0, 0, 0)
+    }
+
+    const eventEndTime = new Date(eventDateTime)
+    eventEndTime.setHours(eventEndTime.getHours() + 2) // 2 hour duration
+
+    // Send calendar invites to both parties
+    try {
+      // Send to organizer
+      await sendCalendarInvite({
+        to: invite.organizerEmail,
+        eventTitle: `Coffee Meetup with ${inviteeName}`,
+        eventDescription: `Meeting for coffee at ${invite.cafe.name}`,
+        eventLocation: invite.cafe.address,
+        eventStartTime: eventDateTime.toISOString(),
+        eventEndTime: eventEndTime.toISOString(),
+        attendeeName: invite.organizerName
+      })
+
+      // Send to invitee
+      await sendCalendarInvite({
+        to: inviteeEmail,
+        eventTitle: `Coffee Meetup with ${invite.organizerName}`,
+        eventDescription: `Meeting for coffee at ${invite.cafe.name}`,
+        eventLocation: invite.cafe.address,
+        eventStartTime: eventDateTime.toISOString(),
+        eventEndTime: eventEndTime.toISOString(),
+        attendeeName: inviteeName
+      })
+    } catch (emailError) {
+      console.error('Failed to send calendar invites:', emailError)
+      // Don't fail the request if email fails
+    }
+
     return NextResponse.json({ 
       success: true,
-      chosenDate: chosenDate
+      chosenDate: chosenDate,
+      chosenTime: chosenTime,
+      eventDateTime: eventDateTime.toISOString()
     })
   } catch (error) {
     console.error('Error in invite confirm:', error)

@@ -5,7 +5,9 @@ import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle, User, Mail } from 'lucide-react'
 
 interface InviteData {
   id: string
@@ -16,18 +18,18 @@ interface InviteData {
     address: string
     priceRange: string
     rating: number
-    openHours: string
+    hours: string
     isVerified: boolean
     description?: string
+    photos?: string[]
   }
-  formData: {
-    name: string
-    email: string
-    dates: string[]
-    priceRange: string
-  }
+  organizerName: string
+  organizerEmail: string
+  availableDates: string[]
+  availableTimes: string[]
   status: 'pending' | 'confirmed' | 'expired'
   chosenDate?: string
+  chosenTime?: string
 }
 
 export default function InvitePage() {
@@ -35,6 +37,9 @@ export default function InvitePage() {
   const router = useRouter()
   const [inviteData, setInviteData] = useState<InviteData | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>('')
+  const [selectedTime, setSelectedTime] = useState<string>('')
+  const [inviteeName, setInviteeName] = useState<string>('')
+  const [inviteeEmail, setInviteeEmail] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
   const [isConfirming, setIsConfirming] = useState(false)
   const [error, setError] = useState<string>('')
@@ -65,8 +70,8 @@ export default function InvitePage() {
   }, [token])
 
   const handleConfirm = async () => {
-    if (!selectedDate) {
-      alert('Please select a date')
+    if (!selectedDate || !selectedTime || !inviteeName || !inviteeEmail) {
+      alert('Please fill in all fields')
       return
     }
 
@@ -75,7 +80,12 @@ export default function InvitePage() {
       const response = await fetch(`/api/invite/${token}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chosenDate: selectedDate })
+        body: JSON.stringify({ 
+          chosenDate: selectedDate,
+          chosenTime: selectedTime,
+          inviteeName: inviteeName,
+          inviteeEmail: inviteeEmail
+        })
       })
       
       if (response.ok) {
@@ -93,9 +103,10 @@ export default function InvitePage() {
 
   const getPriceDisplay = (priceRange: string) => {
     switch (priceRange) {
-      case 'cheap': return '$'
-      case 'normal': return '$$'
-      case 'expensive': return '$$$'
+      case 'BUDGET': return '$'
+      case 'MODERATE': return '$$'
+      case 'EXPENSIVE': return '$$$'
+      case 'LUXURY': return '$$$$'
       default: return '$$'
     }
   }
@@ -148,7 +159,7 @@ export default function InvitePage() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Coffee Meetup Invite</h1>
           <p className="text-gray-600">
-            {inviteData.formData.name} invited you for coffee at this great spot!
+            {inviteData.organizerName} invited you for coffee at this great spot!
           </p>
         </div>
 
@@ -173,6 +184,25 @@ export default function InvitePage() {
               )}
             </div>
           </CardHeader>
+          
+          {/* Cafe Photos */}
+          {inviteData.cafe.photos && inviteData.cafe.photos.length > 0 && (
+            <div className="px-6 pb-4">
+              <div className="grid grid-cols-2 gap-3">
+                {inviteData.cafe.photos.slice(0, 2).map((photo, index) => (
+                  <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
+                    <img
+                      src={photo}
+                      alt={`${inviteData.cafe.name} - Photo ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2 text-gray-600">
               <MapPin className="w-4 h-4" />
@@ -181,7 +211,7 @@ export default function InvitePage() {
             
             <div className="flex items-center gap-2 text-gray-600">
               <Clock className="w-4 h-4" />
-              <span>{inviteData.cafe.openHours}</span>
+              <span>{inviteData.cafe.hours}</span>
             </div>
             
             <div className="flex items-center gap-2">
@@ -190,6 +220,43 @@ export default function InvitePage() {
               <Badge variant="outline" className="ml-auto">
                 {getPriceDisplay(inviteData.cafe.priceRange)}
               </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Invitee Information */}
+        <Card className="shadow-lg mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Your Information
+            </CardTitle>
+            <CardDescription>
+              Please provide your details so we can send you the confirmation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                value={inviteeName}
+                onChange={(e) => setInviteeName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your.email@example.com"
+                value={inviteeEmail}
+                onChange={(e) => setInviteeEmail(e.target.value)}
+                className="mt-1"
+              />
             </div>
           </CardContent>
         </Card>
@@ -207,7 +274,7 @@ export default function InvitePage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {inviteData.formData.dates.map((date) => {
+              {inviteData.availableDates.map((date: string) => {
                 const dateObj = new Date(date)
                 const isSelected = selectedDate === date
                 return (
@@ -233,10 +300,45 @@ export default function InvitePage() {
           </CardContent>
         </Card>
 
+        {/* Time Selection */}
+        {selectedDate && inviteData.availableTimes.length > 0 && (
+          <Card className="shadow-lg mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Choose a Time
+              </CardTitle>
+              <CardDescription>
+                Select your preferred time for the meetup
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {inviteData.availableTimes.map((time: string) => {
+                  const isSelected = selectedTime === time
+                  return (
+                    <button
+                      key={time}
+                      onClick={() => setSelectedTime(time)}
+                      className={`p-4 text-center border rounded-lg transition-colors ${
+                        isSelected
+                          ? 'bg-amber-100 border-amber-500 text-amber-700'
+                          : 'bg-white border-gray-300 hover:border-amber-300'
+                      }`}
+                    >
+                      <div className="font-medium">{time}</div>
+                    </button>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Confirm Button */}
         <Button
           onClick={handleConfirm}
-          disabled={!selectedDate || isConfirming}
+          disabled={!selectedDate || !selectedTime || !inviteeName || !inviteeEmail || isConfirming}
           className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3"
         >
           {isConfirming ? (

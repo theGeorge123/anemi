@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { prisma } = await import('@/lib/prisma')
-    const { cafe, formData, dates } = await request.json()
+    const { cafe, formData, dates, times } = await request.json()
 
     // Generate a unique token for the invite
     const token = randomUUID()
@@ -30,18 +30,25 @@ export async function POST(request: NextRequest) {
         organizerEmail: formData.email,
         cafeId: cafe.id,
         availableDates: dates,
+        availableTimes: times || [],
         status: 'pending',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       }
     })
 
-    // Send invite email
+    // Generate invite link
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const inviteLink = `${baseUrl}/invite/${token}`
+
+    // Send invite email with the link
     try {
       await sendInviteEmail({
         to: formData.email, // For now, send to organizer as demo
         cafe: cafe,
         dates: dates,
+        times: times,
         token: token,
+        inviteLink: inviteLink,
         organizerName: formData.name
       })
     } catch (emailError) {
@@ -52,7 +59,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       inviteId: invite.id,
-      token: token 
+      token: token,
+      inviteLink: inviteLink
     })
   } catch (error) {
     console.error('Error in send-invite:', error)

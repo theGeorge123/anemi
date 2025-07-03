@@ -158,9 +158,13 @@ model MeetupInvite {
   token           String    @unique
   organizerName   String
   organizerEmail  String
+  inviteeName     String?
+  inviteeEmail    String?
   cafeId          String
   availableDates  String[]  // Array of ISO date strings
+  availableTimes  String[]  // Array of time preferences
   chosenDate      String?   // ISO date string
+  chosenTime      String?   // Selected time
   status          String    @default("pending") // pending, confirmed, expired
   expiresAt       DateTime
   confirmedAt     DateTime?

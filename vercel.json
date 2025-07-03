@@ -1,0 +1,11 @@
+{
+  "ignoreCommand": "echo 'Ignoring mcp-supabase for Vercel build'",
+  "builds": [
+    { "src": "src/app/**", "use": "@vercel/next" }
+  ],
+  "functions": {
+    "api/**.ts": {
+      "excludeFiles": "mcp-supabase/**"
+    }
+  }
+} 

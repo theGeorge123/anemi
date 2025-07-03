@@ -46,8 +46,9 @@ export async function POST(
       )
     }
 
-    // Validate that the chosen time is in the available times
-    if (invite.availableTimes.length > 0 && !invite.availableTimes.includes(chosenTime)) {
+    // Validate that the chosen time is in the available times (if times are provided)
+    const availableTimes = (invite as any).availableTimes || []
+    if (availableTimes.length > 0 && !availableTimes.includes(chosenTime)) {
       return NextResponse.json(
         { error: 'Invalid time selected' },
         { status: 400 }

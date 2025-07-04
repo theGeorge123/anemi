@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Coffee, MapPin, Clock, Star, CheckCircle, Mail, Copy, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 
-export default function ConfirmedPage() {
+function ConfirmedContent() {
   const searchParams = useSearchParams()
   const [copied, setCopied] = useState(false)
   const inviteLink = searchParams.get('inviteLink')
@@ -96,8 +96,6 @@ export default function ConfirmedPage() {
           </CardContent>
         </Card>
 
-
-
         {/* Action Buttons */}
         <div className="space-y-4">
           <Button asChild className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3">
@@ -125,5 +123,27 @@ export default function ConfirmedPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="animate-pulse">
+          <div className="w-16 h-16 bg-green-200 rounded-full mx-auto mb-4"></div>
+          <div className="h-8 bg-gray-200 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded mb-8"></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function ConfirmedPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ConfirmedContent />
+    </Suspense>
   )
 } 

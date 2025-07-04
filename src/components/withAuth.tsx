@@ -5,12 +5,20 @@ import { useRouter } from 'next/navigation'
 
 export function withAuth(Page: React.ComponentType) {
   return function Protected(props: any) {
-    const { session } = useSupabase()
+    const { session, client } = useSupabase()
     const router = useRouter()
+    
     React.useEffect(() => {
-      if (!session) router.replace('/login')
-    }, [session, router])
+      // Only redirect if we have a client and no session
+      if (client && !session) {
+        router.replace('/login')
+      }
+    }, [session, client, router])
+    
+    // Show loading state if client is not available yet
+    if (!client) return <div>Loading...</div>
     if (!session) return null
+    
     return <Page {...props} />
   }
 } 

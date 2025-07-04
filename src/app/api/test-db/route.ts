@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
+    // Check if we have the required environment variables
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'DATABASE_URL environment variable not set'
+        },
+        { status: 500 }
+      )
+    }
+
     const { prisma } = await import('@/lib/prisma')
     
     // Test basic database connection

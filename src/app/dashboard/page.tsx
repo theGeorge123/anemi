@@ -8,7 +8,7 @@ const Dashboard = withAuth(() => {
   const [meetups, setMeetups] = useState<any[]>([])
 
   useEffect(() => {
-    if (!session) return
+    if (!session || !client) return
     client
       .from('Meetup')
       .select('id,title,date')

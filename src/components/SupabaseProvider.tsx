@@ -3,13 +3,15 @@ import React, { createContext, useContext, useMemo, useState, useEffect, ReactNo
 import { Session, SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase-browser'
 
-type SupabaseContextType = { session: Session | null, client: SupabaseClient }
+type SupabaseContextType = { session: Session | null, client: SupabaseClient | null }
 const SupabaseContext = createContext<SupabaseContextType | null>(null)
 
 export function SupabaseProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
+    if (!supabase) return
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setSession(session)
     })

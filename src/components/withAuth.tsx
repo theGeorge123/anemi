@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import { useSupabase } from './SupabaseProvider'
 import { useRouter } from 'next/navigation'

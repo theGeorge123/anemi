@@ -26,7 +26,8 @@ export async function GET(
             rating: true,
             hours: true,
             isVerified: true,
-            description: true
+            description: true,
+            photos: true
           }
         }
       }
@@ -49,22 +50,21 @@ export async function GET(
       return 'Hours not available'
     }
 
-    // Format the response with openHours
+    // Format the response to match frontend expectations
     const response = {
       id: invite.id,
       token: invite.token,
       cafe: {
         ...invite.cafe,
-        openHours: formatHours(invite.cafe.hours)
+        hours: formatHours(invite.cafe.hours)
       },
-      formData: {
-        name: invite.organizerName,
-        email: invite.organizerEmail,
-        dates: invite.availableDates,
-        priceRange: invite.cafe.priceRange
-      },
+      organizerName: invite.organizerName,
+      organizerEmail: invite.organizerEmail,
+      availableDates: invite.availableDates || [],
+      availableTimes: invite.availableTimes || [],
       status: invite.status,
-      chosenDate: invite.chosenDate
+      chosenDate: invite.chosenDate,
+      chosenTime: invite.chosenTime
     }
 
     return NextResponse.json(response)

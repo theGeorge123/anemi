@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 
 // Simple in-memory rate limiter
-const memoryStore = new Map<string, { count: number; resetTime: number }>()
+export const memoryStore = new Map<string, { count: number; resetTime: number }>()
 
 export async function rateLimit(request: NextRequest, maxRequests = 10, windowMs = 10000) {
   const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? '127.0.0.1'

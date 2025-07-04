@@ -81,12 +81,14 @@ function ResultPageContent() {
         body: JSON.stringify({
           cafe,
           formData,
-          dates: formData.dates
+          dates: formData.dates,
+          times: formData.times
         })
       })
       
       if (response.ok) {
-        router.push('/confirmed')
+        const result = await response.json()
+        router.push(`/confirmed?inviteLink=${encodeURIComponent(result.inviteLink)}`)
       } else {
         alert('Failed to send invite. Please try again.')
       }

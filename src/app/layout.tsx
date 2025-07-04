@@ -4,6 +4,7 @@ import { Providers } from '@/components/providers';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics';
 import '@/styles/globals.css';
+import { SupabaseProvider } from '@/components/SupabaseProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -106,15 +107,17 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <Providers>
-          <div className="min-h-screen bg-background">
-            <main className="flex-1">
-              {children}
-            </main>
-          </div>
-          <Toaster />
-          <Analytics />
-        </Providers>
+        <SupabaseProvider>
+          <Providers>
+            <div className="min-h-screen bg-background">
+              <main className="flex-1">
+                {children}
+              </main>
+            </div>
+            <Toaster />
+            <Analytics />
+          </Providers>
+        </SupabaseProvider>
       </body>
     </html>
   );

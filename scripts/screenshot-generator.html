@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anemi Meets - Screenshot Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+        
+        .description {
+            font-size: 1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .description {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anemi Meets</h1>
+        <div class="subtitle">Coffee Meetups</div>
+        <div class="description">
+            Discover great local spots with friends.<br>
+            Create and join coffee meetups in Amsterdam & Rotterdam.
+        </div>
+        <a href="#" class="cta-button">Start a Meetup</a>
+    </div>
+    
+    <script>
+        // Instructions for manual screenshot generation
+        console.log(`
+        📸 Screenshot Generation Instructions:
+        
+        1. Desktop Screenshot (1280x720):
+           - Open DevTools (F12)
+           - Set device to 1280x720
+           - Take full page screenshot
+           - Save as: public/screenshot-desktop.png
+        
+        2. Mobile Screenshot (390x844):
+           - Open DevTools (F12)
+           - Set device to iPhone 12 Pro (390x844)
+           - Take full page screenshot
+           - Save as: public/screenshot-mobile.png
+        
+        3. Alternative: Use browser's built-in screenshot tool
+           - Right-click → Inspect
+           - Device toolbar → Select device
+           - Capture screenshot
+        `);
+    </script>
+</body>
+</html> 

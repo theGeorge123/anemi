@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 export function Header() {
+  const { session } = useSupabase()
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -24,6 +26,11 @@ export function Header() {
           <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
             About
           </Link>
+          {session && (
+            <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+              My Meetups
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center space-x-4">

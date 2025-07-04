@@ -47,6 +47,7 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'platform-lookaside.fbsbx.com',
       'graph.facebook.com',
+      'images.unsplash.com',
     ],
     formats: ['image/webp', 'image/avif'],
   },

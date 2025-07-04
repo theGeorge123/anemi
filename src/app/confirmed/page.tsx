@@ -3,42 +3,15 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle, Mail, ExternalLink } from 'lucide-react'
+import { Coffee, MapPin, Clock, Star, CheckCircle, Mail, Copy, Share2 } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 export default function ConfirmedPage() {
-  const handleAddToCalendar = (type: 'google' | 'outlook' | 'apple') => {
-    // This would be populated with actual meetup data
-    const event = {
-      title: 'Coffee Meetup',
-      description: 'Meeting for coffee and conversation',
-      location: 'Coffee Shop Name',
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours later
-    }
-
-    let url = ''
-    switch (type) {
-      case 'google':
-        url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}&dates=${event.startDate.replace(/[-:]/g, '').split('.')[0]}Z/${event.endDate.replace(/[-:]/g, '').split('.')[0]}Z`
-        break
-      case 'outlook':
-        url = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(event.title)}&body=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}&startdt=${event.startDate}&enddt=${event.endDate}`
-        break
-      case 'apple':
-        url = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0D%0AVERSION:2.0%0D%0ABEGIN:VEVENT%0D%0AURL:${encodeURIComponent(window.location.href)}%0D%0ADTSTART:${event.startDate.replace(/[-:]/g, '').split('.')[0]}Z%0D%0ADTEND:${event.endDate.replace(/[-:]/g, '').split('.')[0]}Z%0D%0ASUMMARY:${encodeURIComponent(event.title)}%0D%0ADESCRIPTION:${encodeURIComponent(event.description)}%0D%0ALOCATION:${encodeURIComponent(event.location)}%0D%0AEND:VEVENT%0D%0AEND:VCALENDAR`
-        break
-    }
-    
-    if (type === 'apple') {
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'meetup.ics'
-      link.click()
-    } else {
-      window.open(url, '_blank')
-    }
-  }
+  const searchParams = useSearchParams()
+  const [copied, setCopied] = useState(false)
+  const inviteLink = searchParams.get('inviteLink')
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
@@ -51,6 +24,54 @@ export default function ConfirmedPage() {
           </p>
         </div>
 
+        {/* Invite Link Card */}
+        {inviteLink && (
+          <Card className="shadow-lg mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-blue-600" />
+                Share Your Invite
+              </CardTitle>
+              <CardDescription>
+                Send this link to your friend so they can choose their preferred date and time
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                    📱 Share via WhatsApp, Email, or any app
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={inviteLink}
+                    readOnly
+                    className="flex-1 p-2 border border-gray-300 rounded text-sm bg-white"
+                  />
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(inviteLink)
+                      setCopied(true)
+                      setTimeout(() => setCopied(false), 2000)
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <Copy className="w-4 h-4" />
+                    {copied ? 'Copied!' : 'Copy'}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">
+                  Your friend will be able to choose their preferred date and time from your available options
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Success Card */}
         <Card className="shadow-lg mb-8">
           <CardHeader>
@@ -59,62 +80,23 @@ export default function ConfirmedPage() {
               What&apos;s Next?
             </CardTitle>
             <CardDescription>
-              We&apos;ve sent confirmation emails to both participants with all the details.
+              Share the invite link with your friend and wait for their confirmation
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-green-800 mb-2">✅ Meetup Details Sent</h3>
+              <h3 className="font-semibold text-green-800 mb-2">✅ Invite Created Successfully</h3>
               <ul className="text-sm text-green-700 space-y-1">
-                <li>• Confirmation email sent to both participants</li>
-                <li>• Calendar invites included</li>
-                <li>• Coffee shop details and directions</li>
-                <li>• Reminder email will be sent 24 hours before</li>
+                <li>• Your friend will receive the invite link</li>
+                <li>• They can choose their preferred date and time</li>
+                <li>• You&apos;ll both get confirmation emails once they confirm</li>
+                <li>• Calendar invites will be included in the final confirmation</li>
               </ul>
             </div>
           </CardContent>
         </Card>
 
-        {/* Add to Calendar */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Add to Calendar
-            </CardTitle>
-            <CardDescription>
-              Add this meetup to your calendar to never miss it
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Button
-                onClick={() => handleAddToCalendar('google')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Google Calendar
-              </Button>
-              <Button
-                onClick={() => handleAddToCalendar('outlook')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Outlook
-              </Button>
-              <Button
-                onClick={() => handleAddToCalendar('apple')}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Apple Calendar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Action Buttons */}
         <div className="space-y-4">

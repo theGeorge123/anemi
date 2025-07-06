@@ -35,12 +35,39 @@ export function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm">
-            Sign In
-          </Button>
-          <Button size="sm">
-            Get Started
-          </Button>
+          {client && session ? (
+            <>
+              <Link href="/dashboard">
+                <Button variant="outline" size="sm">
+                  Dashboard
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  if (client) {
+                    await client.auth.signOut()
+                  }
+                }}
+              >
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/signin">
+                <Button variant="outline" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

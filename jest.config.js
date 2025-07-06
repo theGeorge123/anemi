@@ -15,8 +15,8 @@ const customJestConfig = {
     global: {
       lines: 30,
       statements: 30,
-      branches: 20,
-      functions: 25
+      branches: 30,
+      functions: 30
     }
   },
   collectCoverageFrom: [
@@ -43,6 +43,9 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(isows|@supabase)/)',
+  ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

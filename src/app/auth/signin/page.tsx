@@ -33,12 +33,13 @@ export default function SignInPage() {
         toast({
           title: "Error",
           description: error.message,
-          variant: "destructive",
+          type: "error",
         })
       } else {
         toast({
           title: "Success",
           description: "Signed in successfully!",
+          type: "success",
         })
         router.push('/dashboard')
       }
@@ -46,7 +47,7 @@ export default function SignInPage() {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setLoading(false)
@@ -69,14 +70,14 @@ export default function SignInPage() {
         toast({
           title: "Error",
           description: error.message,
-          variant: "destructive",
+          type: "error",
         })
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "An unexpected error occurred",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       setLoading(false)

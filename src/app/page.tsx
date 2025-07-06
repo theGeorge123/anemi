@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Coffee, Users } from 'lucide-react';
+import { Coffee, Users, LogIn, Calendar } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -18,12 +18,32 @@ export default function HomePage() {
           </p>
         </div>
 
-        <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
-          <Link href="/create">
-            <Users className="w-5 h-5 mr-2" />
-            Start a Meetup
-          </Link>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
+            <Link href="/create">
+              <Users className="w-5 h-5 mr-2" />
+              Start a Meetup
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Link href="/auth/signin">
+              <LogIn className="w-5 h-5 mr-2" />
+              Sign In
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Link href="/auth/signup">
+              <Calendar className="w-5 h-5 mr-2" />
+              Join Anemi
+            </Link>
+          </Button>
+        </div>
+        
+        <p className="mt-6 text-sm text-gray-500">
+          Already have meetups? <Link href="/auth/signin" className="text-amber-600 hover:underline">Sign in to view them</Link>
+        </p>
       </div>
     </div>
   );

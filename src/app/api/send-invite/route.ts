@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { prisma } = await import('@/lib/prisma')
-    const { cafe, formData, dates, times } = await request.json()
+    const { cafe, formData, dates, times, userId } = await request.json()
 
     // Server-side validation
     if (!formData || typeof formData.name !== 'string' || formData.name.length < 2 || formData.name.length > 50) {
@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
         availableDates: dates,
         availableTimes: times || [],
         status: 'pending',
-        expiresAt: addDays(new Date(), 7)
+        expiresAt: addDays(new Date(), 7),
+        createdBy: userId || null,
       }
     })
 
@@ -88,7 +89,8 @@ export async function POST(request: NextRequest) {
       success: true, 
       inviteId: invite.id,
       token: token,
-      inviteLink: inviteLink
+      inviteLink: inviteLink,
+      message: `🎉 Your coffee meetup is brewing! Share this magic link with your friend: ${inviteLink} \nWhoever clicks it first gets to pick the date! ☕️✨`
     })
   } catch (error) {
     console.error('Error in send-invite:', error)

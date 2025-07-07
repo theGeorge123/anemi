@@ -12,6 +12,7 @@ import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -37,7 +38,7 @@ export default function SignUpPage() {
   } = useAsyncOperation(async () => {
     if (!client) throw new Error('No Supabase client')
     if (password !== confirmPassword) throw new Error('Passwords do not match')
-    const { error } = await client.auth.signUp({
+    const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
@@ -45,9 +46,16 @@ export default function SignUpPage() {
       },
     })
     if (error) throw error
+    if (data?.user?.id) {
+      await fetch('/api/create-user-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: data.user.id, email }),
+      })
+    }
   }, {
     onSuccess: () => {
-      ErrorService.showToast('Check your email to verify your account!', 'success')
+      ErrorService.showToast('🎉 Account created! Check your email to verify and start your coffee adventure!', 'success')
       router.push('/auth/verify')
     },
     onError: (err) => {
@@ -91,7 +99,7 @@ export default function SignUpPage() {
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Create your account</CardTitle>
-            <CardDescription className="text-base text-gray-500">Join Anemi Meets to start creating coffee meetups.</CardDescription>
+            <CardDescription className="text-base text-gray-500">Sign up in seconds and unlock a world of coffee meetups, new friends, and good vibes. ☕️✨</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-5">

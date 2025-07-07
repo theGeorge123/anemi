@@ -11,8 +11,9 @@ import { getOrSetCsrfToken } from '@/lib/csrf'
 import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
 import { MeetupWizard } from '@/components/meetups/MeetupWizard'
+import { withAuth } from '@/components/withAuth'
 
-export default function CreatePage() {
+const CreateMeetupPage = withAuth(() => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -24,4 +25,6 @@ export default function CreatePage() {
       </div>
     </div>
   )
-} 
+})
+
+export default CreateMeetupPage 

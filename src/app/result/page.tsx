@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { getOrSetCsrfToken } from '@/lib/csrf'
 import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 interface Cafe {
   id: string
@@ -28,6 +29,7 @@ function ResultPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const { session } = useSupabase();
 
   // Always parse params, even if invalid, to keep hooks order stable
   const cafeParam = searchParams.get('cafe')
@@ -84,7 +86,8 @@ function ResultPageContent() {
         cafe,
         formData,
         dates: formData?.dates,
-        times: formData?.times
+        times: formData?.times,
+        userId: session?.user.id,
       })
     });
     if (!response.ok) {

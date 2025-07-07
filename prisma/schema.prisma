@@ -171,6 +171,7 @@ model MeetupInvite {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime? // Soft delete
+  createdBy       String?   // User ID of creator
 
   cafe CoffeeShop @relation(fields: [cafeId], references: [id], onDelete: Cascade)
 
@@ -178,6 +179,7 @@ model MeetupInvite {
   @@index([status])
   @@index([expiresAt])
   @@index([deletedAt])
+  @@index([createdBy])
 }
 
 model CoffeeShop {

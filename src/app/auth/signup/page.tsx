@@ -20,6 +20,9 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('handleSignUp called')
+    console.log('client:', client)
+    console.log('email:', email, 'password:', password, 'confirmPassword:', confirmPassword)
     if (!client) return
 
     if (password !== confirmPassword) {

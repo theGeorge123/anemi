@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics';
 import '@/styles/globals.css';
 import { SupabaseProvider } from '@/components/SupabaseProvider';
-import './i18n';
+import '@/i18n';
 
 const inter = Inter({
   subsets: ['latin'],

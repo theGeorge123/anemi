@@ -89,10 +89,14 @@ describe('Location Utils', () => {
       
       const sorted = sortByDistance(locations, center)
       
-      expect(sorted[0].name).toBe('Center')
-      expect(sorted[1].name).toBe('East')
-      expect(sorted[2].name).toBe('North')
-      expect(sorted[3].name).toBe('South')
+      expect(sorted[0]).toBeDefined()
+      expect(sorted[0]?.name).toBe('Center')
+      expect(sorted[1]).toBeDefined()
+      expect(sorted[1]?.name).toBe('East')
+      expect(sorted[2]).toBeDefined()
+      expect(sorted[2]?.name).toBe('North')
+      expect(sorted[3]).toBeDefined()
+      expect(sorted[3]?.name).toBe('South')
     })
 
     it('should handle empty array', () => {
@@ -114,7 +118,8 @@ describe('Location Utils', () => {
       const nearby = filterByDistance(locations, center, 5)
       
       expect(nearby).toHaveLength(2)
-      expect(nearby.find(l => l.name === 'Far')).toBeUndefined()
+      const far = nearby.find(l => l.name === 'Far')
+      expect(far).toBeUndefined()
     })
 
     it('should handle empty array', () => {

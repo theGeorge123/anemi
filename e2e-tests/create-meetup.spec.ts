@@ -25,7 +25,7 @@ test.describe('Create Meetup Flow', () => {
     const nextWeek = new Date()
     nextWeek.setDate(nextWeek.getDate() + 7)
     const dateString = nextWeek.toISOString().split('T')[0]
-    await page.fill('input[type="date"]', dateString)
+    await page.fill('input[type="date"]', dateString ?? '')
     
     // Select time
     await page.selectOption('select[name="time"]', '14:00')
@@ -41,6 +41,7 @@ test.describe('Create Meetup Flow', () => {
     
     // Verify a cafe was selected
     const cafeName = await page.textContent('[data-testid="selected-cafe"]')
+    if (typeof cafeName !== 'string') throw new Error('Cafe name not found')
     expect(cafeName).toBeTruthy()
     expect(cafeName).not.toBe('')
     expect(cafeName).not.toBeNull()

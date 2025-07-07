@@ -74,7 +74,7 @@ export default function InvitePage() {
     if (token) {
       loadInviteAsync()
     }
-  }, [token])
+  }, [token, loadInviteAsync])
 
   const {
     execute: confirmAsync,

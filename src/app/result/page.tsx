@@ -28,27 +28,18 @@ function ResultPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  
+
+  // Always parse params, even if invalid, to keep hooks order stable
   const cafeParam = searchParams.get('cafe')
   const formParam = searchParams.get('form')
-  
-  if (!cafeParam || !formParam) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Invalid Request</h1>
-          <p className="text-gray-600 mb-6">Please start over and create a new meetup.</p>
-          <Button asChild>
-            <Link href="/create">Create New Meetup</Link>
-          </Button>
-        </div>
-      </div>
-    )
-  }
+  let cafe: Cafe | null = null
+  let formData: any = null
+  try {
+    if (cafeParam) cafe = JSON.parse(decodeURIComponent(cafeParam))
+    if (formParam) formData = JSON.parse(decodeURIComponent(formParam))
+  } catch {}
 
-  const cafe: Cafe = JSON.parse(decodeURIComponent(cafeParam))
-  const formData = JSON.parse(decodeURIComponent(formParam))
-
+  // Always call hooks unconditionally
   const {
     execute: shuffleAgainAsync,
     isLoading: shuffleLoading,
@@ -60,9 +51,9 @@ function ResultPageContent() {
         'Content-Type': 'application/json',
         'x-csrf-token': getOrSetCsrfToken(),
       },
-      body: JSON.stringify({ 
-        priceRange: formData.priceRange,
-        city: formData.city 
+      body: JSON.stringify({
+        priceRange: formData?.priceRange,
+        city: formData?.city
       })
     });
     if (!response.ok) {
@@ -92,8 +83,8 @@ function ResultPageContent() {
       body: JSON.stringify({
         cafe,
         formData,
-        dates: formData.dates,
-        times: formData.times
+        dates: formData?.dates,
+        times: formData?.times
       })
     });
     if (!response.ok) {
@@ -108,6 +99,20 @@ function ResultPageContent() {
       ErrorService.showToast(ErrorService.handleError(err), 'error');
     },
   });
+
+  if (!cafe || !formData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Invalid Request</h1>
+          <p className="text-gray-600 mb-6">Please start over and create a new meetup.</p>
+          <Button asChild>
+            <Link href="/create">Create New Meetup</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   const handleShuffleAgain = () => {
     shuffleAgainAsync();

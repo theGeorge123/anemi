@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 
 export function useFormValidation<T extends Record<string, any>>(

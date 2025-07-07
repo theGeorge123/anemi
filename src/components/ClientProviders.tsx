@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LanguageService } from '@/lib/language-service';
+import { SupabaseProvider } from './SupabaseProvider';
 
 // Simple context for the Tiny-MVP
 interface AppContextType {
@@ -64,12 +65,14 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ToasterProvider>
-      <AppProvider>
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
-      </AppProvider>
-    </ToasterProvider>
+    <SupabaseProvider>
+      <ToasterProvider>
+        <AppProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </AppProvider>
+      </ToasterProvider>
+    </SupabaseProvider>
   );
 } 

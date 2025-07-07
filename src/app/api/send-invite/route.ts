@@ -2,7 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 import { addDays } from 'date-fns'
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 export async function POST(request: NextRequest) {
+  // CSRF protection: double-submit cookie pattern
+  const csrfHeader = request.headers.get('x-csrf-token');
+  const csrfCookie = request.cookies.get('csrf_token')?.value;
+  if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
+    return NextResponse.json(
+      { error: 'Invalid CSRF token' },
+      { status: 403 }
+    );
+  }
   try {
     const { rateLimit } = await import('@/lib/rate-limit')
     const { sendInviteEmail } = await import('@/lib/email')
@@ -19,6 +32,20 @@ export async function POST(request: NextRequest) {
 
     const { prisma } = await import('@/lib/prisma')
     const { cafe, formData, dates, times } = await request.json()
+
+    // Server-side validation
+    if (!formData || typeof formData.name !== 'string' || formData.name.length < 2 || formData.name.length > 50) {
+      return NextResponse.json({ error: 'Invalid name' }, { status: 400 })
+    }
+    if (!formData.email || !isValidEmail(formData.email)) {
+      return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
+    }
+    if (!Array.isArray(dates) || dates.length === 0) {
+      return NextResponse.json({ error: 'At least one date is required' }, { status: 400 })
+    }
+    if (times && !Array.isArray(times)) {
+      return NextResponse.json({ error: 'Times must be an array' }, { status: 400 })
+    }
 
     // Generate a unique token for the invite
     const token = randomUUID()

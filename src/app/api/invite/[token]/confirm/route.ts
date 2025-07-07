@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { token: string } }
@@ -9,6 +13,20 @@ export async function POST(
     const { sendCalendarInvite } = await import('@/lib/email')
     const { token } = params
     const { chosenDate, chosenTime, inviteeName, inviteeEmail } = await request.json()
+
+    // Server-side validation
+    if (!inviteeName || typeof inviteeName !== 'string' || inviteeName.length < 2 || inviteeName.length > 50) {
+      return NextResponse.json({ error: 'Invalid invitee name' }, { status: 400 })
+    }
+    if (!inviteeEmail || !isValidEmail(inviteeEmail)) {
+      return NextResponse.json({ error: 'Invalid invitee email' }, { status: 400 })
+    }
+    if (!chosenDate || typeof chosenDate !== 'string') {
+      return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
+    }
+    if (chosenTime && typeof chosenTime !== 'string') {
+      return NextResponse.json({ error: 'Invalid time' }, { status: 400 })
+    }
 
     // Validate the invite exists and is not expired
     const invite = await prisma.meetupInvite.findFirst({

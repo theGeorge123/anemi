@@ -1,6 +1,8 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LanguageService } from '@/lib/language-service';
 
 // Simple context for the Tiny-MVP
 interface AppContextType {
@@ -34,11 +36,39 @@ function ToasterProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+interface LanguageContextType {
+  changeLanguage: (lang: string) => void;
+}
+
+export const LanguageContext = createContext<LanguageContextType>({ changeLanguage: () => {} });
+
+export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    const preferredLang = LanguageService.getPreferredLanguage();
+    i18n.changeLanguage(preferredLang);
+  }, [i18n]);
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    LanguageService.setPreferredLanguage(lang);
+  };
+
+  return (
+    <LanguageContext.Provider value={{ changeLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ToasterProvider>
       <AppProvider>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </AppProvider>
     </ToasterProvider>
   );

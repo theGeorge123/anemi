@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle, User, Mail } from 'lucide-react'
 import Image from 'next/image'
+import { getOrSetCsrfToken } from '@/lib/csrf'
+import { useAsyncOperation } from '@/lib/use-async-operation'
+import { ErrorService } from '@/lib/error-service'
 
 interface InviteData {
   id: string
@@ -47,59 +50,69 @@ export default function InvitePage() {
 
   const token = params.token as string
 
-  useEffect(() => {
-    const loadInvite = async () => {
-      try {
-        const response = await fetch(`/api/invite/${token}`)
-        if (response.ok) {
-          const data = await response.json()
-          setInviteData(data)
-        } else {
-          setError('Invite not found or has expired')
-        }
-      } catch (error) {
-        console.error('Error loading invite:', error)
-        setError('Failed to load invite')
-      } finally {
-        setIsLoading(false)
-      }
+  const {
+    execute: loadInviteAsync,
+    isLoading: inviteLoading,
+    error: inviteError,
+  } = useAsyncOperation(async () => {
+    const response = await fetch(`/api/invite/${token}`)
+    if (!response.ok) {
+      throw new Error('Invite not found or has expired')
     }
+    return response.json()
+  }, {
+    onSuccess: (data) => {
+      setInviteData(data)
+    },
+    onError: (err) => {
+      setError(ErrorService.handleError(err))
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
 
+  useEffect(() => {
     if (token) {
-      loadInvite()
+      loadInviteAsync()
     }
   }, [token])
 
-  const handleConfirm = async () => {
+  const {
+    execute: confirmAsync,
+    isLoading: confirmLoading,
+    error: confirmError,
+  } = useAsyncOperation(async () => {
+    const response = await fetch(`/api/invite/${token}/confirm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': getOrSetCsrfToken(),
+      },
+      body: JSON.stringify({ 
+        chosenDate: selectedDate,
+        chosenTime: selectedTime,
+        inviteeName: inviteeName,
+        inviteeEmail: inviteeEmail
+      })
+    })
+    if (!response.ok) {
+      throw new Error('Failed to confirm meetup.')
+    }
+    return response.json()
+  }, {
+    onSuccess: () => {
+      router.push('/confirmed')
+    },
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
+
+  const handleConfirm = () => {
     if (!selectedDate || !selectedTime || !inviteeName || !inviteeEmail) {
-      alert('Please fill in all fields')
+      ErrorService.showToast('Please fill in all fields', 'error')
       return
     }
-
-    setIsConfirming(true)
-    try {
-      const response = await fetch(`/api/invite/${token}/confirm`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          chosenDate: selectedDate,
-          chosenTime: selectedTime,
-          inviteeName: inviteeName,
-          inviteeEmail: inviteeEmail
-        })
-      })
-      
-      if (response.ok) {
-        router.push('/confirmed')
-      } else {
-        alert('Failed to confirm meetup. Please try again.')
-      }
-    } catch (error) {
-      console.error('Error confirming:', error)
-      alert('Something went wrong. Please try again.')
-    } finally {
-      setIsConfirming(false)
-    }
+    confirmAsync()
   }
 
   const getPriceDisplay = (priceRange: string) => {
@@ -112,7 +125,7 @@ export default function InvitePage() {
     }
   }
 
-  if (isLoading) {
+  if (inviteLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">

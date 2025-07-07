@@ -1,15 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
+import { SecureStorage } from './secure-storage';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Only create Supabase client if environment variables are available
 export const supabase = supabaseUrl && supabaseAnonKey 
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true,
+        autoRefreshToken: true,
+        storage: SecureStorage,
       },
     })
   : null;

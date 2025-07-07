@@ -8,79 +8,74 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { toast } from '@/components/ui/use-toast'
+import { useAsyncOperation } from '@/lib/use-async-operation'
+import { ErrorService } from '@/lib/error-service'
+import { useFormValidation } from '@/lib/use-form-validation'
+import { Validators } from '@/lib/validators'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
   const { client } = useSupabase()
   const router = useRouter()
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const form = useFormValidation({
+    email: '',
+    password: '',
+  }, {
+    email: [Validators.required, Validators.email],
+    password: [Validators.required, Validators.minLength(8)],
+  })
+
+  const {
+    execute: signInAsync,
+    isLoading: signInLoading,
+    error: signInError,
+  } = useAsyncOperation(async () => {
+    if (!client) throw new Error('No Supabase client')
+    const { error } = await client.auth.signInWithPassword({
+      email,
+      password,
+    })
+    if (error) throw error
+  }, {
+    onSuccess: () => {
+      ErrorService.showToast('Signed in successfully!', 'success')
+      router.push('/dashboard')
+    },
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
+
+  const {
+    execute: googleSignInAsync,
+    isLoading: googleLoading,
+    error: googleError,
+  } = useAsyncOperation(async () => {
+    if (!client) throw new Error('No Supabase client')
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    })
+    if (error) throw error
+  }, {
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
+
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!client) return
-
-    setLoading(true)
-    try {
-      const { error } = await client.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          type: "error",
-        })
-      } else {
-        toast({
-          title: "Success",
-          description: "Signed in successfully!",
-          type: "success",
-        })
-        router.push('/dashboard')
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        type: "error",
-      })
-    } finally {
-      setLoading(false)
-    }
+    form.handleSubmit((values) => {
+      signInAsync()
+    })(e)
   }
 
-  const handleGoogleSignIn = async () => {
-    if (!client) return
-
-    setLoading(true)
-    try {
-      const { error } = await client.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          type: "error",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        type: "error",
-      })
-    } finally {
-      setLoading(false)
-    }
+  const handleGoogleSignIn = () => {
+    googleSignInAsync()
   }
 
   return (
@@ -99,10 +94,12 @@ export default function SignInPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.values.email}
+                  onChange={(e) => form.handleChange('email')(e)}
+                  onBlur={form.handleBlur('email')}
                   required
                 />
+                {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -110,13 +107,15 @@ export default function SignInPage() {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.values.password}
+                  onChange={(e) => form.handleChange('password')(e)}
+                  onBlur={form.handleBlur('password')}
                   required
                 />
+                {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
               </div>
-              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
+              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signInLoading}>
+                {signInLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
 
@@ -133,7 +132,7 @@ export default function SignInPage() {
               variant="outline"
               className="w-full border-amber-200 hover:bg-amber-50"
               onClick={handleGoogleSignIn}
-              disabled={loading}
+              disabled={googleLoading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path

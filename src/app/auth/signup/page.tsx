@@ -8,95 +8,81 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { toast } from '@/components/ui/use-toast'
+import { useAsyncOperation } from '@/lib/use-async-operation'
+import { ErrorService } from '@/lib/error-service'
+import { useFormValidation } from '@/lib/use-form-validation'
+import { Validators } from '@/lib/validators'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
   const { client } = useSupabase()
   const router = useRouter()
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const form = useFormValidation({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  }, {
+    email: [Validators.required, Validators.email],
+    password: [Validators.required, Validators.minLength(8)],
+    confirmPassword: [Validators.required],
+  })
+
+  const {
+    execute: signUpAsync,
+    isLoading: signUpLoading,
+    error: signUpError,
+  } = useAsyncOperation(async () => {
+    if (!client) throw new Error('No Supabase client')
+    if (password !== confirmPassword) throw new Error('Passwords do not match')
+    const { error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/verify`,
+      },
+    })
+    if (error) throw error
+  }, {
+    onSuccess: () => {
+      ErrorService.showToast('Check your email to verify your account!', 'success')
+      router.push('/auth/verify')
+    },
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
+
+  const {
+    execute: googleSignUpAsync,
+    isLoading: googleLoading,
+    error: googleError,
+  } = useAsyncOperation(async () => {
+    if (!client) throw new Error('No Supabase client')
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    })
+    if (error) throw error
+  }, {
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error')
+    },
+  })
+
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('handleSignUp called')
-    console.log('client:', client)
-    console.log('email:', email, 'password:', password, 'confirmPassword:', confirmPassword)
-    if (!client) return
-
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        type: "error",
-      })
-      return
-    }
-
-    setLoading(true)
-    try {
-      const { error } = await client.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/verify`,
-        },
-      })
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          type: "error",
-        })
-      } else {
-        toast({
-          title: "Success",
-          description: "Check your email to verify your account!",
-          type: "success",
-        })
-        router.push('/auth/verify')
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        type: "error",
-      })
-    } finally {
-      setLoading(false)
-    }
+    form.handleSubmit((values) => {
+      signUpAsync()
+    })(e)
   }
 
-  const handleGoogleSignUp = async () => {
-    if (!client) return
-
-    setLoading(true)
-    try {
-      const { error } = await client.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          type: "error",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        type: "error",
-      })
-    } finally {
-      setLoading(false)
-    }
+  const handleGoogleSignUp = () => {
+    googleSignUpAsync()
   }
 
   return (
@@ -115,10 +101,12 @@ export default function SignUpPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.values.email}
+                  onChange={form.handleChange('email')}
+                  onBlur={form.handleBlur('email')}
                   required
                 />
+                {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -126,11 +114,13 @@ export default function SignUpPage() {
                   id="password"
                   type="password"
                   placeholder="Create a password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.values.password}
+                  onChange={form.handleChange('password')}
+                  onBlur={form.handleBlur('password')}
                   required
-                  minLength={6}
+                  minLength={8}
                 />
+                {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -138,14 +128,15 @@ export default function SignUpPage() {
                   id="confirmPassword"
                   type="password"
                   placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={form.values.confirmPassword}
+                  onChange={form.handleChange('confirmPassword')}
+                  onBlur={form.handleBlur('confirmPassword')}
                   required
-                  minLength={6}
                 />
+                {form.errors.confirmPassword && <p className="text-red-500">{form.errors.confirmPassword}</p>}
               </div>
-              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={loading}>
-                {loading ? 'Creating account...' : 'Create Account'}
+              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
+                {signUpLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
 
@@ -162,7 +153,7 @@ export default function SignUpPage() {
               variant="outline"
               className="w-full border-amber-200 hover:bg-amber-50"
               onClick={handleGoogleSignUp}
-              disabled={loading}
+              disabled={googleLoading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path

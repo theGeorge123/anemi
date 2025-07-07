@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import { Coffee, MapPin, Clock, Star, Shuffle, Send, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { getOrSetCsrfToken } from '@/lib/csrf'
+import { useAsyncOperation } from '@/lib/use-async-operation'
+import { ErrorService } from '@/lib/error-service'
 
 interface Cafe {
   id: string
@@ -46,59 +49,73 @@ function ResultPageContent() {
   const cafe: Cafe = JSON.parse(decodeURIComponent(cafeParam))
   const formData = JSON.parse(decodeURIComponent(formParam))
 
-  const handleShuffleAgain = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch('/api/shuffle-cafe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          priceRange: formData.priceRange,
-          city: formData.city 
-        })
+  const {
+    execute: shuffleAgainAsync,
+    isLoading: shuffleLoading,
+    error: shuffleError,
+  } = useAsyncOperation(async () => {
+    const response = await fetch('/api/shuffle-cafe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': getOrSetCsrfToken(),
+      },
+      body: JSON.stringify({ 
+        priceRange: formData.priceRange,
+        city: formData.city 
       })
-      
-      if (response.ok) {
-        const newCafe = await response.json()
-        router.push(`/result?cafe=${encodeURIComponent(JSON.stringify(newCafe))}&form=${encodeURIComponent(JSON.stringify(formData))}`)
-      } else {
-        alert('Failed to find another cafe. Please try again.')
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      alert('Something went wrong. Please try again.')
-    } finally {
-      setIsLoading(false)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to find another cafe.');
     }
-  }
+    return response.json();
+  }, {
+    onSuccess: (newCafe) => {
+      router.push(`/result?cafe=${encodeURIComponent(JSON.stringify(newCafe))}&form=${encodeURIComponent(JSON.stringify(formData))}`);
+    },
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error');
+    },
+  });
 
-  const handleSendInvite = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch('/api/send-invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cafe,
-          formData,
-          dates: formData.dates,
-          times: formData.times
-        })
+  const {
+    execute: sendInviteAsync,
+    isLoading: inviteLoading,
+    error: inviteError,
+  } = useAsyncOperation(async () => {
+    const response = await fetch('/api/send-invite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': getOrSetCsrfToken(),
+      },
+      body: JSON.stringify({
+        cafe,
+        formData,
+        dates: formData.dates,
+        times: formData.times
       })
-      
-      if (response.ok) {
-        const result = await response.json()
-        router.push(`/confirmed?inviteLink=${encodeURIComponent(result.inviteLink)}`)
-      } else {
-        alert('Failed to send invite. Please try again.')
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      alert('Something went wrong. Please try again.')
-    } finally {
-      setIsLoading(false)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to send invite.');
     }
-  }
+    return response.json();
+  }, {
+    onSuccess: (result) => {
+      router.push(`/confirmed?inviteLink=${encodeURIComponent(result.inviteLink)}`);
+    },
+    onError: (err) => {
+      ErrorService.showToast(ErrorService.handleError(err), 'error');
+    },
+  });
+
+  const handleShuffleAgain = () => {
+    shuffleAgainAsync();
+  };
+
+  const handleSendInvite = () => {
+    sendInviteAsync();
+  };
 
   const getPriceDisplay = (priceRange: string) => {
     switch (priceRange) {
@@ -193,13 +210,13 @@ function ResultPageContent() {
         <div className="space-y-4">
           <Button
             onClick={handleSendInvite}
-            disabled={isLoading}
+            disabled={shuffleLoading || inviteLoading}
             className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3"
           >
-            {isLoading ? (
+            {shuffleLoading || inviteLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Sending Invite...
+                {shuffleLoading ? 'Shuffling...' : 'Sending Invite...'}
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -211,7 +228,7 @@ function ResultPageContent() {
           
           <Button
             onClick={handleShuffleAgain}
-            disabled={isLoading}
+            disabled={shuffleLoading}
             variant="outline"
             className="w-full py-3"
           >

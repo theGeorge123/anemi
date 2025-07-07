@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
-import { Providers } from '@/components/providers';
+import ClientRoot from '@/components/ClientRoot';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics';
 import '@/styles/globals.css';
@@ -109,7 +109,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <SupabaseProvider>
-          <Providers>
+          <ClientRoot>
             <div className="min-h-screen bg-background">
               <main className="flex-1">
                 {children}
@@ -117,7 +117,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <Analytics />
-          </Providers>
+          </ClientRoot>
         </SupabaseProvider>
       </body>
     </html>

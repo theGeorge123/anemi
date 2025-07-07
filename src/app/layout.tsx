@@ -4,7 +4,6 @@ import ClientRoot from '@/components/ClientRoot';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@/components/analytics';
 import '@/styles/globals.css';
-import '@/i18n';
 
 const inter = Inter({
   subsets: ['latin'],

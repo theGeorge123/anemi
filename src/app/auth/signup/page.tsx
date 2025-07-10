@@ -15,9 +15,6 @@ import { Validators } from '@/lib/validators'
 import { supabaseAdmin } from '@/lib/supabase'
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const { client } = useSupabase()
   const router = useRouter()
 
@@ -37,10 +34,10 @@ export default function SignUpPage() {
     error: signUpError,
   } = useAsyncOperation(async () => {
     if (!client) throw new Error('No Supabase client')
-    if (password !== confirmPassword) throw new Error('Passwords do not match')
+    if (form.values.password !== form.values.confirmPassword) throw new Error('Passwords do not match')
     const { data, error } = await client.auth.signUp({
-      email,
-      password,
+      email: form.values.email,
+      password: form.values.password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/verify`,
       },
@@ -50,7 +47,7 @@ export default function SignUpPage() {
       await fetch('/api/create-user-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: data.user.id, email }),
+        body: JSON.stringify({ userId: data.user.id, email: form.values.email }),
       })
     }
   }, {

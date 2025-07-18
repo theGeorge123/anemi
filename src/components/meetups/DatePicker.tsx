@@ -20,7 +20,7 @@ export function DatePicker({ selectedDates, onDateToggle }: DatePickerProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-foreground mb-2">
         Available Dates (Select 2-3) 📅
       </label>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -36,14 +36,14 @@ export function DatePicker({ selectedDates, onDateToggle }: DatePickerProps) {
               className={`p-4 text-sm border rounded-lg transition-all hover:scale-105 ${
                 isSelected
                   ? 'bg-amber-100 border-amber-500 text-amber-700 shadow-md'
-                  : 'bg-white border-gray-300 hover:border-amber-300 hover:shadow-sm'
+                  : 'bg-background border-border hover:border-amber-300 hover:shadow-sm'
               }`}
             >
               <div className="text-lg mb-1">{emoji}</div>
               <div className="font-medium">
                 {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-muted-foreground">
                 {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </div>
             </button>

@@ -49,13 +49,13 @@ export function DateTimePreferences({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-foreground mb-2">
         Set specific times for each date 🗓️
       </label>
       <div className="space-y-4">
         {dates.map((date) => (
-          <div key={date} className="border rounded-lg p-4 bg-white">
-            <h4 className="font-medium text-gray-900 mb-3">
+          <div key={date} className="border rounded-lg p-4 bg-background">
+            <h4 className="font-medium text-foreground mb-3">
               {formatDate(date)}
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -71,7 +71,7 @@ export function DateTimePreferences({
                       className={`p-2 text-xs border rounded-md transition-all hover:scale-105 ${
                         isSelected
                           ? 'bg-amber-100 border-amber-500 text-amber-700 shadow-md'
-                          : 'bg-gray-50 border-gray-300 hover:border-amber-300 hover:shadow-sm'
+                          : 'bg-muted border-border hover:border-amber-300 hover:shadow-sm'
                       }`}
                     >
                       <div className="text-sm mb-1">{slot.emoji}</div>

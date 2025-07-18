@@ -28,7 +28,7 @@ export function TimeSelector({ selectedTimes, onChange }: TimeSelectorProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-foreground mb-2">
         What times work for you? ⏰ (Select multiple)
       </label>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -40,7 +40,7 @@ export function TimeSelector({ selectedTimes, onChange }: TimeSelectorProps) {
             className={`p-3 text-sm border rounded-md transition-all hover:scale-105 ${
               selectedTimes.includes(slot.value)
                 ? 'bg-amber-100 border-amber-500 text-amber-700 shadow-md'
-                : 'bg-white border-gray-300 hover:border-amber-300 hover:shadow-sm'
+                : 'bg-background border-border hover:border-amber-300 hover:shadow-sm'
             }`}
           >
             <div className="text-lg mb-1">{slot.emoji}</div>

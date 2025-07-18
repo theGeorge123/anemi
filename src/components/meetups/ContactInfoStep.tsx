@@ -1,8 +1,8 @@
 import { NameInput } from './NameInput';
-import { EmailInput } from './EmailInput';
 import { Button } from '@/components/ui/button';
 import { useFormValidation } from '@/lib/use-form-validation';
 import { Validators } from '@/lib/validators';
+import { useSupabase } from '@/components/SupabaseProvider';
 
 export interface ContactInfoStepProps {
   name: string;
@@ -11,18 +11,21 @@ export interface ContactInfoStepProps {
 }
 
 export function ContactInfoStep({ name, email, onNext }: ContactInfoStepProps) {
+  const { session } = useSupabase();
+  
   const form = useFormValidation(
-    { name, email },
+    { name },
     {
       name: [Validators.required],
-      email: [Validators.required, Validators.email],
     }
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     form.handleSubmit((values) => {
-      onNext(values);
+      // Use the logged-in user's email
+      const userEmail = session?.user?.email || email;
+      onNext({ name: values.name, email: userEmail });
     })(e);
   };
 
@@ -34,8 +37,14 @@ export function ContactInfoStep({ name, email, onNext }: ContactInfoStepProps) {
       </div>
       <NameInput value={form.values.name} onChange={(value) => form.handleChange('name')({ target: { value } } as any)} />
       {form.errors.name && <p className="text-red-500 text-sm">{form.errors.name}</p>}
-      <EmailInput value={form.values.email} onChange={(value) => form.handleChange('email')({ target: { value } } as any)} />
-      {form.errors.email && <p className="text-red-500 text-sm">{form.errors.email}</p>}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <p className="text-sm text-amber-800">
+          <span className="font-medium">📧 Email:</span> {session?.user?.email || 'Loading...'}
+        </p>
+        <p className="text-xs text-amber-600 mt-1">
+          We&apos;ll use your account email for notifications
+        </p>
+      </div>
       <p className="text-gray-600">Don&apos;t worry, you can change this later.</p>
       <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3">Next</Button>
     </form>

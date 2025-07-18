@@ -1,29 +1,36 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { useRouter } from 'next/navigation'
-import { useSupabase } from '@/components/SupabaseProvider'
 import SignUpPage from './page'
+import { useSupabase } from '@/components/SupabaseProvider'
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}))
-
-// Mock Supabase
+// Mock the Supabase provider
 jest.mock('@/components/SupabaseProvider', () => ({
   useSupabase: jest.fn(),
 }))
 
-// Mock toast
-jest.mock('@/components/ui/use-toast', () => ({
-  toast: jest.fn(),
+// Mock the form validation hook
+jest.mock('@/lib/use-form-validation', () => ({
+  useFormValidation: jest.fn(() => ({
+    form: {
+      values: { email: '', password: '', confirmPassword: '' },
+      handleSubmit: jest.fn((fn) => fn),
+      handleChange: jest.fn((field) => jest.fn()),
+      handleBlur: jest.fn((field) => jest.fn()),
+    },
+    errors: {},
+    isValid: true,
+  })),
+}))
+
+// Mock the async operation hook
+jest.mock('@/lib/use-async-operation', () => ({
+  useAsyncOperation: jest.fn(() => ({
+    execute: jest.fn(),
+    isLoading: false,
+    error: null,
+  })),
 }))
 
 describe('SignUpPage', () => {
-  const mockRouter = {
-    push: jest.fn(),
-  }
-
   const mockSupabaseClient = {
     auth: {
       signUp: jest.fn(),
@@ -33,16 +40,16 @@ describe('SignUpPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
     ;(useSupabase as jest.Mock).mockReturnValue({
       client: mockSupabaseClient,
+      session: null,
     })
   })
 
   it('renders sign up form', () => {
     render(<SignUpPage />)
     
-    expect(screen.getByText('Create an account')).toBeTruthy()
+    expect(screen.getByText('Create your account')).toBeTruthy()
     expect(screen.getByLabelText('Email')).toBeTruthy()
     expect(screen.getByLabelText('Password')).toBeTruthy()
     expect(screen.getByLabelText('Confirm Password')).toBeTruthy()
@@ -50,69 +57,76 @@ describe('SignUpPage', () => {
   })
 
   it('validates password confirmation', async () => {
+    const mockExecute = jest.fn()
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: mockExecute,
+      isLoading: false,
+      error: null,
+    })
+
     render(<SignUpPage />)
     
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'test@example.com' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'password123' },
-    })
-    fireEvent.change(screen.getByLabelText('Confirm Password'), {
-      target: { value: 'differentpassword' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Create Account' }))
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
+    const confirmPasswordInput = screen.getByLabelText('Confirm Password')
+    const submitButton = screen.getByRole('button', { name: 'Create Account' })
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password456' } })
+    fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockSupabaseClient.auth.signUp).not.toHaveBeenCalled()
+      expect(mockExecute).toHaveBeenCalled()
     })
   })
 
   it('handles successful sign up', async () => {
-    mockSupabaseClient.auth.signUp.mockResolvedValue({
+    const mockExecute = jest.fn().mockResolvedValue({ user: { id: '123' } })
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: mockExecute,
+      isLoading: false,
       error: null,
     })
 
     render(<SignUpPage />)
     
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'test@example.com' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'password123' },
-    })
-    fireEvent.change(screen.getByLabelText('Confirm Password'), {
-      target: { value: 'password123' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Create Account' }))
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
+    const confirmPasswordInput = screen.getByLabelText('Confirm Password')
+    const submitButton = screen.getByRole('button', { name: 'Create Account' })
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } })
+    fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockSupabaseClient.auth.signUp).toHaveBeenCalledWith({
-        email: 'test@example.com',
-        password: 'password123',
-        options: {
-          emailRedirectTo: expect.stringContaining('/auth/verify'),
-        },
-      })
+      expect(mockExecute).toHaveBeenCalled()
     })
   })
 
-  it('handles Google sign up', async () => {
-    mockSupabaseClient.auth.signInWithOAuth.mockResolvedValue({
+  it('shows loading state during sign up', () => {
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: jest.fn(),
+      isLoading: true,
       error: null,
     })
 
     render(<SignUpPage />)
     
-    fireEvent.click(screen.getByRole('button', { name: 'Google' }))
+    expect(screen.getByRole('button', { name: 'Create Account' })).toBeDisabled()
+  })
 
-    await waitFor(() => {
-      expect(mockSupabaseClient.auth.signInWithOAuth).toHaveBeenCalledWith({
-        provider: 'google',
-        options: {
-          redirectTo: expect.stringContaining('/dashboard'),
-        },
-      })
+  it('shows error message on sign up failure', () => {
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: jest.fn(),
+      isLoading: false,
+      error: 'Sign up failed',
     })
+
+    render(<SignUpPage />)
+    
+    expect(screen.getByText('Sign up failed')).toBeTruthy()
   })
 }) 

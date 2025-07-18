@@ -16,7 +16,11 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
     const { data: listener } = client.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setSession(session)
     })
-    client.auth.getSession().then(({ data }: { data: { session: Session | null } }) => setSession(data.session))
+    
+    client.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+      setSession(data.session)
+    })
+    
     return () => { listener?.subscription.unsubscribe() }
   }, [client])
 

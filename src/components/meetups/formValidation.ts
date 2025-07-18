@@ -1,4 +1,5 @@
 import { type City } from '@/constants/cities'
+import { PriceRange } from '@prisma/client'
 
 export interface FormData {
   name: string
@@ -7,7 +8,9 @@ export interface FormData {
   dates: string[]
   times: string[] // Multiple times
   dateTimePreferences: Record<string, string[]> // Date -> Times mapping
-  priceRange: string
+  priceRange: PriceRange
+  viewType?: 'map' | 'list' // How to view cafes
+  cafeId?: string // Optional cafe selection
 }
 
 export function validateForm(formData: FormData): string | null {

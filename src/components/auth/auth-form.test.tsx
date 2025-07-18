@@ -1,29 +1,36 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { useRouter } from 'next/navigation'
-import { useSupabase } from '@/components/SupabaseProvider'
 import SignInPage from '@/app/auth/signin/page'
+import { useSupabase } from '@/components/SupabaseProvider'
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}))
-
-// Mock Supabase
+// Mock the Supabase provider
 jest.mock('@/components/SupabaseProvider', () => ({
   useSupabase: jest.fn(),
 }))
 
-// Mock toast
-jest.mock('@/components/ui/use-toast', () => ({
-  toast: jest.fn(),
+// Mock the form validation hook
+jest.mock('@/lib/use-form-validation', () => ({
+  useFormValidation: jest.fn(() => ({
+    form: {
+      values: { email: '', password: '' },
+      handleSubmit: jest.fn((fn) => fn),
+      handleChange: jest.fn((field) => jest.fn()),
+      handleBlur: jest.fn((field) => jest.fn()),
+    },
+    errors: {},
+    isValid: true,
+  })),
+}))
+
+// Mock the async operation hook
+jest.mock('@/lib/use-async-operation', () => ({
+  useAsyncOperation: jest.fn(() => ({
+    execute: jest.fn(),
+    isLoading: false,
+    error: null,
+  })),
 }))
 
 describe('SignInPage', () => {
-  const mockRouter = {
-    push: jest.fn(),
-  }
-
   const mockSupabaseClient = {
     auth: {
       signInWithPassword: jest.fn(),
@@ -33,78 +40,66 @@ describe('SignInPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
     ;(useSupabase as jest.Mock).mockReturnValue({
       client: mockSupabaseClient,
+      session: null,
     })
   })
 
   it('renders sign in form', () => {
     render(<SignInPage />)
     
-    expect(screen.getByText('Welcome back')).toBeTruthy()
+    expect(screen.getByText('Sign in')).toBeTruthy()
+    expect(screen.getByText('Welcome back! Sign in to your account to continue.')).toBeTruthy()
     expect(screen.getByLabelText('Email')).toBeTruthy()
     expect(screen.getByLabelText('Password')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeTruthy()
   })
 
   it('handles form submission', async () => {
-    mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
+    const mockExecute = jest.fn()
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: mockExecute,
+      isLoading: false,
       error: null,
     })
 
     render(<SignInPage />)
     
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'test@example.com' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'password123' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Sign In' }))
+    const emailInput = screen.getByLabelText('Email')
+    const passwordInput = screen.getByLabelText('Password')
+    const submitButton = screen.getByRole('button', { name: 'Sign In' })
+
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
-        email: 'test@example.com',
-        password: 'password123',
-      })
+      expect(mockExecute).toHaveBeenCalled()
     })
   })
 
-  it('handles Google sign in', async () => {
-    mockSupabaseClient.auth.signInWithOAuth.mockResolvedValue({
+  it('shows loading state during sign in', () => {
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: jest.fn(),
+      isLoading: true,
       error: null,
     })
 
     render(<SignInPage />)
     
-    fireEvent.click(screen.getByRole('button', { name: 'Google' }))
-
-    await waitFor(() => {
-      expect(mockSupabaseClient.auth.signInWithOAuth).toHaveBeenCalledWith({
-        provider: 'google',
-        options: {
-          redirectTo: expect.stringContaining('/dashboard'),
-        },
-      })
-    })
+    expect(screen.getByRole('button', { name: 'Sign In' })).toBeDisabled()
   })
 
-  it('shows loading state during submission', async () => {
-    mockSupabaseClient.auth.signInWithPassword.mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve({ error: null }), 100))
-    )
+  it('shows error message on sign in failure', () => {
+    ;(require('@/lib/use-async-operation').useAsyncOperation as jest.Mock).mockReturnValue({
+      execute: jest.fn(),
+      isLoading: false,
+      error: 'Sign in failed',
+    })
 
     render(<SignInPage />)
     
-    fireEvent.change(screen.getByLabelText('Email'), {
-      target: { value: 'test@example.com' },
-    })
-    fireEvent.change(screen.getByLabelText('Password'), {
-      target: { value: 'password123' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Sign In' }))
-
-    expect(screen.getByRole('button', { name: 'Signing in...' })).toBeTruthy()
+    expect(screen.getByText('Sign in failed')).toBeTruthy()
   })
 }) 

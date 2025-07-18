@@ -107,8 +107,8 @@ function ResultPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Invalid Request</h1>
-          <p className="text-gray-600 mb-6">Please start over and create a new meetup.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Invalid Request</h1>
+          <p className="text-muted-foreground mb-6">Please start over and create a new meetup.</p>
           <Button asChild>
             <Link href="/create">Create New Meetup</Link>
           </Button>

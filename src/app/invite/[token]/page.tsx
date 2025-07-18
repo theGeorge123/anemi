@@ -1,375 +1,235 @@
 "use client"
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Coffee, MapPin, Clock, Star, Calendar, CheckCircle, User, Mail } from 'lucide-react'
-import Image from 'next/image'
-import { getOrSetCsrfToken } from '@/lib/csrf'
-import { useAsyncOperation } from '@/lib/use-async-operation'
-import { ErrorService } from '@/lib/error-service'
 
 interface InviteData {
-  id: string
   token: string
-  cafe: {
-    id: string
-    name: string
-    address: string
-    priceRange: string
-    rating: number
-    hours: string
-    isVerified: boolean
-    description?: string
-    photos?: string[]
-  }
   organizerName: string
   organizerEmail: string
+  cafeId: string
   availableDates: string[]
   availableTimes: string[]
-  status: 'pending' | 'confirmed' | 'expired'
-  chosenDate?: string
-  chosenTime?: string
+  status: string
+  expiresAt: string
 }
 
 export default function InvitePage() {
   const params = useParams()
-  const router = useRouter()
-  const [inviteData, setInviteData] = useState<InviteData | null>(null)
-  const [selectedDate, setSelectedDate] = useState<string>('')
-  const [selectedTime, setSelectedTime] = useState<string>('')
-  const [inviteeName, setInviteeName] = useState<string>('')
-  const [inviteeEmail, setInviteeEmail] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [isConfirming, setIsConfirming] = useState(false)
-  const [error, setError] = useState<string>('')
-
   const token = params.token as string
-
-  const {
-    execute: loadInviteAsync,
-    isLoading: inviteLoading,
-    error: inviteError,
-  } = useAsyncOperation(async () => {
-    const response = await fetch(`/api/invite/${token}`)
-    if (!response.ok) {
-      throw new Error('Invite not found or has expired')
-    }
-    return response.json()
-  }, {
-    onSuccess: (data) => {
-      setInviteData(data)
-    },
-    onError: (err) => {
-      setError(ErrorService.handleError(err))
-      ErrorService.showToast(ErrorService.handleError(err), 'error')
-    },
-  })
+  
+  const [invite, setInvite] = useState<InviteData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [inviteeName, setInviteeName] = useState('')
+  const [inviteeEmail, setInviteeEmail] = useState('')
+  const [accepting, setAccepting] = useState(false)
 
   useEffect(() => {
+    const fetchInvite = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/invite/${token}`)
+        if (!response.ok) {
+          throw new Error('Invite not found or expired')
+        }
+        const data = await response.json()
+        setInvite(data.invite)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load invite')
+      } finally {
+        setLoading(false)
+      }
+    }
+
     if (token) {
-      loadInviteAsync()
+      fetchInvite()
     }
-  }, [token, loadInviteAsync])
+  }, [token])
 
-  const {
-    execute: confirmAsync,
-    isLoading: confirmLoading,
-    error: confirmError,
-  } = useAsyncOperation(async () => {
-    const response = await fetch(`/api/invite/${token}/confirm`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': getOrSetCsrfToken(),
-      },
-      body: JSON.stringify({ 
-        chosenDate: selectedDate,
-        chosenTime: selectedTime,
-        inviteeName: inviteeName,
-        inviteeEmail: inviteeEmail
-      })
-    })
-    if (!response.ok) {
-      throw new Error('Failed to confirm meetup.')
-    }
-    return response.json()
-  }, {
-    onSuccess: () => {
-      router.push('/confirmed')
-    },
-    onError: (err) => {
-      ErrorService.showToast(ErrorService.handleError(err), 'error')
-    },
-  })
-
-  const handleConfirm = () => {
-    if (!selectedDate || !selectedTime || !inviteeName || !inviteeEmail) {
-      ErrorService.showToast('Please fill in all fields', 'error')
+  const handleAccept = async () => {
+    if (!inviteeName.trim() || !inviteeEmail.trim()) {
+      setError('Please fill in your name and email')
       return
     }
-    confirmAsync()
-  }
 
-  const getPriceDisplay = (priceRange: string) => {
-    switch (priceRange) {
-      case 'BUDGET': return '$'
-      case 'MODERATE': return '$$'
-      case 'EXPENSIVE': return '$$$'
-      case 'LUXURY': return '$$$$'
-      default: return '$$'
+    try {
+      setAccepting(true)
+      const response = await fetch(`/api/invite/${token}/accept`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inviteeName,
+          inviteeEmail,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to accept invite')
+      }
+
+      // Redirect to success page or dashboard
+      window.location.href = '/dashboard?invite=accepted'
+    } catch (error) {
+      setError('Failed to accept invite. Please try again.')
+    } finally {
+      setAccepting(false)
     }
   }
 
-  if (inviteLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your invite...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading invite...</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  if (error || !inviteData) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Invite Not Found</h1>
-          <p className="text-gray-600 mb-6">{error || 'This invite link is invalid or has expired.'}</p>
-          <Button onClick={() => router.push('/')}>
-            Go Home
-          </Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="text-4xl mb-4">😕</div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Invite Not Found</h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <Button onClick={() => window.location.href = '/'}>
+                Go Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  if (inviteData.status === 'confirmed') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Meetup Confirmed!</h1>
-          <p className="text-gray-600 mb-6">
-            You&apos;ve already confirmed this meetup for {inviteData.chosenDate && new Date(inviteData.chosenDate).toLocaleDateString()}.
-          </p>
-          <Button onClick={() => router.push('/confirmed')}>
-            View Details
-          </Button>
-        </div>
-      </div>
-    )
+  if (!invite) {
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Coffee Meetup Invite</h1>
-          <p className="text-gray-600">
-            {inviteData.organizerName} invited you for coffee at this great spot!
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+      <Card className="w-full max-w-2xl">
+        <CardContent className="p-8">
+          <div className="text-center mb-8">
+            <div className="text-6xl mb-4">☕</div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Je bent uitgenodigd voor een koffie!
+            </h1>
+            <p className="text-gray-600">
+              {invite.organizerName} heeft een meetup gepland en nodigt je uit
+            </p>
+          </div>
 
-        {/* Cafe Card */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Coffee className="w-5 h-5 text-amber-600" />
-                  {inviteData.cafe.name}
-                </CardTitle>
-                <CardDescription className="mt-2">
-                  {inviteData.cafe.description || 'A great place for your meetup'}
-                </CardDescription>
-              </div>
-              {inviteData.cafe.isVerified && (
-                <Badge variant="secondary" className="bg-green-100 text-green-700">
-                  <Star className="w-3 h-3 mr-1" />
-                  Verified
-                </Badge>
-              )}
+          <div className="space-y-6">
+            {/* Organizer Info */}
+            <div className="bg-amber-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-900 mb-2">Uitnodiging van:</h3>
+              <p className="text-gray-700">{invite.organizerName}</p>
             </div>
-          </CardHeader>
-          
-          {/* Cafe Photos */}
-          {inviteData.cafe.photos && inviteData.cafe.photos.length > 0 && (
-            <div className="px-6 pb-4">
-              <div className="grid grid-cols-2 gap-3">
-                {inviteData.cafe.photos.slice(0, 2).map((photo, index) => (
-                  <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
-                    <Image
-                      src={photo}
-                      alt={`${inviteData.cafe.name} - Photo ${index + 1}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
+
+            {/* Available Dates */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-2">Beschikbare data:</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {invite.availableDates.map((date) => (
+                  <div key={date} className="bg-gray-100 p-2 rounded text-sm text-center">
+                    {new Date(date).toLocaleDateString('nl-NL', { 
+                      weekday: 'short', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
                   </div>
                 ))}
               </div>
             </div>
-          )}
-          
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-4 h-4" />
-              <span>{inviteData.cafe.address}</span>
-            </div>
-            
-            <div className="flex items-center gap-2 text-gray-600">
-              <Clock className="w-4 h-4" />
-              <span>{inviteData.cafe.hours}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-500 fill-current" />
-              <span className="text-gray-600">{inviteData.cafe.rating}/5</span>
-              <Badge variant="outline" className="ml-auto">
-                {getPriceDisplay(inviteData.cafe.priceRange)}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Invitee Information */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Your Information
-            </CardTitle>
-            <CardDescription>
-              Please provide your details so we can send you the confirmation
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            {/* Available Times */}
             <div>
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Your name"
-                value={inviteeName}
-                onChange={(e) => setInviteeName(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.email@example.com"
-                value={inviteeEmail}
-                onChange={(e) => setInviteeEmail(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Date Selection */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Choose a Date
-            </CardTitle>
-            <CardDescription>
-              Select one of the available dates for your meetup
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {inviteData.availableDates.map((date: string) => {
-                const dateObj = new Date(date)
-                const isSelected = selectedDate === date
-                return (
-                  <button
-                    key={date}
-                    onClick={() => setSelectedDate(date)}
-                    className={`p-4 text-center border rounded-lg transition-colors ${
-                      isSelected
-                        ? 'bg-amber-100 border-amber-500 text-amber-700'
-                        : 'bg-white border-gray-300 hover:border-amber-300'
-                    }`}
-                  >
-                    <div className="font-medium">
-                      {dateObj.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Time Selection */}
-        {selectedDate && inviteData.availableTimes.length > 0 && (
-          <Card className="shadow-lg mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Choose a Time
-              </CardTitle>
-              <CardDescription>
-                Select your preferred time for the meetup
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {inviteData.availableTimes.map((time: string) => {
-                  const isSelected = selectedTime === time
-                  return (
-                    <button
-                      key={time}
-                      onClick={() => setSelectedTime(time)}
-                      className={`p-4 text-center border rounded-lg transition-colors ${
-                        isSelected
-                          ? 'bg-amber-100 border-amber-500 text-amber-700'
-                          : 'bg-white border-gray-300 hover:border-amber-300'
-                      }`}
-                    >
-                      <div className="font-medium">{time}</div>
-                    </button>
-                  )
-                })}
+              <h3 className="font-semibold text-gray-900 mb-2">Beschikbare tijden:</h3>
+              <div className="flex flex-wrap gap-2">
+                {invite.availableTimes.map((time) => (
+                  <span key={time} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    {time}
+                  </span>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
 
-        {/* Confirm Button */}
-        <Button
-          onClick={handleConfirm}
-          disabled={!selectedDate || !selectedTime || !inviteeName || !inviteeEmail || isConfirming}
-          className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3"
-        >
-          {isConfirming ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Confirming...
+            {/* Your Info */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-gray-900">Jouw gegevens:</h3>
+              
+              <div>
+                <Label htmlFor="name">Naam</Label>
+                <Input
+                  id="name"
+                  value={inviteeName}
+                  onChange={(e) => setInviteeName(e.target.value)}
+                  placeholder="Jouw naam"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={inviteeEmail}
+                  onChange={(e) => setInviteeEmail(e.target.value)}
+                  placeholder="jouw@email.com"
+                  className="mt-1"
+                />
+              </div>
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4" />
-              Confirm Meetup
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 pt-4">
+              <Button
+                onClick={handleAccept}
+                disabled={accepting || !inviteeName.trim() || !inviteeEmail.trim()}
+                className="flex-1 bg-amber-500 hover:bg-amber-600"
+              >
+                {accepting ? 'Accepteren...' : '✅ Accepteren'}
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = '/'}
+                className="flex-1"
+              >
+                ❌ Afwijzen
+              </Button>
             </div>
-          )}
-        </Button>
-      </div>
+
+            <div className="text-center text-xs text-gray-500 mt-4">
+              <p>Deze invite verloopt op {new Date(invite.expiresAt).toLocaleDateString('nl-NL')}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 } 

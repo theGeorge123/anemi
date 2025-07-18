@@ -7,8 +7,12 @@ import { DatePicker } from './DatePicker'
 import { TimeSelector } from './TimeSelector'
 import { DateTimePreferences } from './DateTimePreferences'
 import { PriceSelector } from './PriceSelector'
+import { CafeSelector } from './CafeSelector'
+import { ViewSelector } from './ViewSelector'
+import { MapView } from './MapView'
 import { StepNavigation } from './StepNavigation'
 import { type FormData } from './formValidation'
+import { type City } from '@/constants/cities'
 
 interface StepContentProps {
   currentStep: number
@@ -35,6 +39,8 @@ export function StepContent({
       case 4: return formData.times.length > 0
       case 5: return Object.keys(formData.dateTimePreferences).length > 0
       case 6: return formData.priceRange
+      case 7: return formData.viewType // View type is required
+      case 8: return true // Cafe selection is optional
       default: return true
     }
   }
@@ -52,10 +58,14 @@ export function StepContent({
               value={formData.name}
               onChange={(name) => onFormDataChange({ name })}
             />
-            <EmailInput 
-              value={formData.email}
-              onChange={(email) => onFormDataChange({ email })}
-            />
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-sm text-amber-800">
+                <span className="font-medium">📧 Email:</span> {formData.email || 'Loading...'}
+              </p>
+              <p className="text-xs text-amber-600 mt-1">
+                We&apos;ll use your account email for notifications
+              </p>
+            </div>
             <p className="text-gray-600">Don&apos;t worry, you can change this later.</p>
           </div>
         )
@@ -133,6 +143,7 @@ export function StepContent({
             <PriceSelector 
               value={formData.priceRange}
               onChange={(priceRange) => onFormDataChange({ priceRange })}
+              city={formData.city}
             />
           </div>
         )
@@ -141,24 +152,72 @@ export function StepContent({
         return (
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">🎉 You&apos;re all set!</h3>
-              <p className="text-gray-600">Ready to find your perfect coffee spot?</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">🔍 Hoe wil je cafes bekijken?</h3>
+              <p className="text-gray-600">Kies je voorkeur voor het ontdekken van cafes</p>
+            </div>
+            <ViewSelector
+              selectedView={formData.viewType || null}
+              onViewSelect={(viewType) => onFormDataChange({ viewType })}
+            />
+          </div>
+        )
+      
+      case 8:
+        return (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                {formData.viewType === 'map' ? '🗺️' : '📋'} Cafes in {formData.city}
+              </h3>
+              <p className="text-gray-600">
+                {formData.viewType === 'map' 
+                  ? 'Bekijk cafes op de kaart en selecteer je favoriet'
+                  : 'Bekijk alle cafes en selecteer je favoriet'
+                }
+              </p>
+            </div>
+            {formData.viewType === 'map' ? (
+              <MapView
+                selectedCity={formData.city}
+                selectedCafeId={formData.cafeId}
+                onCafeSelect={(cafeId) => onFormDataChange({ cafeId })}
+                onSkip={() => onFormDataChange({ cafeId: '' })}
+              />
+            ) : (
+              <CafeSelector
+                selectedCity={formData.city}
+                selectedCafeId={formData.cafeId}
+                onCafeSelect={(cafeId) => onFormDataChange({ cafeId })}
+                onSkip={() => onFormDataChange({ cafeId: '' })}
+              />
+            )}
+          </div>
+        )
+      
+      case 9:
+        return (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">🎉 Je meetup is klaar!</h3>
+              <p className="text-gray-600">Tijd om je vriend uit te nodigen</p>
             </div>
             <div className="bg-amber-50 p-6 rounded-lg border border-amber-200">
-              <h4 className="font-semibold text-gray-900 mb-3">Meetup Summary:</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">Meetup Samenvatting:</h4>
               <div className="space-y-2 text-sm text-gray-700">
-                <p><strong>Name:</strong> {formData.name}</p>
+                <p><strong>Naam:</strong> {formData.name}</p>
                 <p><strong>Email:</strong> {formData.email}</p>
-                <p><strong>City:</strong> {formData.city}</p>
-                <p><strong>Dates:</strong> {formData.dates.length} selected</p>
-                <p><strong>Times:</strong> {formData.times.length} available</p>
+                <p><strong>Stad:</strong> {formData.city}</p>
+                <p><strong>Data:</strong> {formData.dates.length} geselecteerd</p>
+                <p><strong>Tijden:</strong> {formData.times.length} beschikbaar</p>
                 <p><strong>Budget:</strong> {formData.priceRange}</p>
+                <p><strong>Weergave:</strong> {formData.viewType === 'map' ? 'Kaart' : 'Lijst'}</p>
+                {formData.cafeId && <p><strong>Cafe:</strong> Geselecteerd</p>}
                 <div className="mt-3 pt-3 border-t border-amber-200">
-                  <p className="font-medium text-gray-900 mb-2">Date & Time Preferences:</p>
+                  <p className="font-medium text-gray-900 mb-2">Datum & Tijd Voorkeuren:</p>
                   {Object.entries(formData.dateTimePreferences).map(([date, times]) => (
                     <div key={date} className="text-xs">
                       <span className="font-medium">
-                        {new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}:
+                        {new Date(date).toLocaleDateString('nl-NL', { weekday: 'short', month: 'short', day: 'numeric' })}:
                       </span>
                       <span className="ml-2">{times.join(', ')}</span>
                     </div>
@@ -179,11 +238,11 @@ export function StepContent({
       {renderStep()}
       <StepNavigation
         currentStep={currentStep}
-        totalSteps={7}
-        onNext={currentStep === 7 ? onFinish : onNext}
+        totalSteps={9}
+        onNext={currentStep === 9 ? onFinish : onNext}
         onBack={onBack}
         isNextDisabled={!isStepValid()}
-        nextLabel={currentStep === 7 ? 'Find Coffee Shop! ☕' : 'Next'}
+        nextLabel={currentStep === 9 ? 'Genereer Invite Code! 🎫' : 'Next'}
       />
     </div>
   )

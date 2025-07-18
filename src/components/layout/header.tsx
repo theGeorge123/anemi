@@ -18,15 +18,6 @@ export function Header() {
         </div>
         
         <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/meetups" className="text-sm font-medium transition-colors hover:text-primary">
-            Meetups
-          </Link>
-          <Link href="/coffee-shops" className="text-sm font-medium transition-colors hover:text-primary">
-            Coffee Shops
-          </Link>
-          <Link href="/about" className="text-sm font-medium transition-colors hover:text-primary">
-            About
-          </Link>
           {client && session && (
             <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
               My Meetups

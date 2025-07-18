@@ -24,23 +24,23 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
             <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
               step.number <= currentStep
                 ? 'bg-amber-500 border-amber-500 text-white'
-                : 'bg-white border-gray-300 text-gray-400'
+                : 'bg-background border-muted text-muted-foreground'
             }`}>
               <span className="text-sm font-bold">{step.emoji}</span>
             </div>
             {index < steps.length - 1 && (
               <div className={`w-10 h-1 mx-2 transition-all ${
-                step.number < currentStep ? 'bg-amber-500' : 'bg-gray-300'
+                step.number < currentStep ? 'bg-amber-500' : 'bg-muted'
               }`} />
             )}
           </div>
         ))}
       </div>
       <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">
+        <h2 className="text-xl font-bold text-foreground mb-1">
           {steps[currentStep - 1]?.label}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Step {currentStep} of {totalSteps}
         </p>
       </div>

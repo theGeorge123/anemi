@@ -10,10 +10,10 @@ export default function HomePage() {
           <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Coffee className="w-10 h-10 text-amber-600" />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
             Connect Over Coffee
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-muted-foreground mb-8">
             Create coffee meetups and discover great local spots with friends.
           </p>
         </div>
@@ -41,7 +41,7 @@ export default function HomePage() {
           </Button>
         </div>
         
-        <p className="mt-6 text-sm text-gray-500">
+        <p className="mt-6 text-sm text-muted-foreground">
           Already have meetups? <Link href="/auth/signin" className="text-amber-600 hover:underline">Sign in to view them</Link>
         </p>
       </div>

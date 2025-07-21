@@ -49,7 +49,15 @@ const Dashboard = withAuth(() => {
         if (!response.ok) {
           const errorText = await response.text()
           console.error('❌ API Error:', errorText)
-          throw new Error(`Failed to fetch meetups: ${response.status} ${errorText}`)
+          
+          // Provide specific error messages
+          if (response.status === 401) {
+            throw new Error('🔐 Not authorized. Please sign in again.')
+          } else if (response.status === 500) {
+            throw new Error('🔧 Server error. Please try again in a moment.')
+          } else {
+            throw new Error(`Failed to load meetups: ${response.status} ${errorText}`)
+          }
         }
         
         const data = await response.json()
@@ -121,7 +129,7 @@ const Dashboard = withAuth(() => {
           </div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oops! Something went wrong</h2>
           <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            Don&apos;t worry, it happens to the best of us! Let&apos;s try again and get you back to your coffee adventures.
+            {error}
           </p>
           <div className="space-y-4">
             <Button 

@@ -18,6 +18,7 @@ function SignInPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
+  const [specificError, setSpecificError] = useState<string | null>(null)
 
   const form = useFormValidation({
     email: '',
@@ -27,26 +28,66 @@ function SignInPageContent() {
     password: [Validators.required, Validators.minLength(8)],
   })
 
+  const getSpecificErrorMessage = (error: any) => {
+    if (!error) return 'Something went wrong'
+    
+    const message = error.message || ''
+    const status = error.status || 0
+    
+    // Check for specific error types
+    if (message.includes('Invalid login credentials') || status === 400) {
+      return '❌ Wrong email or password. Please check your credentials and try again.'
+    }
+    
+    if (message.includes('Email not confirmed') || status === 422) {
+      return '📧 Please check your email and click the verification link before signing in.'
+    }
+    
+    if (message.includes('Too many requests') || status === 429) {
+      return '⏰ Too many login attempts. Please wait a few minutes and try again.'
+    }
+    
+    if (message.includes('User not found')) {
+      return '👤 Account not found. Please check your email or create a new account.'
+    }
+    
+    if (message.includes('No API key found')) {
+      return '🔧 Technical issue. Please try again or contact support.'
+    }
+    
+    // Default error message
+    return `😅 ${message || 'Something went wrong. Please try again.'}`
+  }
+
   const {
     execute: signInAsync,
     isLoading: signInLoading,
     error: signInError,
   } = useAsyncOperation(async () => {
     if (!supabase) throw new Error('No Supabase client')
+    
+    setSpecificError(null) // Clear previous errors
+    
     const { error } = await supabase.auth.signInWithPassword({
       email: form.values.email,
       password: form.values.password,
     })
-    if (error) throw error
+    
+    if (error) {
+      const specificMessage = getSpecificErrorMessage(error)
+      setSpecificError(specificMessage)
+      throw error
+    }
   }, {
     onSuccess: () => {
-      ErrorService.showToast('Signed in successfully!', 'success')
+      ErrorService.showToast('☕ Welcome back! Signing you in...', 'success')
       // Redirect to the original URL if provided, otherwise to dashboard
       const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
       router.push(targetUrl)
     },
     onError: (err) => {
-      ErrorService.showToast(ErrorService.handleError(err), 'error')
+      // Error is already handled with specific message above
+      console.error('Sign in error:', err)
     },
   })
 
@@ -62,11 +103,11 @@ function SignInPageContent() {
       <div className="w-full max-w-md">
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Sign in</CardTitle>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Welcome Back!</CardTitle>
             <CardDescription className="text-base text-gray-500">
               {redirectUrl 
                 ? 'Sign in to continue to your destination'
-                : 'Welcome back! Sign in to your account to continue.'
+                : 'Ready for your next coffee adventure?'
               }
             </CardDescription>
           </CardHeader>
@@ -83,7 +124,7 @@ function SignInPageContent() {
                   onBlur={form.handleBlur('email')}
                   required
                 />
-                {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
+                {form.errors.email && <p className="text-red-500 text-sm">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -96,16 +137,35 @@ function SignInPageContent() {
                   onBlur={form.handleBlur('password')}
                   required
                 />
-                {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
+                {form.errors.password && <p className="text-red-500 text-sm">{form.errors.password}</p>}
               </div>
-              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signInLoading}>
-                {signInLoading ? 'Signing in...' : 'Sign In'}
+              
+              {/* Specific error message */}
+              {specificError && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{specificError}</p>
+                </div>
+              )}
+              
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg font-semibold" 
+                disabled={signInLoading}
+              >
+                {signInLoading ? '🔄 Signing in...' : '☕ Sign In'}
               </Button>
             </form>
+            
             <div className="mt-6 text-center text-sm text-gray-600">
               Don&apos;t have an account?{' '}
               <Link href="/auth/signup" className="text-amber-700 hover:underline font-medium">
-                Sign up
+                Sign up here
+              </Link>
+            </div>
+            
+            <div className="mt-4 text-center text-xs text-gray-400">
+              <Link href="/auth/verify" className="text-amber-600 hover:underline">
+                Need to verify your email?
               </Link>
             </div>
           </CardContent>
@@ -122,7 +182,7 @@ export default function SignInPage() {
         <div className="w-full max-w-md">
           <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Loading...</CardTitle>
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Loading...</CardTitle>
             </CardHeader>
           </Card>
         </div>

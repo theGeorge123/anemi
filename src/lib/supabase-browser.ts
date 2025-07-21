@@ -1,5 +1,43 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Custom storage to handle stale tokens
+const customStorage = {
+  getItem: (key: string) => {
+    // Clear stale tokens when switching from localhost to production
+    if (typeof window !== 'undefined') {
+      const currentDomain = window.location.hostname;
+      const isProduction = currentDomain !== 'localhost' && !currentDomain.includes('127.0.0.1');
+      
+      if (isProduction && key.includes('sb-') && key.includes('auth-token')) {
+        // Check if token is from localhost
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          try {
+            const tokenData = JSON.parse(stored);
+            // If token was created for localhost, clear it
+            if (tokenData.currentSession?.access_token) {
+              console.log('🧹 Clearing stale auth token for production domain');
+              localStorage.removeItem(key);
+              return null;
+            }
+          } catch (e) {
+            // If parsing fails, clear it anyway
+            localStorage.removeItem(key);
+            return null;
+          }
+        }
+      }
+    }
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string) => {
+    localStorage.setItem(key, value);
+  },
+  removeItem: (key: string) => {
+    localStorage.removeItem(key);
+  }
+};
+
 // Create a singleton instance
 let supabaseClient: any = null;
 
@@ -52,6 +90,7 @@ export function getSupabaseClient() {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        storage: customStorage, // Use custom storage to handle stale tokens
       },
       global: {
         headers: {
@@ -129,4 +168,38 @@ export async function testSupabaseAuth() {
     console.error('❌ Unexpected error in auth test:', error);
     return { valid: false, error: 'Unexpected error in auth test' };
   }
+}
+
+// Function to manually clear stale tokens
+export function clearStaleTokens() {
+  if (typeof window === 'undefined') return;
+  
+  console.log('🧹 Clearing stale Supabase tokens...');
+  
+  // Clear all Supabase-related localStorage items
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.includes('sb-') || key.includes('supabase'))) {
+      keysToRemove.push(key);
+    }
+  }
+  
+  keysToRemove.forEach(key => {
+    console.log(`🗑️ Removing: ${key}`);
+    localStorage.removeItem(key);
+  });
+  
+  // Clear cookies
+  const cookies = document.cookie.split(';');
+  cookies.forEach(cookie => {
+    const [name] = cookie.split('=');
+    if (name && name.trim().includes('sb-')) {
+      const cookieName = name.trim();
+      console.log(`🗑️ Removing cookie: ${cookieName}`);
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+  });
+  
+  console.log('✅ Stale tokens cleared');
 } 

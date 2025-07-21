@@ -38,16 +38,27 @@ const Dashboard = withAuth(() => {
     
     const fetchMeetups = async () => {
       setIsLoading(true)
+      setError(null)
+      
       try {
+        console.log('🔍 Fetching meetups for user:', session.user.email)
+        
         const response = await fetch('/api/meetups')
+        console.log('📊 Response status:', response.status)
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch meetups')
+          const errorText = await response.text()
+          console.error('❌ API Error:', errorText)
+          throw new Error(`Failed to fetch meetups: ${response.status} ${errorText}`)
         }
+        
         const data = await response.json()
+        console.log('✅ Meetups data:', data)
+        
         setMeetups(data.meetups || [])
       } catch (error) {
-        console.error('Error fetching meetups:', error)
-        setError('Failed to load meetups')
+        console.error('❌ Error fetching meetups:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load meetups')
       } finally {
         setIsLoading(false)
       }
@@ -59,15 +70,15 @@ const Dashboard = withAuth(() => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">⏳ Pending</span>
+        return <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full font-medium">⏳ Wachten op reactie</span>
       case 'confirmed':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">✅ Confirmed</span>
+        return <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-medium">✅ Bevestigd!</span>
       case 'declined':
-        return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">❌ Declined</span>
+        return <span className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full font-medium">❌ Afgewezen</span>
       case 'expired':
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">⏰ Expired</span>
+        return <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full font-medium">⏰ Verlopen</span>
       default:
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">{status}</span>
+        return <span className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full font-medium">{status}</span>
     }
   }
 
@@ -81,108 +92,144 @@ const Dashboard = withAuth(() => {
   }
 
   const getInviteLink = (token: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3005'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3007'
     return `${baseUrl}/invite/${token}`
   }
 
   return (
     <main className="max-w-4xl mx-auto p-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">☕ My Meetups</h1>
-        <p className="text-gray-600">Manage your coffee meetups and invitations</p>
+      <div className="mb-8 text-center">
+        <div className="flex items-center justify-center mb-4">
+          <span className="text-4xl mr-3">☕</span>
+          <h1 className="text-4xl font-bold text-gray-900">Hey there!</h1>
+        </div>
+        <p className="text-gray-600 text-lg">Ready to discover some amazing coffee spots? 🚀</p>
       </div>
       
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">☕</span>
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <span className="text-3xl">☕</span>
           </div>
-          <p className="text-gray-500">Loading your meetups...</p>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading your coffee adventures...</h2>
+          <p className="text-gray-500">Brewing up something special for you! ✨</p>
         </div>
       ) : error ? (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">❌</span>
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">😅</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Error loading meetups</h2>
-          <p className="text-gray-500 mb-6">{error}</p>
-          <Button onClick={() => window.location.reload()}>
-            Try Again
-          </Button>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oops! Something went wrong</h2>
+          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            Don't worry, it happens to the best of us! Let's try again and get you back to your coffee adventures.
+          </p>
+          <div className="space-y-4">
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="bg-amber-600 hover:bg-amber-700 px-6 py-3"
+            >
+              🔄 Try Again
+            </Button>
+            <div className="text-sm text-gray-400">
+              or <Link href="/debug-vercel" className="text-amber-600 hover:underline">check what's up</Link>
+            </div>
+          </div>
         </div>
       ) : meetups.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">☕</span>
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">🌟</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">No meetups yet!</h2>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            Ready to start your coffee adventure? Create your first meetup and discover amazing coffee spots with new friends.
+          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Your coffee journey starts here!</h2>
+          <p className="text-gray-500 mb-8 max-w-md mx-auto">
+            No meetups yet, but that's totally fine! Let's create your first coffee adventure and discover amazing spots with new friends.
           </p>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Link href="/create">
-              <Button className="bg-amber-600 hover:bg-amber-700">
-                ☕ Create Your First Meetup
+              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 text-lg font-semibold">
+                ☕ Start Your First Coffee Adventure
               </Button>
             </Link>
             <div className="text-sm text-gray-400">
-              or <Link href="/" className="text-amber-600 hover:underline">explore the app</Link>
+              or <Link href="/" className="text-amber-600 hover:underline">explore what we're all about</Link>
             </div>
           </div>
         </div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-900">Your Meetups ({meetups.length})</h2>
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900">Your Coffee Adventures ({meetups.length})</h2>
+              <p className="text-gray-500">All your meetups in one cozy place ☕</p>
+            </div>
             <Link href="/create">
-              <Button size="sm" className="bg-amber-600 hover:bg-amber-700">
-                + New Meetup
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                ✨ New Adventure
               </Button>
             </Link>
           </div>
           
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {meetups.map((meetup) => (
-              <Card key={meetup.id} className="hover:shadow-md transition-shadow">
+              <Card key={meetup.id} className="hover:shadow-lg transition-all duration-300 border-amber-100">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Coffee at {meetup.cafe.name}
+                      <div className="flex items-center gap-3 mb-3">
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          ☕ Coffee at {meetup.cafe.name}
                         </h3>
                         {getStatusBadge(meetup.status)}
                       </div>
                       
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p>📍 {meetup.cafe.address}, {meetup.cafe.city}</p>
-                        <p>👤 Organized by: {meetup.organizerName}</p>
-                        <p>📅 Available dates: {meetup.availableDates.length} selected</p>
-                        <p>⏰ Available times: {meetup.availableTimes.length} selected</p>
+                      <div className="text-sm text-gray-600 space-y-2">
+                        <p className="flex items-center gap-2">
+                          <span className="text-amber-600">📍</span> 
+                          {meetup.cafe.address}, {meetup.cafe.city}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="text-amber-600">👤</span> 
+                          Organized by: {meetup.organizerName}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="text-amber-600">📅</span> 
+                          {meetup.availableDates.length} dates available
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="text-amber-600">⏰</span> 
+                          {meetup.availableTimes.length} time slots
+                        </p>
                         {meetup.chosenDate && (
-                          <p className="text-green-600 font-medium">
-                            ✅ Confirmed for: {formatDate(meetup.chosenDate)}
+                          <p className="flex items-center gap-2 text-green-600 font-medium">
+                            <span>✅</span> 
+                            Confirmed for: {formatDate(meetup.chosenDate)}
                           </p>
                         )}
                         {meetup.inviteeName && (
-                          <p>👥 Meeting with: {meetup.inviteeName}</p>
+                          <p className="flex items-center gap-2">
+                            <span className="text-amber-600">👥</span> 
+                            Meeting with: {meetup.inviteeName}
+                          </p>
                         )}
-                        <p>📅 Created: {formatDate(meetup.createdAt)}</p>
-                        <p>⏰ Expires: {formatDate(meetup.expiresAt)}</p>
+                        <div className="flex gap-4 text-xs text-gray-400 mt-3">
+                          <span>📅 Created: {formatDate(meetup.createdAt)}</span>
+                          <span>⏰ Expires: {formatDate(meetup.expiresAt)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     {meetup.status === 'pending' && (
                       <>
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="border-amber-200 text-amber-700 hover:bg-amber-50"
                           onClick={() => {
                             const link = getInviteLink(meetup.token)
                             navigator.clipboard.writeText(link)
-                            alert('Invite link copied to clipboard!')
+                            alert('Invite link copied! Share it with your coffee buddy ☕')
                           }}
                         >
                           📋 Copy Invite Link
@@ -190,6 +237,7 @@ const Dashboard = withAuth(() => {
                         <Button 
                           variant="outline" 
                           size="sm"
+                          className="border-amber-200 text-amber-700 hover:bg-amber-50"
                           onClick={() => {
                             const link = getInviteLink(meetup.token)
                             window.open(link, '_blank')
@@ -203,9 +251,9 @@ const Dashboard = withAuth(() => {
                       <Button 
                         variant="outline" 
                         size="sm"
+                        className="border-green-200 text-green-700 hover:bg-green-50"
                         onClick={() => {
-                          // TODO: Add calendar integration
-                          alert('Calendar integration coming soon!')
+                          alert('Calendar integration coming soon! 📅')
                         }}
                       >
                         📅 Add to Calendar

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { ErrorService } from '@/lib/error-service'
+import { useCallback } from 'react'
 
 function VerifyPageContent() {
   const { client } = useSupabase()
@@ -18,13 +19,7 @@ function VerifyPageContent() {
   const token = searchParams.get('token')
   const email = searchParams.get('email')
 
-  useEffect(() => {
-    if (token && email) {
-      handleVerification()
-    }
-  }, [token, email])
-
-  const handleVerification = async () => {
+  const handleVerification = useCallback(async () => {
     if (!token || !email) return
 
     setIsVerifying(true)
@@ -67,7 +62,13 @@ function VerifyPageContent() {
     } finally {
       setIsVerifying(false)
     }
-  }
+  }, [token, email, router])
+
+  useEffect(() => {
+    if (token && email) {
+      handleVerification()
+    }
+  }, [token, email, handleVerification])
 
   const resendVerification = async () => {
     if (!email) return

@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, XCircle, Coffee, Heart } from 'lucide-react'
 
-export default function ConfirmedPage() {
+function ConfirmedPageContent() {
   const searchParams = useSearchParams()
   const status = searchParams.get('status')
   const [mounted, setMounted] = useState(false)
@@ -104,14 +104,6 @@ export default function ConfirmedPage() {
               >
                 Terug naar home
               </Button>
-              
-              <Button
-                onClick={() => window.location.href = '/create'}
-                variant="outline"
-                className="w-full"
-              >
-                Maak zelf een meetup
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -119,33 +111,67 @@ export default function ConfirmedPage() {
     )
   }
 
-  // Default fallback
+  // Default case - no status or invalid status
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardContent className="p-8 text-center">
           <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">☕</span>
+            <Coffee className="w-12 h-12 text-amber-600" />
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Oeps! 🤔
+            Welkom bij Anemi Meets! ☕
           </h1>
           
           <p className="text-lg text-gray-600 mb-6">
-            Er is iets misgegaan. 
-            <br />
-            Probeer het opnieuw!
+            Je bent succesvol geregistreerd en klaar om coffee meetups te ontdekken!
           </p>
 
-          <Button
-            onClick={() => window.location.href = '/'}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-          >
-            Terug naar home
-          </Button>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <Heart className="w-5 h-5 text-amber-600" />
+              <p className="text-amber-800">
+                <strong>Start je coffee adventure</strong> door je eerste meetup te maken!
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <Button
+              onClick={() => window.location.href = '/create'}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              Maak je eerste meetup
+            </Button>
+            
+            <Button
+              onClick={() => window.location.href = '/'}
+              variant="outline"
+              className="w-full"
+            >
+              Verken de app
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function ConfirmedPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Coffee className="w-12 h-12 text-amber-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Laden...</h1>
+        </div>
+      </div>
+    }>
+      <ConfirmedPageContent />
+    </Suspense>
   )
 } 

@@ -217,7 +217,7 @@ export default function TestRetentionPage() {
                 Klaar om te testen!
               </h3>
               <p className="text-gray-600 mb-4">
-                Klik op "Run Retention Tests" om alle retention features te testen.
+                Klik op &quot;Run Retention Tests&quot; om alle retention features te testen.
                 Dit zal controleren of alle systemen correct werken.
               </p>
               <div className="text-sm text-gray-500">

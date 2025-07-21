@@ -303,8 +303,8 @@ export default function SimpleRetentionTestPage() {
                 Klaar om te testen!
               </h3>
               <p className="text-gray-600 mb-4">
-                Klik op "Run Simple Tests" om de retention features te testen.
-                Dit test alleen de core functionaliteit zonder complexe dependencies.
+                Klik op &quot;Run Simple Tests&quot; om de retention features te testen.
+                Dit zal controleren of alle systemen correct werken.
               </p>
               <div className="text-sm text-gray-500">
                 <p>✅ Module Imports</p>

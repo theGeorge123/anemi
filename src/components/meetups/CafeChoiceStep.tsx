@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { type City } from '@/constants/cities'
@@ -27,7 +27,7 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
   const [error, setError] = useState<string | null>(null)
   const [shuffling, setShuffling] = useState(false)
 
-    const fetchRandomCafe = async (isShuffle = false) => {
+    const fetchRandomCafe = useCallback(async (isShuffle = false) => {
     try {
       if (isShuffle) {
         setShuffling(true)
@@ -56,11 +56,11 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
       setLoading(false)
       setShuffling(false)
     }
-  }
+  }, [selectedCity])
 
   useEffect(() => {
     fetchRandomCafe()
-  }, [selectedCity])
+  }, [fetchRandomCafe])
 
   if (loading) {
     return (

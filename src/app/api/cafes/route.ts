@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const city = searchParams.get('city')
     const random = searchParams.get('random') === 'true'
     
-    // Force dynamic rendering
-    const url = request.url
-
     if (!city) {
       return NextResponse.json(
         { error: 'City parameter is required' },

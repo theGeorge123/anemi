@@ -6,15 +6,35 @@ interface StepIndicatorProps {
 }
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
-  const steps = [
-    { number: 1, label: 'Who are you?', emoji: '👋' },
-    { number: 2, label: 'Where?', emoji: '🌍' },
-    { number: 3, label: 'When?', emoji: '📅' },
-    { number: 4, label: 'What times?', emoji: '⏰' },
-    { number: 5, label: 'Date + Time', emoji: '🗓️' },
-    { number: 6, label: 'Budget?', emoji: '💰' },
-    { number: 7, label: 'Ready!', emoji: '🎉' }
-  ]
+  const getStepLabel = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 1: return { label: 'Wie ben je?', emoji: '👋' }
+      case 2: return { label: 'Waar?', emoji: '🌍' }
+      case 3: return { label: 'Wanneer?', emoji: '📅' }
+      case 4: 
+        if (totalSteps >= 6) return { label: 'Tijden per datum', emoji: '🗓️' }
+        return { label: 'Cafe?', emoji: '☕' }
+      case 5:
+        if (totalSteps >= 7) return { label: 'Cafe?', emoji: '☕' }
+        if (totalSteps === 6) return { label: 'Cafe?', emoji: '☕' }
+        return { label: 'Klaar!', emoji: '🎉' }
+      case 6:
+        if (totalSteps >= 8) return { label: 'Cafe selectie', emoji: '📋' }
+        if (totalSteps === 7) return { label: 'Cafe selectie', emoji: '📋' }
+        return { label: 'Klaar!', emoji: '🎉' }
+      case 7:
+        if (totalSteps === 8) return { label: 'Klaar!', emoji: '🎉' }
+        return { label: 'Cafe selectie', emoji: '📋' }
+      case 8: return { label: 'Klaar!', emoji: '🎉' }
+      default: return { label: 'Stap', emoji: '📝' }
+    }
+  }
+
+  const steps = Array.from({ length: totalSteps }, (_, i) => {
+    const stepNumber = i + 1
+    const { label, emoji } = getStepLabel(stepNumber)
+    return { number: stepNumber, label, emoji }
+  })
 
   return (
     <div className="mb-8">

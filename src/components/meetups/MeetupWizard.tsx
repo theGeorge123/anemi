@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StepContent } from './StepContent';
 import { StepIndicator } from './StepIndicator';
+import { InviteModal } from './InviteModal';
 import { type City } from '@/constants/cities';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSupabase } from '@/components/SupabaseProvider';
@@ -32,6 +33,8 @@ const initialFormData: MeetupFormData = {
 export function MeetupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<MeetupFormData>(initialFormData);
+  const [inviteCode, setInviteCode] = useState<string>('');
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const { session } = useSupabase();
 
   // Initialize email from user session
@@ -48,6 +51,14 @@ export function MeetupWizard() {
 
   const handleFinish = async () => {
     try {
+      // Check if user is logged in
+      if (!session?.user?.email) {
+        console.error('User not logged in');
+        // Redirect to login with return URL
+        window.location.href = `/auth/signin?redirect=${encodeURIComponent('/create')}`;
+        return;
+      }
+
       // Generate invite code
       const response = await fetch('/api/generate-invite', {
         method: 'POST',
@@ -68,24 +79,29 @@ export function MeetupWizard() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate invite');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate invite');
       }
 
       const data = await response.json();
       
-      // Redirect to invite page with the generated code
-      window.location.href = `/invite/${data.invite.token}`;
+      // Show invite code modal instead of redirecting
+      setInviteCode(data.invite.token);
+      setShowInviteModal(true);
     } catch (error) {
       console.error('Error generating invite:', error);
       // Handle error - could show a toast or error message
     }
   };
 
+  // Total steps will be calculated dynamically in StepContent
+  const [totalSteps, setTotalSteps] = useState(5);
+
   return (
     <div className="meetup-wizard">
       <Card className="shadow-lg animate-bounceIn">
         <CardContent className="p-8">
-          <StepIndicator currentStep={currentStep} totalSteps={7} />
+          <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
           <StepContent
             currentStep={currentStep}
             formData={formData as FormData}
@@ -93,9 +109,16 @@ export function MeetupWizard() {
             onNext={handleNext}
             onBack={handleBack}
             onFinish={handleFinish}
+            onTotalStepsChange={setTotalSteps}
           />
         </CardContent>
       </Card>
+      
+      <InviteModal
+        inviteCode={inviteCode}
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+      />
     </div>
   );
 } 

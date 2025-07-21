@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,9 +13,11 @@ import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
 
-export default function SignInPage() {
+function SignInPageContent() {
   const { client } = useSupabase()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect')
 
   const form = useFormValidation({
     email: '',
@@ -39,7 +41,9 @@ export default function SignInPage() {
   }, {
     onSuccess: () => {
       ErrorService.showToast('Signed in successfully!', 'success')
-      router.push('/dashboard')
+      // Redirect to the original URL if provided, otherwise to dashboard
+      const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
+      router.push(targetUrl)
     },
     onError: (err) => {
       ErrorService.showToast(ErrorService.handleError(err), 'error')
@@ -59,7 +63,12 @@ export default function SignInPage() {
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Sign in</CardTitle>
-            <CardDescription className="text-base text-gray-500">Welcome back! Sign in to your account to continue.</CardDescription>
+            <CardDescription className="text-base text-gray-500">
+              {redirectUrl 
+                ? 'Sign in to continue to your destination'
+                : 'Welcome back! Sign in to your account to continue.'
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-5">
@@ -103,5 +112,23 @@ export default function SignInPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
+        <div className="w-full max-w-md">
+          <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Loading...</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    }>
+      <SignInPageContent />
+    </Suspense>
   )
 } 

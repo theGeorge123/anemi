@@ -8,13 +8,6 @@ export async function POST(request: NextRequest) {
     const supabase = createRouteHandlerClient({ cookies })
     const { data: { user } } = await supabase.auth.getUser()
     
-    if (!user?.email) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
     const {
       organizerName,
@@ -27,6 +20,16 @@ export async function POST(request: NextRequest) {
       viewType,
       cafeId
     } = body
+    
+    // Get user email from request body if not authenticated
+    let userEmail = user?.email || organizerEmail
+    
+    if (!userEmail) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No user email found' },
+        { status: 401 }
+      )
+    }
 
     // Validate required fields
     if (!organizerName || !organizerEmail || !city || !dates || !times) {
@@ -54,7 +57,7 @@ export async function POST(request: NextRequest) {
         availableTimes: times,
         status: 'pending',
         expiresAt,
-        createdBy: user.email
+        createdBy: userEmail
       }
     })
 

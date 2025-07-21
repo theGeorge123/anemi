@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,9 +13,11 @@ import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
 
-export default function SignUpPage() {
+function SignUpPageContent() {
   const { client } = useSupabase()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams.get('redirect')
 
   const form = useFormValidation({
     email: '',
@@ -94,7 +96,9 @@ export default function SignUpPage() {
   }, {
     onSuccess: () => {
       ErrorService.showToast('🎉 Account created and signed in! Check your email for a fun verification message to start your coffee adventure!', 'success')
-      router.push('/dashboard')
+      // Redirect to the original URL if provided, otherwise to dashboard
+      const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
+      router.push(targetUrl)
     },
     onError: (err) => {
       console.error('Signup error:', err)
@@ -141,7 +145,12 @@ export default function SignUpPage() {
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Create your account</CardTitle>
-            <CardDescription className="text-base text-gray-500">Sign up in seconds and unlock a world of coffee meetups, new friends, and good vibes. ☕️✨</CardDescription>
+            <CardDescription className="text-base text-gray-500">
+              {redirectUrl 
+                ? 'Sign up to continue to your destination'
+                : 'Sign up in seconds and unlock a world of coffee meetups, new friends, and good vibes. ☕️✨'
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-5">
@@ -191,7 +200,7 @@ export default function SignUpPage() {
             </form>
             <div className="mt-6 text-center text-sm text-gray-600">
               Already have an account?{' '}
-              <Link href="/auth/signin" className="text-amber-700 hover:underline font-medium">
+              <Link href={`/auth/signin${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
                 Sign in
               </Link>
             </div>
@@ -199,5 +208,23 @@ export default function SignUpPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
+        <div className="w-full max-w-md">
+          <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Loading...</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    }>
+      <SignUpPageContent />
+    </Suspense>
   )
 } 

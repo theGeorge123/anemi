@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { DeclineModal } from '@/components/meetups/DeclineModal'
 
 interface InviteData {
   token: string
@@ -28,6 +29,9 @@ export default function InvitePage() {
   const [inviteeName, setInviteeName] = useState('')
   const [inviteeEmail, setInviteeEmail] = useState('')
   const [accepting, setAccepting] = useState(false)
+  const [declining, setDeclining] = useState(false)
+  const [showDeclineModal, setShowDeclineModal] = useState(false)
+  const [declineReason, setDeclineReason] = useState('')
 
   useEffect(() => {
     const fetchInvite = async () => {
@@ -53,7 +57,7 @@ export default function InvitePage() {
 
   const handleAccept = async () => {
     if (!inviteeName.trim() || !inviteeEmail.trim()) {
-      setError('Please fill in your name and email')
+      setError('Vul je naam en email in')
       return
     }
 
@@ -74,12 +78,46 @@ export default function InvitePage() {
         throw new Error('Failed to accept invite')
       }
 
-      // Redirect to success page or dashboard
-      window.location.href = '/dashboard?invite=accepted'
+      // Redirect to success page
+      window.location.href = '/confirmed?status=accepted'
     } catch (error) {
-      setError('Failed to accept invite. Please try again.')
+      setError('Kon invite niet accepteren. Probeer het opnieuw.')
     } finally {
       setAccepting(false)
+    }
+  }
+
+  const handleDecline = async (reason: string) => {
+    if (!inviteeName.trim() || !inviteeEmail.trim()) {
+      setError('Vul je naam en email in')
+      return
+    }
+
+    try {
+      setDeclining(true)
+      const response = await fetch(`/api/invite/${token}/decline`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inviteeName,
+          inviteeEmail,
+          reason,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to decline invite')
+      }
+
+      // Redirect to decline page
+      window.location.href = '/confirmed?status=declined'
+    } catch (error) {
+      setError('Kon invite niet afwijzen. Probeer het opnieuw.')
+    } finally {
+      setDeclining(false)
+      setShowDeclineModal(false)
     }
   }
 
@@ -89,8 +127,11 @@ export default function InvitePage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-6">
             <div className="text-center">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">☕</span>
+              </div>
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading invite...</p>
+              <p className="text-gray-600">Even geduld, we laden je invite...</p>
             </div>
           </CardContent>
         </Card>
@@ -104,11 +145,13 @@ export default function InvitePage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="text-4xl mb-4">😕</div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Invite Not Found</h2>
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">😕</span>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Oeps! Invite niet gevonden</h2>
               <p className="text-gray-600 mb-4">{error}</p>
               <Button onClick={() => window.location.href = '/'}>
-                Go Home
+                Terug naar home
               </Button>
             </div>
           </CardContent>
@@ -126,12 +169,14 @@ export default function InvitePage() {
       <Card className="w-full max-w-2xl">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <div className="text-6xl mb-4">☕</div>
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">☕</span>
+            </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Je bent uitgenodigd voor een koffie!
+              Je bent uitgenodigd voor een koffie! 🎉
             </h1>
-            <p className="text-gray-600">
-              {invite.organizerName} heeft een meetup gepland en nodigt je uit
+            <p className="text-gray-600 text-lg">
+              <strong>{invite.organizerName}</strong> heeft een meetup gepland en nodigt je uit
             </p>
           </div>
 
@@ -209,18 +254,19 @@ export default function InvitePage() {
             <div className="flex gap-4 pt-4">
               <Button
                 onClick={handleAccept}
-                disabled={accepting || !inviteeName.trim() || !inviteeEmail.trim()}
-                className="flex-1 bg-amber-500 hover:bg-amber-600"
+                disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
               >
-                {accepting ? 'Accepteren...' : '✅ Accepteren'}
+                {accepting ? 'Accepteren...' : '✅ Ja, ik ga mee!'}
               </Button>
               
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/'}
-                className="flex-1"
+                onClick={() => setShowDeclineModal(true)}
+                disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
               >
-                ❌ Afwijzen
+                {declining ? 'Afwijzen...' : '❌ Nee, helaas'}
               </Button>
             </div>
 
@@ -230,6 +276,13 @@ export default function InvitePage() {
           </div>
         </CardContent>
       </Card>
+      
+      <DeclineModal
+        isOpen={showDeclineModal}
+        onClose={() => setShowDeclineModal(false)}
+        onConfirm={handleDecline}
+        isDeclining={declining}
+      />
     </div>
   )
 } 

@@ -165,9 +165,11 @@ model MeetupInvite {
   availableTimes  String[]  // Array of time preferences
   chosenDate      String?   // ISO date string
   chosenTime      String?   // Selected time
-  status          String    @default("pending") // pending, confirmed, expired
+  status          String    @default("pending") // pending, confirmed, declined, expired
   expiresAt       DateTime
   confirmedAt     DateTime?
+  declinedAt      DateTime?
+  declineReason   String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime? // Soft delete

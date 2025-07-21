@@ -23,6 +23,8 @@ export default function DebugEnvPage() {
         RESEND_API_KEY: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
         NODE_ENV: process.env.NODE_ENV,
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+        VERCEL_URL: process.env.VERCEL_URL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
       }
       setEnvVars(env)
 
@@ -30,8 +32,12 @@ export default function DebugEnvPage() {
       console.log('🔍 Environment Debug Info:')
       console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
       console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY length:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length)
+      console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY starts with:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 10))
       console.log('NODE_ENV:', process.env.NODE_ENV)
       console.log('NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL)
+      console.log('VERCEL_URL:', process.env.VERCEL_URL)
+      console.log('VERCEL_ENV:', process.env.VERCEL_ENV)
+      console.log('Is Vercel:', !!process.env.VERCEL_URL)
 
       // Test Supabase connection
       try {

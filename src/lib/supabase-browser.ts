@@ -12,11 +12,15 @@ export function getSupabaseClient() {
   console.log('Key exists:', !!key)
   console.log('URL starts with https:', url?.startsWith('https://'))
   console.log('Key length:', key?.length)
+  console.log('Is Vercel environment:', !!process.env.VERCEL_URL)
+  console.log('NODE_ENV:', process.env.NODE_ENV)
   
   if (!url || !key) {
     console.error('❌ getSupabaseClient: Missing environment variables');
     console.error('NEXT_PUBLIC_SUPABASE_URL:', url ? '✅ Set' : '❌ Missing');
     console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', key ? '✅ Set' : '❌ Missing');
+    console.error('VERCEL_URL:', process.env.VERCEL_URL);
+    console.error('VERCEL_ENV:', process.env.VERCEL_ENV);
     return null;
   }
 
@@ -40,6 +44,9 @@ export function getSupabaseClient() {
   
   try {
     console.log('🔧 Creating new Supabase client...');
+    console.log('🔧 URL:', url);
+    console.log('🔧 Key starts with:', key.substring(0, 10) + '...');
+    
     supabaseClient = createClient(url, key, {
       auth: {
         persistSession: true,

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       invite: {
         token: invite.token,
         expiresAt: invite.expiresAt,
-        inviteUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3003'}/invite/${token}`
+        inviteUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/invite/${token}`
       }
     })
   } catch (error) {

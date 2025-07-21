@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate invite link
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     const inviteLink = `${baseUrl}/invite/${token}`
 
     // Send invite email with the link

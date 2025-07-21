@@ -15,7 +15,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 DATABASE_URL=postgresql://postgres.cceqmxxtjbuxbznatskj:xohhit-jizwif-0zoWcy@aws-0-eu-central-1.pooler.supabase.com:5432/postgres
 RESEND_API_KEY=re_5qwUzMsy_PdsXke5gM52LGbUFMG91HY3m
 EMAIL_FROM=team@anemimeets.com
-GOOGLE_MAPS_API_KEY=AIzaSyASE0Eb-TR0tbtmkzSP1imlX-7gddIYrEg
+GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 NEXT_PUBLIC_SITE_URL=https://your-vercel-domain.vercel.app
 ```
 

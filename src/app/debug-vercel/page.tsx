@@ -29,6 +29,12 @@ interface DebugInfo {
     validationResult: any
     authTestResult: any
   }
+  domain: {
+    currentDomain: string
+    customDomain: string
+    vercelUrl: string
+    siteUrlEnv: string
+  }
 }
 
 export default function DebugVercelPage() {
@@ -47,7 +53,19 @@ export default function DebugVercelPage() {
       }
       
       const data = await response.json()
-      setDebugInfo(data)
+      
+      // Add domain information
+      const domainInfo = {
+        currentDomain: window.location.hostname,
+        customDomain: 'www.anemimeets.com',
+        vercelUrl: data.environment?.VERCEL_URL || 'Not set',
+        siteUrlEnv: data.other?.siteUrl || 'Not set'
+      }
+      
+      setDebugInfo({
+        ...data,
+        domain: domainInfo
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
@@ -78,6 +96,56 @@ export default function DebugVercelPage() {
 
       {debugInfo && (
         <div className="space-y-6">
+          {/* Domain Info */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">🌐 Domain Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <strong>Current Domain:</strong> 
+                <span className={`ml-2 px-2 py-1 rounded text-xs ${debugInfo.domain.currentDomain === 'www.anemimeets.com' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                  {debugInfo.domain.currentDomain}
+                </span>
+              </div>
+              <div>
+                <strong>Custom Domain:</strong> 
+                <span className="ml-2 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                  {debugInfo.domain.customDomain}
+                </span>
+              </div>
+              <div>
+                <strong>Vercel URL:</strong> 
+                <span className="ml-2 px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
+                  {debugInfo.domain.vercelUrl}
+                </span>
+              </div>
+              <div>
+                <strong>Site URL Env:</strong> 
+                <span className={`ml-2 px-2 py-1 rounded text-xs ${debugInfo.domain.siteUrlEnv === 'Not set' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {debugInfo.domain.siteUrlEnv}
+                </span>
+              </div>
+            </div>
+            
+            {debugInfo.domain.siteUrlEnv === 'Not set' && (
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Missing Site URL</h3>
+                <p className="text-yellow-700 text-sm mb-3">
+                  The <code>NEXT_PUBLIC_SITE_URL</code> environment variable is not set. This can cause issues with invite links and redirects.
+                </p>
+                <div className="text-sm text-yellow-700">
+                  <strong>To fix this:</strong>
+                  <ol className="list-decimal list-inside mt-2 space-y-1">
+                    <li>Go to your Vercel dashboard</li>
+                    <li>Navigate to your project settings</li>
+                    <li>Go to Environment Variables</li>
+                    <li>Add: <code>NEXT_PUBLIC_SITE_URL=https://www.anemimeets.com</code></li>
+                    <li>Redeploy your application</li>
+                  </ol>
+                </div>
+              </div>
+            )}
+          </Card>
+
           {/* Environment Info */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">🌍 Environment</h2>

@@ -1,59 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseClient, validateSupabaseConnection, testSupabaseAuth } from '@/lib/supabase-browser'
+import { validateSupabaseConnection, testSupabaseAuth } from '@/lib/supabase-browser'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const debugInfo = {
-      timestamp: new Date().toISOString(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV,
-        VERCEL: process.env.VERCEL,
-        VERCEL_URL: process.env.VERCEL_URL,
-        VERCEL_ENV: process.env.VERCEL_ENV,
-      },
-      supabase: {
-        url: process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing',
-        anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
-        serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
-      },
-      other: {
-        databaseUrl: process.env.DATABASE_URL ? '✅ Set' : '❌ Missing',
-        resendApiKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
-        emailFrom: process.env.EMAIL_FROM ? '✅ Set' : '❌ Missing',
-        googleMapsKey: process.env.GOOGLE_MAPS_API_KEY ? '✅ Set' : '❌ Missing',
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL ? '✅ Set' : '❌ Missing',
-      },
-      connection: {
-        supabaseClient: null as any,
-        validationResult: null as any,
-        authTestResult: null as any,
-      }
+    // Get environment variables
+    const environment = {
+      NODE_ENV: process.env.NODE_ENV || 'Not set',
+      VERCEL: process.env.VERCEL || 'Not set',
+      VERCEL_URL: process.env.VERCEL_URL || 'Not set',
+      VERCEL_ENV: process.env.VERCEL_ENV || 'Not set',
     }
 
-    // Test Supabase client creation
-    try {
-      const client = getSupabaseClient()
-      debugInfo.connection.supabaseClient = client ? '✅ Created' : '❌ Failed'
-      
-      if (client) {
-        // Test connection
-        const validationResult = await validateSupabaseConnection()
-        debugInfo.connection.validationResult = validationResult
-        
-        // Test auth
-        const authTestResult = await testSupabaseAuth()
-        debugInfo.connection.authTestResult = authTestResult
+    const supabase = {
+      url: process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing',
+      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+      serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing',
+    }
+
+    const other = {
+      databaseUrl: process.env.DATABASE_URL ? '✅ Set' : '❌ Missing',
+      resendApiKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
+      emailFrom: process.env.EMAIL_FROM ? '✅ Set' : '❌ Missing',
+      googleMapsKey: process.env.GOOGLE_MAPS_API_KEY ? '✅ Set' : '❌ Missing',
+      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '❌ Missing',
+    }
+
+    // Test Supabase connection
+    const connectionResult = await validateSupabaseConnection()
+    const authTestResult = await testSupabaseAuth()
+
+    // Get current domain info
+    const host = request.headers.get('host') || 'unknown'
+    const protocol = request.headers.get('x-forwarded-proto') || 'http'
+    const currentDomain = `${protocol}://${host}`
+
+    const debugInfo = {
+      timestamp: new Date().toISOString(),
+      environment,
+      supabase,
+      other,
+      connection: {
+        supabaseClient: connectionResult.valid ? '✅ Created' : '❌ Failed',
+        validationResult: connectionResult,
+        authTestResult: authTestResult,
+      },
+      domain: {
+        currentDomain,
+        customDomain: 'https://www.anemimeets.com',
+        vercelUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'Not set',
+        siteUrlEnv: process.env.NEXT_PUBLIC_SITE_URL || 'Not set',
       }
-    } catch (error) {
-      debugInfo.connection.supabaseClient = `❌ Error: ${error}`
     }
 
     return NextResponse.json(debugInfo)
   } catch (error) {
+    console.error('Debug API error:', error)
     return NextResponse.json(
-      { error: 'Debug failed', details: error },
+      { 
+        error: 'Failed to get debug info',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

@@ -121,7 +121,7 @@ const Dashboard = withAuth(() => {
           </div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oops! Something went wrong</h2>
           <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            Don't worry, it happens to the best of us! Let's try again and get you back to your coffee adventures.
+            Don&apos;t worry, it happens to the best of us! Let&apos;s try again and get you back to your coffee adventures.
           </p>
           <div className="space-y-4">
             <Button 
@@ -131,7 +131,7 @@ const Dashboard = withAuth(() => {
               🔄 Try Again
             </Button>
             <div className="text-sm text-gray-400">
-              or <Link href="/debug-vercel" className="text-amber-600 hover:underline">check what's up</Link>
+              or <Link href="/debug-vercel" className="text-amber-600 hover:underline">check what&apos;s up</Link>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ const Dashboard = withAuth(() => {
           </div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-3">Your coffee journey starts here!</h2>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">
-            No meetups yet, but that's totally fine! Let's create your first coffee adventure and discover amazing spots with new friends.
+            No meetups yet, but that&apos;s totally fine! Let&apos;s create your first coffee adventure and discover amazing spots with new friends.
           </p>
           <div className="space-y-4">
             <Link href="/create">
@@ -151,7 +151,7 @@ const Dashboard = withAuth(() => {
               </Button>
             </Link>
             <div className="text-sm text-gray-400">
-              or <Link href="/" className="text-amber-600 hover:underline">explore what we're all about</Link>
+              or <Link href="/" className="text-amber-600 hover:underline">explore what we&apos;re all about</Link>
             </div>
           </div>
         </div>

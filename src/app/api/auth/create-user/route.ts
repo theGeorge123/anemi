@@ -20,11 +20,11 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Create user with admin privileges (this bypasses email confirmation)
+    // Create user with admin privileges but REQUIRE email confirmation
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email
+      email_confirm: false, // Require email confirmation
       user_metadata: {
         custom_email_verification: true
       }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       user: data.user,
-      message: 'User created successfully' 
+      message: 'User created successfully. Please check your email to verify your account.' 
     })
 
   } catch (error) {

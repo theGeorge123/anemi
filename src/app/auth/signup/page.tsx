@@ -64,17 +64,6 @@ function SignUpPageContent() {
 
     console.log('User created successfully')
     
-    // Automatically sign in the user after account creation
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: form.values.email,
-      password: form.values.password,
-    })
-
-    if (signInError) {
-      console.error('Auto sign-in error:', signInError)
-      // Don't throw error here, just log it - user can sign in manually
-    }
-    
     // Send our custom verification email
     const response = await fetch('/api/auth/verify-email', {
       method: 'POST',
@@ -95,10 +84,9 @@ function SignUpPageContent() {
     // No need to call the API endpoint manually
   }, {
     onSuccess: () => {
-      ErrorService.showToast('🎉 Account created and signed in! Check your email for a fun verification message to start your coffee adventure!', 'success')
-      // Redirect to the original URL if provided, otherwise to dashboard
-      const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
-      router.push(targetUrl)
+      ErrorService.showToast('🎉 Account created! Please check your email to verify your account before signing in.', 'success')
+      // Redirect to verification page instead of dashboard
+      router.push('/auth/verify?email=' + encodeURIComponent(form.values.email))
     },
     onError: (err) => {
       console.error('Signup error:', err)

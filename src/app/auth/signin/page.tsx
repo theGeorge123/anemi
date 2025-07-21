@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,16 @@ function SignInPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
+  const message = searchParams.get('message')
   const [specificError, setSpecificError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+  // Show success message if user just verified their email
+  useEffect(() => {
+    if (message === 'verified') {
+      setSuccessMessage('🎉 Email verified successfully! You can now sign in to start your coffee adventure.')
+    }
+  }, [message])
 
   const form = useFormValidation({
     email: '',
@@ -113,6 +122,13 @@ function SignInPageContent() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-5">
+              {/* Success message */}
+              {successMessage && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-700 text-sm">{successMessage}</p>
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

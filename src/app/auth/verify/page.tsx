@@ -15,9 +15,16 @@ function VerifyPageContent() {
   const searchParams = useSearchParams()
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
+  const [email, setEmail] = useState<string>('')
 
   const token = searchParams.get('token')
-  const email = searchParams.get('email')
+  const emailParam = searchParams.get('email')
+
+  useEffect(() => {
+    if (emailParam) {
+      setEmail(emailParam)
+    }
+  }, [emailParam])
 
   const handleVerification = useCallback(async () => {
     if (!token || !email) return
@@ -51,9 +58,9 @@ function VerifyPageContent() {
         console.error('Error sending welcome email:', error)
       }
       
-      // Redirect to the main app after a short delay
+      // Redirect to sign in page after a short delay
       setTimeout(() => {
-        router.push('/')
+        router.push('/auth/signin?message=verified')
       }, 3000)
     } catch (error) {
       console.error('Verification error:', error)
@@ -93,6 +100,56 @@ function VerifyPageContent() {
     }
   }
 
+  // If no token, show the verification pending page
+  if (!token && email) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
+        <div className="w-full max-w-md">
+          <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+            <CardHeader className="text-center pb-2">
+              <div className="text-6xl mb-4">📧</div>
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Check Your Email</CardTitle>
+              <CardDescription className="text-base text-gray-500">
+                We&apos;ve sent a verification link to <strong>{email}</strong>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="space-y-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-amber-800 mb-2">☕ Welcome to Anemi Meets!</h3>
+                  <p className="text-amber-700 text-sm">
+                    To start your coffee adventure, please click the verification link in your email.
+                  </p>
+                </div>
+                
+                <div className="text-sm text-gray-600 space-y-2">
+                  <p>📧 Check your inbox (and spam folder)</p>
+                  <p>🔗 Click the verification link</p>
+                  <p>✅ Come back here to sign in</p>
+                </div>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={resendVerification}
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
+                  >
+                    📧 Resend Verification Email
+                  </Button>
+                  
+                  <Link href="/auth/signin">
+                    <Button variant="outline" className="w-full">
+                      ☕ Back to Sign In
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
   if (verificationStatus === 'success') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
@@ -102,19 +159,26 @@ function VerifyPageContent() {
               <div className="text-6xl mb-4">🎉</div>
               <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Welcome to Anemi Meets!</CardTitle>
               <CardDescription className="text-base text-gray-500">
-                Your email has been verified successfully. Your coffee adventure is about to begin!
+                Your email has been verified successfully. You can now sign in to start your coffee adventure!
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <div className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-green-700">
+                    ✅ Email verified successfully!
+                  </p>
+                </div>
+                
                 <p className="text-gray-600">
-                  Redirecting you to the main app...
+                  Redirecting you to sign in...
                 </p>
+                
                 <Button 
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/auth/signin?message=verified')}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                 >
-                  Go to Anemi Meets
+                  ☕ Sign In Now
                 </Button>
               </div>
             </CardContent>
@@ -142,11 +206,11 @@ function VerifyPageContent() {
                   onClick={resendVerification}
                   className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                 >
-                  Resend Verification Email
+                  📧 Resend Verification Email
                 </Button>
                 <Link href="/auth/signin">
                   <Button variant="outline" className="w-full">
-                    Back to Sign In
+                    ☕ Back to Sign In
                   </Button>
                 </Link>
               </div>
@@ -183,11 +247,11 @@ function VerifyPageContent() {
                 className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                 disabled={isVerifying}
               >
-                Resend Verification Email
+                📧 Resend Verification Email
               </Button>
               <Link href="/auth/signin">
                 <Button variant="outline" className="w-full">
-                  Back to Sign In
+                  ☕ Back to Sign In
                 </Button>
               </Link>
             </div>

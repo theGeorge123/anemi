@@ -54,7 +54,7 @@ export default function FixTokensPage() {
         <h2 className="text-xl font-semibold mb-4">🚨 Probleem</h2>
         <p className="mb-4">
           Je hebt waarschijnlijk oude Supabase auth tokens van localhost in je browser die 
-          niet meer werken op de Vercel domain. Dit veroorzaakt de "Invalid login credentials" error.
+          niet meer werken op de Vercel domain. Dit veroorzaakt de &quot;Invalid login credentials&quot; error.
         </p>
         
         <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mb-4">

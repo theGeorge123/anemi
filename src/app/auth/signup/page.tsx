@@ -14,7 +14,7 @@ import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
 
 function SignUpPageContent() {
-  const { client } = useSupabase()
+  const { supabase } = useSupabase()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
@@ -34,7 +34,7 @@ function SignUpPageContent() {
     isLoading: signUpLoading,
     error: signUpError,
   } = useAsyncOperation(async () => {
-    if (!client) {
+    if (!supabase) {
       console.error('Supabase client not available')
       throw new Error('Authentication service not available. Please refresh the page and try again.')
     }
@@ -65,7 +65,7 @@ function SignUpPageContent() {
     console.log('User created successfully')
     
     // Automatically sign in the user after account creation
-    const { error: signInError } = await client.auth.signInWithPassword({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email: form.values.email,
       password: form.values.password,
     })
@@ -114,7 +114,7 @@ function SignUpPageContent() {
   }
 
   // Show error if Supabase client is not available
-  if (!client) {
+  if (!supabase) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
         <div className="w-full max-w-md">

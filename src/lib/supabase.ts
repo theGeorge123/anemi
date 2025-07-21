@@ -18,6 +18,13 @@ export const supabase = supabaseUrl && supabaseAnonKey
         persistSession: true,
         autoRefreshToken: true,
         storage: SecureStorage,
+        detectSessionInUrl: true,
+      },
+      global: {
+        headers: {
+          'apikey': supabaseAnonKey,
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+        },
       },
     })
   : null;
@@ -28,6 +35,12 @@ export const supabaseAdmin = supabaseUrl && process.env.SUPABASE_SERVICE_ROLE_KE
       auth: {
         autoRefreshToken: false,
         persistSession: false,
+      },
+      global: {
+        headers: {
+          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
       },
     })
   : null;

@@ -44,6 +44,13 @@ export function getSupabaseClient() {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+      global: {
+        headers: {
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
+        },
       },
     });
     

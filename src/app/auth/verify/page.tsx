@@ -10,7 +10,7 @@ import { ErrorService } from '@/lib/error-service'
 import { useCallback } from 'react'
 
 function VerifyPageContent() {
-  const { client } = useSupabase()
+  const { supabase } = useSupabase()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isVerifying, setIsVerifying] = useState(false)

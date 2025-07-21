@@ -3,46 +3,23 @@ import React, { useState, useEffect } from 'react'
 import { useSupabase } from './SupabaseProvider'
 import { useRouter, usePathname } from 'next/navigation'
 
-export function withAuth(Page: React.ComponentType) {
-  return function Protected(props: any) {
-    const { session, client } = useSupabase()
+export function withAuth<P extends object>(
+  Component: React.ComponentType<P>
+) {
+  return function AuthenticatedComponent(props: P) {
+    const { session, supabase, loading } = useSupabase()
     const router = useRouter()
-    const pathname = usePathname()
-    const [hasMounted, setHasMounted] = useState(false)
-
-    useEffect(() => {
-      setHasMounted(true)
-    }, [])
 
     // Always render loading on first mount (SSR and first client render)
-    if (!hasMounted) return <div>Loading...</div>
-    if (!client) return <div>Loading...</div>
+    if (loading) return <div>Loading...</div>
+
+    if (!supabase) return <div>Loading...</div>
+
     if (!session) {
-      // Create redirect URL with current path
-      const redirectUrl = encodeURIComponent(pathname)
-      const signinUrl = `/auth/signin?redirect=${redirectUrl}`
-      
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4 text-center">
-          <h2 className="text-4xl font-extrabold mb-4">👋 Hey coffee lover!</h2>
-          <p className="mb-6 text-lg max-w-xl mx-auto">
-            To start your coffee adventure, you need to <span className="font-semibold text-amber-700">sign in</span>.<br/>
-            No account yet? No worries! Creating one is as quick and easy as brewing an espresso ☕️✨
-          </p>
-          <button
-            className="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-8 rounded-lg text-lg mb-3 shadow-md transition"
-            onClick={() => router.push(signinUrl)}
-          >
-            Sign In &rarr;
-          </button>
-          <div className="text-gray-600">
-            <span>New here?</span>{' '}
-            <a href={`/auth/signup?redirect=${redirectUrl}`} className="text-amber-700 hover:underline font-semibold">Create an account</a>
-          </div>
-        </div>
-      )
+      router.push('/auth/signin')
+      return <div>Redirecting to sign in...</div>
     }
 
-    return <Page {...props} />
+    return <Component {...props} />
   }
 } 

@@ -6,7 +6,7 @@ import { Logo } from '@/components/ui/logo'
 import { useSupabase } from '@/components/SupabaseProvider'
 
 export function Header() {
-  const { session, client } = useSupabase()
+  const { session, supabase } = useSupabase()
   
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -18,48 +18,45 @@ export function Header() {
         </div>
         
         <nav className="hidden md:flex items-center space-x-6">
-          {client && session && (
+          {supabase && session && (
             <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
               My Meetups
             </Link>
           )}
         </nav>
 
-        <div className="flex items-center space-x-4">
-          {client && session ? (
-            <>
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  Dashboard
-                </Button>
-              </Link>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={async () => {
-                  if (client) {
-                    await client.auth.signOut()
-                  }
-                }}
-              >
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link href="/auth/signin">
-                <Button variant="outline" size="sm">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/signup">
-                <Button size="sm">
-                  Get Started
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
+        {supabase && session && (
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Welcome, {session.user.email}
+            </div>
+            <Button
+              onClick={async () => {
+                if (supabase) {
+                  await supabase.auth.signOut()
+                }
+              }}
+              variant="outline"
+              size="sm"
+            >
+              Sign Out
+            </Button>
+          </div>
+        )}
+
+        {supabase && session ? (
+          <Link href="/dashboard">
+            <Button variant="outline" size="sm">
+              Dashboard
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/auth/signin">
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+          </Link>
+        )}
       </div>
     </header>
   )

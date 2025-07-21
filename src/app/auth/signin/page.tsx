@@ -14,7 +14,7 @@ import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
 
 function SignInPageContent() {
-  const { client } = useSupabase()
+  const { supabase } = useSupabase()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
@@ -32,8 +32,8 @@ function SignInPageContent() {
     isLoading: signInLoading,
     error: signInError,
   } = useAsyncOperation(async () => {
-    if (!client) throw new Error('No Supabase client')
-    const { error } = await client.auth.signInWithPassword({
+    if (!supabase) throw new Error('No Supabase client')
+    const { error } = await supabase.auth.signInWithPassword({
       email: form.values.email,
       password: form.values.password,
     })

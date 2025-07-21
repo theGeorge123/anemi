@@ -18,6 +18,7 @@ function SignUpPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
+  const [specificError, setSpecificError] = useState<string | null>(null)
 
   const form = useFormValidation({
     email: '',
@@ -26,7 +27,12 @@ function SignUpPageContent() {
   }, {
     email: [Validators.required, Validators.email],
     password: [Validators.required, Validators.minLength(8)],
-    confirmPassword: [Validators.required],
+    confirmPassword: [Validators.required, (value: string) => {
+      if (value !== form.values.password) {
+        return '❌ Passwords do not match'
+      }
+      return true
+    }],
   })
 
   const {
@@ -39,8 +45,14 @@ function SignUpPageContent() {
       throw new Error('Authentication service not available. Please refresh the page and try again.')
     }
     
+    // Clear previous errors
+    setSpecificError(null)
+    
+    // Check password match before proceeding
     if (form.values.password !== form.values.confirmPassword) {
-      throw new Error('Passwords do not match')
+      const errorMessage = '❌ Passwords do not match. Please make sure both passwords are identical.'
+      setSpecificError(errorMessage)
+      throw new Error(errorMessage)
     }
 
     console.log('Attempting signup with email:', form.values.email)
@@ -59,7 +71,9 @@ function SignUpPageContent() {
 
     if (!createUserResponse.ok) {
       const errorData = await createUserResponse.json()
-      throw new Error(errorData.error || 'Failed to create account')
+      const errorMessage = errorData.error || 'Failed to create account'
+      setSpecificError(`❌ ${errorMessage}`)
+      throw new Error(errorMessage)
     }
 
     console.log('User created successfully')
@@ -77,7 +91,9 @@ function SignUpPageContent() {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.error || 'Failed to send verification email')
+      const errorMessage = errorData.error || 'Failed to send verification email'
+      setSpecificError(`📧 ${errorMessage}`)
+      throw new Error(errorMessage)
     }
     
     // The user profile will be created automatically by the SQL trigger
@@ -90,7 +106,10 @@ function SignUpPageContent() {
     },
     onError: (err) => {
       console.error('Signup error:', err)
-      ErrorService.showToast(ErrorService.handleError(err), 'error')
+      // Don't show toast if we already set a specific error
+      if (!specificError) {
+        ErrorService.showToast(ErrorService.handleError(err), 'error')
+      }
     },
   })
 
@@ -181,8 +200,16 @@ function SignUpPageContent() {
                   required
                 />
                 {form.errors.confirmPassword && <p className="text-red-500">{form.errors.confirmPassword}</p>}
-              </div>
-              <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
+                              </div>
+                
+                {/* Specific error message */}
+                {specificError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm">{specificError}</p>
+                  </div>
+                )}
+                
+                <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
                 {signUpLoading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>

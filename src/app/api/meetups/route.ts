@@ -1,22 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    const { data: { user } } = await supabase.auth.getUser()
+    // Get the authorization header
+    const authHeader = request.headers.get('authorization')
+    console.log('🔍 Auth header:', authHeader ? 'Present' : 'Missing')
     
-    if (!user?.email) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('❌ No valid auth header')
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'No authorization token provided' },
         { status: 401 }
       )
     }
+
+    const token = authHeader.replace('Bearer ', '')
+    console.log('🔑 Token length:', token.length)
+
+    // Create Supabase client with the token
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      }
+    )
+
+    // Verify the user
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    if (userError || !user?.email) {
+      console.error('❌ User verification failed:', userError)
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      )
+    }
+
+    console.log('✅ User verified:', user.email)
 
     // Get meetups created by the user
     const meetups = await prisma.meetupInvite.findMany({
@@ -31,6 +61,8 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc'
       }
     })
+
+    console.log('📊 Found meetups:', meetups.length)
 
     return NextResponse.json({
       meetups: meetups.map(meetup => ({
@@ -50,7 +82,7 @@ export async function GET(request: NextRequest) {
       }))
     })
   } catch (error) {
-    console.error('Error fetching meetups:', error)
+    console.error('❌ Error fetching meetups:', error)
     return NextResponse.json(
       { error: 'Failed to fetch meetups' },
       { status: 500 }

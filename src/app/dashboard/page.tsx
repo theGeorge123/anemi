@@ -28,13 +28,18 @@ interface MeetupInvite {
 }
 
 const Dashboard = withAuth(() => {
-  const { session } = useSupabase()
+  const { session, supabase } = useSupabase()
   const [meetups, setMeetups] = useState<MeetupInvite[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!session) return
+    if (!session) {
+      console.log('❌ No session available')
+      setError('🔐 Please sign in to view your meetups')
+      setIsLoading(false)
+      return
+    }
     
     const fetchMeetups = async () => {
       setIsLoading(true)
@@ -43,7 +48,22 @@ const Dashboard = withAuth(() => {
       try {
         console.log('🔍 Fetching meetups for user:', session.user.email)
         
-        const response = await fetch('/api/meetups')
+        // Get the access token
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        const accessToken = currentSession?.access_token
+        
+        if (!accessToken) {
+          throw new Error('🔐 No access token available. Please sign in again.')
+        }
+        
+        console.log('🔑 Access token length:', accessToken.length)
+        
+        const response = await fetch('/api/meetups', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
         console.log('📊 Response status:', response.status)
         
         if (!response.ok) {

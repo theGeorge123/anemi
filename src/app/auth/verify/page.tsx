@@ -88,7 +88,14 @@ function VerifyPageContent() {
         
         // Redirect to sign in page after a short delay
         setTimeout(() => {
-          router.push('/auth/signin?message=verified')
+          // Check if there's a stored redirect URL from signup
+          const storedRedirect = sessionStorage.getItem('signup_redirect')
+          sessionStorage.removeItem('signup_redirect') // Clean up
+          
+          const signinUrl = storedRedirect 
+            ? `/auth/signin?redirect=${storedRedirect}&message=verified`
+            : '/auth/signin?message=verified'
+          router.push(signinUrl)
         }, 3000)
       } else {
         setVerificationStatus('error')
@@ -148,9 +155,9 @@ function VerifyPageContent() {
           <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
               <div className="text-6xl mb-4">⏳</div>
-              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Verifying Your Email</CardTitle>
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Je E-mail Verifiëren</CardTitle>
               <CardDescription className="text-base text-gray-500">
-                Please wait while we verify your email address...
+                Even geduld terwijl we je e-mailadres verifiëren...
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -170,25 +177,34 @@ function VerifyPageContent() {
           <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
               <div className="text-6xl mb-4">✅</div>
-              <CardTitle className="text-3xl font-bold text-green-700 mb-1">Email Verified!</CardTitle>
+              <CardTitle className="text-3xl font-bold text-green-700 mb-1">E-mail Geverifieerd!</CardTitle>
               <CardDescription className="text-base text-gray-500">
-                Your email has been verified successfully!
+                Je e-mail is succesvol geverifieerd!
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <div className="space-y-4">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-green-800 mb-2">🎉 Welcome to Anemi Meets!</h3>
+                  <h3 className="font-semibold text-green-800 mb-2">🎉 Welkom bij Anemi Meets!</h3>
                   <p className="text-green-700 text-sm">
-                    You can now sign in and start your coffee adventure!
+                    Je kunt nu inloggen en je koffie avontuur beginnen!
                   </p>
                 </div>
                 
                 <Button 
-                  onClick={() => router.push('/auth/signin')}
+                  onClick={() => {
+                    // Check if there's a stored redirect URL
+                    const storedRedirect = sessionStorage.getItem('signup_redirect')
+                    sessionStorage.removeItem('signup_redirect') // Clean up
+                    
+                    const signinUrl = storedRedirect 
+                      ? `/auth/signin?redirect=${storedRedirect}&message=verified`
+                      : '/auth/signin?message=verified'
+                    router.push(signinUrl)
+                  }}
                   className="w-full bg-green-600 hover:bg-green-700 text-lg font-semibold"
                 >
-                  ☕ Go to Sign In
+                  ☕ Ga naar Inloggen
                 </Button>
               </div>
             </CardContent>
@@ -206,17 +222,17 @@ function VerifyPageContent() {
           <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
               <div className="text-6xl mb-4">❌</div>
-              <CardTitle className="text-3xl font-bold text-red-700 mb-1">Verification Failed</CardTitle>
+              <CardTitle className="text-3xl font-bold text-red-700 mb-1">Verificatie Mislukt</CardTitle>
               <CardDescription className="text-base text-gray-500">
-                We couldn&apos;t verify your email. Please try again.
+                We konden je e-mail niet verifiëren. Probeer het opnieuw.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <div className="space-y-4">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-red-800 mb-2">🔧 Troubleshooting</h3>
+                  <h3 className="font-semibold text-red-800 mb-2">🔧 Probleemoplossing</h3>
                   <p className="text-red-700 text-sm">
-                    The verification link might be expired or invalid. Try requesting a new one.
+                    De verificatielink is mogelijk verlopen of ongeldig. Vraag een nieuwe aan.
                   </p>
                 </div>
                 
@@ -225,7 +241,7 @@ function VerifyPageContent() {
                     onClick={resendVerification}
                     className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                   >
-                    📧 Resend Verification Email
+                    📧 Verificatie E-mail Opnieuw Versturen
                   </Button>
                   
                   <Button 
@@ -233,7 +249,7 @@ function VerifyPageContent() {
                     variant="outline"
                     className="w-full"
                   >
-                    ☕ Back to Sign In
+                    ☕ Terug naar Inloggen
                   </Button>
                 </div>
               </div>

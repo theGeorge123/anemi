@@ -88,9 +88,17 @@ function SignUpPageContent() {
       // Check if email was skipped due to SMTP issues
       if (data?.emailSkipped) {
         ErrorService.showToast('🎉 Account created! Email verification was skipped due to SMTP issues. You can now sign in directly.', 'success')
-        router.push('/auth/signin?message=account_created')
+        // Redirect to signin with the original redirect URL
+        const signinUrl = redirectUrl 
+          ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
+          : '/auth/signin?message=account_created'
+        router.push(signinUrl)
       } else {
         ErrorService.showToast('🎉 Account created! Please check your email to verify your account before signing in.', 'success')
+        // Store redirect URL in sessionStorage for after verification
+        if (redirectUrl) {
+          sessionStorage.setItem('signup_redirect', redirectUrl)
+        }
         router.push('/auth/verify?email=' + encodeURIComponent(form.values.email))
       }
     },

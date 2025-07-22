@@ -9,6 +9,7 @@ export function withAuth<P extends object>(
   return function AuthenticatedComponent(props: P) {
     const { session, supabase, loading } = useSupabase()
     const router = useRouter()
+    const pathname = usePathname()
 
     // Always render loading on first mount (SSR and first client render)
     if (loading) return <div>Loading...</div>
@@ -16,8 +17,10 @@ export function withAuth<P extends object>(
     if (!supabase) return <div>Loading...</div>
 
     if (!session) {
-      router.push('/auth/signin')
-      return <div>Redirecting to sign in...</div>
+      // Redirect to signin with current path as redirect URL
+      const redirectUrl = encodeURIComponent(pathname)
+      router.push(`/auth/signin?redirect=${redirectUrl}`)
+      return <div>Doorverwijzen naar inloggen...</div>
     }
 
     return <Component {...props} />

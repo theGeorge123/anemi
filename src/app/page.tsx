@@ -18,12 +18,6 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLogout = async () => {
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-background to-orange-50 flex items-center justify-center px-4">
@@ -75,7 +69,11 @@ export default function HomePage() {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={handleLogout}
+            onClick={async () => {
+              if (supabase) {
+                await supabase.auth.signOut();
+              }
+            }}
             className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           >
             <LogOut className="w-4 h-4 mr-2" />

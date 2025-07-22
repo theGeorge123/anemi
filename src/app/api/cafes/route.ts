@@ -10,7 +10,10 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get('city')
     const random = searchParams.get('random') === 'true'
     
+    console.log('🔍 Cafe API called with:', { city, random })
+    
     if (!city) {
+      console.log('❌ No city parameter provided')
       return NextResponse.json(
         { error: 'City parameter is required' },
         { status: 400 }
@@ -20,6 +23,7 @@ export async function GET(request: NextRequest) {
     let cafes
     if (random) {
       // Get a random cafe
+      console.log('🎲 Fetching random cafe for city:', city)
       const allCafes = await prisma.coffeeShop.findMany({
         where: {
           city: city,
@@ -46,11 +50,16 @@ export async function GET(request: NextRequest) {
         }
       })
       
+      console.log('📊 Found', allCafes.length, 'cafes for random selection')
+      
       // Select a random cafe
       const randomIndex = Math.floor(Math.random() * allCafes.length)
       cafes = allCafes.length > 0 ? [allCafes[randomIndex]] : []
+      
+      console.log('🎯 Selected random cafe:', cafes[0]?.name || 'None')
     } else {
       // Get all cafes ordered by rating
+      console.log('📋 Fetching all cafes for city:', city)
       cafes = await prisma.coffeeShop.findMany({
         where: {
           city: city,
@@ -80,16 +89,29 @@ export async function GET(request: NextRequest) {
           updatedAt: true
         }
       })
+      
+      console.log('📊 Found', cafes.length, 'cafes for city:', city)
+      
+      // Log cafe details for debugging
+      cafes.forEach((cafe, index) => {
+        console.log(`☕ ${index + 1}. ${cafe.name} - ${cafe.address} (${cafe.latitude}, ${cafe.longitude})`)
+      })
     }
 
     return NextResponse.json({
       cafes,
-      count: cafes.length
+      count: cafes.length,
+      city: city,
+      debug: {
+        totalFound: cafes.length,
+        withCoordinates: cafes.filter(c => c && c.latitude && c.longitude).length,
+        averageRating: cafes.length > 0 ? cafes.reduce((sum, c) => sum + (c?.rating || 0), 0) / cafes.length : 0
+      }
     })
   } catch (error) {
-    console.error('Error fetching cafes:', error)
+    console.error('❌ Error fetching cafes:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch cafes' },
+      { error: 'Failed to fetch cafes', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

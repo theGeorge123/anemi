@@ -78,20 +78,17 @@ export function StepContent({
         return true // Summary step is always valid
       case 6: 
         if (showDateTimePreferences && showCafeChoice) {
-          return true // Cafe selection step is always valid
-        }
-        if (showDateTimePreferences) {
           return formData.viewType // View selector step requires viewType
-        }
-        if (showCafeSelection) {
+        } else if (showDateTimePreferences) {
+          return true // Cafe choice step is always valid
+        } else if (showCafeSelection) {
           return true // Cafe selection step is always valid
         }
         return true // Summary step is always valid
       case 7: 
-        if (showDateTimePreferences && showCafeChoice && showCafeSelection) {
+        if (showDateTimePreferences && showCafeChoice) {
           return true // Cafe selection step is always valid
-        }
-        if (showDateTimePreferences && showCafeSelection) {
+        } else if (showDateTimePreferences && showCafeSelection) {
           return true // Cafe selection step is always valid
         }
         return true // Summary step is always valid
@@ -223,11 +220,11 @@ export function StepContent({
         selectedCity={formData.city}
         onCafeSelect={(cafeId) => {
           onFormDataChange({ cafeId })
-          setShowCafeChoice(true)
+          // If user accepts random cafe, go directly to summary
           onNext()
         }}
         onChooseOwn={() => {
-          // Set cafe selection flag and advance to next step
+          // Set cafe selection flag and advance to view selector
           setShowCafeSelection(true)
           onNext()
         }}
@@ -376,16 +373,16 @@ export function StepContent({
         }
       case 6:
         if (showDateTimePreferences && showCafeChoice) {
-          return renderCafeSelection()
-        } else if (showDateTimePreferences) {
           return renderViewSelector()
+        } else if (showDateTimePreferences) {
+          return renderCafeChoice()
         } else if (showCafeSelection) {
           return renderCafeSelection()
         } else {
           return renderSummary()
         }
       case 7:
-        if (showDateTimePreferences && showCafeChoice && showCafeSelection) {
+        if (showDateTimePreferences && showCafeChoice) {
           return renderCafeSelection()
         } else if (showDateTimePreferences && showCafeSelection) {
           return renderCafeSelection()

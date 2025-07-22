@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { X, Calendar, Clock, Trash2, Save, AlertTriangle } from 'lucide-react'
+import { X, Calendar, Clock, Trash2, Save, AlertTriangle, Coffee, MapPin, Users } from 'lucide-react'
 
 interface MeetupData {
   id: string
@@ -57,17 +57,17 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
     if (!meetup) return
 
     if (!organizerName.trim()) {
-      setError('Vul je naam in')
+      setError('Hé! Vul even je naam in ☕')
       return
     }
 
     if (availableDates.length === 0) {
-      setError('Selecteer minimaal één datum')
+      setError('Oeps! Kies minimaal één leuke datum 📅')
       return
     }
 
     if (availableTimes.length === 0) {
-      setError('Selecteer minimaal één tijd')
+      setError('Hey! Kies minimaal één gezellige tijd ⏰')
       return
     }
 
@@ -83,7 +83,7 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
 
       onClose()
     } catch (err) {
-      setError('Kon meetup niet opslaan. Probeer het opnieuw.')
+      setError('Hmm, er ging iets mis! Probeer het nog een keer 😅')
     } finally {
       setIsSaving(false)
     }
@@ -99,7 +99,7 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
       await onDelete(meetup.id)
       onClose()
     } catch (err) {
-      setError('Kon meetup niet verwijderen. Probeer het opnieuw.')
+      setError('Oeps! Kon de meetup niet verwijderen. Probeer het nog een keer!')
     } finally {
       setIsDeleting(false)
       setShowDeleteConfirm(false)
@@ -142,120 +142,171 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold">✏️ Meetup Bewerken</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+        <CardHeader className="flex items-center justify-between bg-gradient-to-r from-amber-100 to-orange-100 rounded-t-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-200 rounded-full flex items-center justify-center">
+              <Coffee className="w-5 h-5 text-amber-700" />
+            </div>
+            <CardTitle className="text-xl font-bold text-amber-800">✏️ Meetup Bewerken</CardTitle>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-amber-200">
             <X className="w-4 h-4" />
           </Button>
         </CardHeader>
         
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-6">
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-red-600 text-sm">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">😅</span>
+                <p className="text-red-600 text-sm font-medium">{error}</p>
+              </div>
             </div>
           )}
 
           {/* Cafe Info */}
-          <div className="bg-amber-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-2">☕ Cafe</h3>
-            <p className="text-gray-700">{meetup.cafe.name}</p>
-            <p className="text-sm text-gray-600">{meetup.cafe.address}, {meetup.cafe.city}</p>
+          <div className="bg-white border border-amber-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                <Coffee className="w-4 h-4 text-amber-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">☕ Cafe</h3>
+            </div>
+            <p className="text-gray-700 font-medium">{meetup.cafe.name}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <MapPin className="w-4 h-4" />
+              <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
+            </div>
           </div>
 
           {/* Organizer Name */}
-          <div>
-            <Label htmlFor="organizerName">Jouw naam</Label>
+          <div className="bg-white border border-amber-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-600" />
+              </div>
+              <Label htmlFor="organizerName" className="font-semibold text-gray-900">👤 Jouw naam</Label>
+            </div>
             <Input
               id="organizerName"
               value={organizerName}
               onChange={(e) => setOrganizerName(e.target.value)}
-              placeholder="Jouw naam"
-              className="mt-1"
+              placeholder="Hoe mogen we je noemen?"
+              className="border-amber-300 focus:border-amber-500 focus:ring-amber-500"
             />
           </div>
 
           {/* Available Dates */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Beschikbare data
-              </Label>
-              <Button variant="outline" size="sm" onClick={addDate}>
+          <div className="bg-white border border-amber-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-green-600" />
+                </div>
+                <Label className="font-semibold text-gray-900">📅 Beschikbare data</Label>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={addDate}
+                className="border-green-300 text-green-700 hover:bg-green-50"
+              >
                 + Datum toevoegen
               </Button>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               {availableDates.map((date, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <Input
                     type="date"
                     value={date || ''}
                     onChange={(e) => updateDate(index, e.target.value)}
-                    className="flex-1"
+                    className="flex-1 border-green-300 focus:border-green-500 focus:ring-green-500"
                   />
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => removeDate(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
+              {availableDates.length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  <span className="text-lg">📅</span>
+                  <p className="text-sm">Nog geen data gekozen</p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Available Times */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <Label className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Beschikbare tijden
-              </Label>
-              <Button variant="outline" size="sm" onClick={addTime}>
+          <div className="bg-white border border-amber-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-purple-600" />
+                </div>
+                <Label className="font-semibold text-gray-900">⏰ Beschikbare tijden</Label>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={addTime}
+                className="border-purple-300 text-purple-700 hover:bg-purple-50"
+              >
                 + Tijd toevoegen
               </Button>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               {availableTimes.map((time, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <Input
                     type="time"
                     value={time || ''}
                     onChange={(e) => updateTime(index, e.target.value)}
-                    className="flex-1"
+                    className="flex-1 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
                   />
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => removeTime(index)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
+              {availableTimes.length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  <span className="text-lg">⏰</span>
+                  <p className="text-sm">Nog geen tijden gekozen</p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Status Info */}
           {meetup.status !== 'pending' && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 text-blue-800">
-                <AlertTriangle className="w-4 h-4" />
-                <span className="font-medium">Let op:</span>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-3 text-blue-800">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-medium">Hey! Let op:</span>
+                  <p className="text-blue-700 text-sm mt-1">
+                    Deze meetup is al {meetup.status === 'confirmed' ? 'bevestigd' : 'afgewezen'}. 
+                    Wijzigingen kunnen impact hebben op de afspraak! 🤔
+                  </p>
+                </div>
               </div>
-              <p className="text-blue-700 text-sm mt-1">
-                Deze meetup is al {meetup.status === 'confirmed' ? 'bevestigd' : 'afgewezen'}. 
-                Wijzigingen kunnen impact hebben op de afspraak.
-              </p>
             </div>
           )}
 
@@ -264,7 +315,7 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
             <Button
               onClick={handleSave}
               disabled={isSaving || isDeleting}
-              className="flex-1 bg-amber-500 hover:bg-amber-600"
+              className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold"
             >
               {isSaving ? (
                 <>
@@ -274,7 +325,7 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  Opslaan
+                  💾 Opslaan
                 </>
               )}
             </Button>
@@ -283,10 +334,10 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
               variant="outline"
               onClick={() => setShowDeleteConfirm(true)}
               disabled={isSaving || isDeleting}
-              className="border-red-300 text-red-600 hover:bg-red-50"
+              className="border-red-300 text-red-600 hover:bg-red-50 font-semibold"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Verwijderen
+              🗑️ Verwijderen
             </Button>
           </div>
         </CardContent>
@@ -295,22 +346,33 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-60">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-red-600">⚠️ Meetup Verwijderen</CardTitle>
+          <Card className="w-full max-w-md border-red-200 bg-gradient-to-br from-red-50 to-pink-50">
+            <CardHeader className="bg-gradient-to-r from-red-100 to-pink-100 rounded-t-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                  <span className="text-xl">⚠️</span>
+                </div>
+                <CardTitle className="text-lg font-bold text-red-700">Meetup Verwijderen</CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-gray-700">
-                Weet je zeker dat je deze meetup wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-              </p>
+            <CardContent className="space-y-4 p-6">
+              <div className="text-center">
+                <span className="text-4xl mb-3 block">😱</span>
+                <p className="text-gray-700 font-medium">
+                  Weet je zeker dat je deze meetup wilt verwijderen?
+                </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Deze actie kan niet ongedaan worden gemaakt! 🚨
+                </p>
+              </div>
               
               <div className="flex gap-3">
                 <Button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="flex-1 bg-red-500 hover:bg-red-600"
+                  className="flex-1 bg-red-500 hover:bg-red-600 font-semibold"
                 >
-                  {isDeleting ? 'Verwijderen...' : 'Ja, verwijderen'}
+                  {isDeleting ? 'Verwijderen...' : '😢 Ja, verwijderen'}
                 </Button>
                 <Button
                   variant="outline"
@@ -318,7 +380,7 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
                   disabled={isDeleting}
                   className="flex-1"
                 >
-                  Annuleren
+                  😅 Annuleren
                 </Button>
               </div>
             </CardContent>

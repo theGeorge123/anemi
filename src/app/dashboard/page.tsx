@@ -114,6 +114,8 @@ export default function Dashboard() {
         throw new Error(errorData.error || 'Failed to update meetup')
       }
 
+      const result = await response.json()
+
       // Refresh meetups list
       const updatedMeetups = meetups.map(meetup => 
         meetup.id === meetupId 
@@ -122,7 +124,12 @@ export default function Dashboard() {
       )
       setMeetups(updatedMeetups)
 
-      alert('✅ Meetup succesvol bijgewerkt!')
+      // Show success message with notification info
+      if (result.changesNotified) {
+        alert('✅ Meetup succesvol bijgewerkt! 📧 Een email is verstuurd naar je koffie maatje met de nieuwe details!')
+      } else {
+        alert('✅ Meetup succesvol bijgewerkt!')
+      }
     } catch (error) {
       console.error('Error updating meetup:', error)
       throw error

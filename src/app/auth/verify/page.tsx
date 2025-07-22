@@ -31,37 +31,53 @@ function VerifyPageContent() {
 
     setIsVerifying(true)
     try {
-      // For now, we'll just show a success message
-      // In a real implementation, you'd verify the token with your backend
-      setVerificationStatus('success')
-      ErrorService.showToast('🎉 Email verified successfully! Welcome to Anemi Meets!', 'success')
-      
-      // Send welcome email after successful verification
-      try {
-        const response = await fetch('/api/auth/welcome-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            email,
-            userName: email.split('@')[0] // Use email prefix as username
-          }),
-        })
+      // Verify the token with Supabase
+      const { data, error } = await supabase.auth.verifyOtp({
+        token_hash: token,
+        type: 'email'
+      })
 
-        if (response.ok) {
-          console.log('Welcome email sent successfully')
-        } else {
-          console.error('Failed to send welcome email')
-        }
-      } catch (error) {
-        console.error('Error sending welcome email:', error)
+      if (error) {
+        console.error('Verification error:', error)
+        setVerificationStatus('error')
+        ErrorService.showToast(`Verification failed: ${error.message}`, 'error')
+        return
       }
-      
-      // Redirect to sign in page after a short delay
-      setTimeout(() => {
-        router.push('/auth/signin?message=verified')
-      }, 3000)
+
+      if (data.user) {
+        setVerificationStatus('success')
+        ErrorService.showToast('🎉 Email verified successfully! Welcome to Anemi Meets!', 'success')
+        
+        // Send welcome email after successful verification
+        try {
+          const response = await fetch('/api/auth/welcome-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              email,
+              userName: email.split('@')[0] // Use email prefix as username
+            }),
+          })
+
+          if (response.ok) {
+            console.log('Welcome email sent successfully')
+          } else {
+            console.error('Failed to send welcome email')
+          }
+        } catch (error) {
+          console.error('Error sending welcome email:', error)
+        }
+        
+        // Redirect to sign in page after a short delay
+        setTimeout(() => {
+          router.push('/auth/signin?message=verified')
+        }, 3000)
+      } else {
+        setVerificationStatus('error')
+        ErrorService.showToast('Verification failed. Please try again.', 'error')
+      }
     } catch (error) {
       console.error('Verification error:', error)
       setVerificationStatus('error')
@@ -69,7 +85,7 @@ function VerifyPageContent() {
     } finally {
       setIsVerifying(false)
     }
-  }, [token, email, router])
+  }, [token, email, router, supabase])
 
   useEffect(() => {
     if (token && email) {

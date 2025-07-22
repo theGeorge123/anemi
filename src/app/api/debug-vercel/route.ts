@@ -27,6 +27,14 @@ export async function GET(request: NextRequest) {
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '❌ Missing',
     }
 
+    // Email verification specific checks
+    const emailVerification = {
+      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '❌ Missing - Critical for email verification',
+      resendKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing - For custom SMTP',
+      emailFrom: process.env.EMAIL_FROM || '❌ Missing - For custom sender',
+      vercelUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '❌ Missing',
+    }
+
     // Test Supabase connection
     const connectionResult = await validateSupabaseConnection()
     const authTestResult = await testSupabaseAuth()
@@ -41,6 +49,7 @@ export async function GET(request: NextRequest) {
       environment,
       supabase,
       other,
+      emailVerification,
       connection: {
         supabaseClient: connectionResult.valid ? '✅ Created' : '❌ Failed',
         validationResult: connectionResult,
@@ -51,6 +60,12 @@ export async function GET(request: NextRequest) {
         customDomain: 'https://www.anemimeets.com',
         vercelUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'Not set',
         siteUrlEnv: process.env.NEXT_PUBLIC_SITE_URL || 'Not set',
+      },
+      recommendations: {
+        siteUrl: !process.env.NEXT_PUBLIC_SITE_URL ? 'Set NEXT_PUBLIC_SITE_URL to your Vercel domain' : '✅ OK',
+        smtp: !process.env.RESEND_API_KEY ? 'Consider using Resend for better email delivery' : '✅ OK',
+        redirectUrls: 'Make sure Supabase redirect URLs include your Vercel domain',
+        emailTemplate: 'Check Supabase email template uses correct SiteURL variable'
       }
     }
 

@@ -145,7 +145,7 @@ function SignUpPageContent() {
             <CardDescription className="text-base text-gray-500">
               {redirectUrl 
                 ? 'Sign up to continue to your destination'
-                : 'Sign up in seconds and unlock a world of coffee meetups, new friends, and good vibes. ☕️✨'
+                : 'Sign up in seconds and unlock a world of coffee meetups, reconnect with friends, and good vibes. ☕️✨'
               }
             </CardDescription>
           </CardHeader>

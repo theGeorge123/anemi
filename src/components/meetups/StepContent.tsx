@@ -47,6 +47,7 @@ export function StepContent({
     
     if (showDateTimePreferences) steps++ // Extra step for date/time preferences
     if (showCafeChoice) steps++ // Extra step for cafe choice
+    if (showCafeSelection) steps++ // Extra step for view selector
     if (showCafeSelection) steps++ // Extra step for cafe selection
     
     setTotalSteps(steps)
@@ -71,17 +72,26 @@ export function StepContent({
         if (showDateTimePreferences) {
           return true // Cafe choice step is always valid
         }
+        if (showCafeSelection) {
+          return formData.viewType // View selector step requires viewType
+        }
         return true // Summary step is always valid
       case 6: 
         if (showDateTimePreferences && showCafeChoice) {
           return true // Cafe selection step is always valid
         }
         if (showDateTimePreferences) {
-          return true // Summary step is always valid
+          return formData.viewType // View selector step requires viewType
         }
-        return true // Cafe selection step is always valid
+        if (showCafeSelection) {
+          return true // Cafe selection step is always valid
+        }
+        return true // Summary step is always valid
       case 7: 
         if (showDateTimePreferences && showCafeChoice && showCafeSelection) {
+          return true // Cafe selection step is always valid
+        }
+        if (showDateTimePreferences && showCafeSelection) {
           return true // Cafe selection step is always valid
         }
         return true // Summary step is always valid
@@ -217,8 +227,23 @@ export function StepContent({
           onNext()
         }}
         onChooseOwn={() => {
-          onFormDataChange({ viewType: 'list' })
+          // Don't go to next step yet, show view selector first
           setShowCafeSelection(true)
+        }}
+      />
+    </div>
+  )
+
+  const renderViewSelector = () => (
+    <div className="space-y-6 animate-fadeIn">
+      <div className="text-center mb-6">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">🔍 Hoe wil je cafes bekijken?</h3>
+        <p className="text-gray-600">Kies je voorkeur voor het ontdekken van cafes in {formData.city}</p>
+      </div>
+      <ViewSelector
+        selectedView={formData.viewType || null}
+        onViewSelect={(viewType) => {
+          onFormDataChange({ viewType })
           onNext()
         }}
       />
@@ -343,6 +368,8 @@ export function StepContent({
       case 5:
         if (showDateTimePreferences) {
           return renderCafeChoice()
+        } else if (showCafeSelection) {
+          return renderViewSelector()
         } else {
           return renderSummary()
         }
@@ -350,12 +377,16 @@ export function StepContent({
         if (showDateTimePreferences && showCafeChoice) {
           return renderCafeSelection()
         } else if (showDateTimePreferences) {
-          return renderSummary()
-        } else {
+          return renderViewSelector()
+        } else if (showCafeSelection) {
           return renderCafeSelection()
+        } else {
+          return renderSummary()
         }
       case 7:
         if (showDateTimePreferences && showCafeChoice && showCafeSelection) {
+          return renderCafeSelection()
+        } else if (showDateTimePreferences && showCafeSelection) {
           return renderCafeSelection()
         } else {
           return renderSummary()

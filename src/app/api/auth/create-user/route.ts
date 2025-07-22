@@ -33,12 +33,22 @@ export async function POST(request: NextRequest) {
       console.error('User creation error:', error)
       
       // Check if it's an email sending error
-      if (error.message.includes('email') || error.message.includes('confirmation')) {
+      if (error.message.includes('email') || error.message.includes('confirmation') || error.message.includes('smtp')) {
         console.warn('Email sending failed, but user might have been created')
-        return NextResponse.json({ 
-          error: 'User created but email verification failed. Please contact support or try again later.',
-          details: error.message 
-        }, { status: 400 })
+        
+        // Check if user was actually created
+        if (data?.user) {
+          return NextResponse.json({ 
+            error: 'Account created successfully! However, the verification email could not be sent. Please check your email settings or contact support.',
+            userCreated: true,
+            details: error.message 
+          }, { status: 400 })
+        } else {
+          return NextResponse.json({ 
+            error: 'Failed to create account due to email configuration issues. Please try again later or contact support.',
+            details: error.message 
+          }, { status: 400 })
+        }
       }
       
       return NextResponse.json({ error: error.message }, { status: 400 })

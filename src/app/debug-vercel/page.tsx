@@ -77,6 +77,45 @@ export default function DebugVercelPage() {
     fetchDebugInfo()
   }, [])
 
+  const getConnectionStatus = () => {
+    if (!debugInfo) return 'unknown'
+    if (debugInfo.connection.supabaseClient.includes('✅')) return 'success'
+    return 'failed'
+  }
+
+  const getTroubleshootingSteps = (): string[] => {
+    const steps: string[] = []
+    
+    if (!debugInfo) return steps
+
+    // Check Supabase URL
+    if (debugInfo.supabase.url.includes('❌')) {
+      steps.push('❌ NEXT_PUBLIC_SUPABASE_URL is missing in Vercel environment variables')
+    }
+
+    // Check Supabase Key
+    if (debugInfo.supabase.anonKey.includes('❌')) {
+      steps.push('❌ NEXT_PUBLIC_SUPABASE_ANON_KEY is missing in Vercel environment variables')
+    }
+
+    // Check connection
+    if (debugInfo.connection.supabaseClient.includes('❌')) {
+      steps.push('❌ Supabase client creation failed - check your Supabase project is online')
+    }
+
+    // Check auth test
+    if (debugInfo.connection.authTestResult && !debugInfo.connection.authTestResult.valid) {
+      steps.push(`❌ Auth test failed: ${debugInfo.connection.authTestResult.error}`)
+    }
+
+    // Check site URL
+    if (debugInfo.domain.siteUrlEnv === '❌ Missing') {
+      steps.push('❌ NEXT_PUBLIC_SITE_URL is missing - critical for email verification')
+    }
+
+    return steps
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">🔍 Vercel Debug Info</h1>
@@ -96,118 +135,28 @@ export default function DebugVercelPage() {
 
       {debugInfo && (
         <div className="space-y-6">
-          {/* Domain Info */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">🌐 Domain Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <strong>Current Domain:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded text-xs ${debugInfo.domain.currentDomain === 'www.anemimeets.com' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                  {debugInfo.domain.currentDomain}
+          {/* Connection Status */}
+          <Card className={`p-6 ${getConnectionStatus() === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+            <h2 className="text-xl font-semibold mb-4">🔌 Connection Status</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Supabase Client:</span>
+                <span className={`font-mono ${getConnectionStatus() === 'success' ? 'text-green-700' : 'text-red-700'}`}>
+                  {debugInfo.connection.supabaseClient}
                 </span>
               </div>
-              <div>
-                <strong>Custom Domain:</strong> 
-                <span className="ml-2 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                  {debugInfo.domain.customDomain}
-                </span>
-              </div>
-              <div>
-                <strong>Vercel URL:</strong> 
-                <span className="ml-2 px-2 py-1 rounded text-xs bg-gray-100 text-gray-800">
-                  {debugInfo.domain.vercelUrl}
-                </span>
-              </div>
-              <div>
-                <strong>Site URL Env:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded text-xs ${debugInfo.domain.siteUrlEnv === 'Not set' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                  {debugInfo.domain.siteUrlEnv}
-                </span>
-              </div>
-            </div>
-            
-            {debugInfo.domain.siteUrlEnv === 'Not set' && (
-              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Missing Site URL</h3>
-                <p className="text-yellow-700 text-sm mb-3">
-                  The <code>NEXT_PUBLIC_SITE_URL</code> environment variable is not set. This can cause issues with invite links and redirects.
-                </p>
-                <div className="text-sm text-yellow-700">
-                  <strong>To fix this:</strong>
-                  <ol className="list-decimal list-inside mt-2 space-y-1">
-                    <li>Go to your Vercel dashboard</li>
-                    <li>Navigate to your project settings</li>
-                    <li>Go to Environment Variables</li>
-                    <li>Add: <code>NEXT_PUBLIC_SITE_URL=https://www.anemimeets.com</code></li>
-                    <li>Redeploy your application</li>
-                  </ol>
-                </div>
-              </div>
-            )}
-          </Card>
-
-          {/* Environment Info */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">🌍 Environment</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <strong>NODE_ENV:</strong> {debugInfo.environment.NODE_ENV || 'Not set'}
-              </div>
-              <div>
-                <strong>VERCEL:</strong> {debugInfo.environment.VERCEL || 'Not set'}
-              </div>
-              <div>
-                <strong>VERCEL_URL:</strong> {debugInfo.environment.VERCEL_URL || 'Not set'}
-              </div>
-              <div>
-                <strong>VERCEL_ENV:</strong> {debugInfo.environment.VERCEL_ENV || 'Not set'}
-              </div>
-            </div>
-          </Card>
-
-          {/* Supabase Variables */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">🔑 Supabase Variables</h2>
-            <div className="space-y-2">
-              <div>URL: {debugInfo.supabase.url}</div>
-              <div>Anon Key: {debugInfo.supabase.anonKey}</div>
-              <div>Service Key: {debugInfo.supabase.serviceKey}</div>
-            </div>
-          </Card>
-
-          {/* Other Variables */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">⚙️ Other Variables</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>Database URL: {debugInfo.other.databaseUrl}</div>
-              <div>Resend API Key: {debugInfo.other.resendApiKey}</div>
-              <div>Email From: {debugInfo.other.emailFrom}</div>
-              <div>Google Maps Key: {debugInfo.other.googleMapsKey}</div>
-              <div>Site URL: {debugInfo.other.siteUrl}</div>
-            </div>
-          </Card>
-
-          {/* Connection Tests */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">🔌 Connection Tests</h2>
-            <div className="space-y-4">
-              <div>
-                <strong>Supabase Client:</strong> {debugInfo.connection.supabaseClient}
-              </div>
-              
               {debugInfo.connection.validationResult && (
-                <div>
-                  <strong>Connection Test:</strong>
-                  <pre className="mt-2 p-3 bg-gray-100 rounded text-sm overflow-auto">
+                <div className="mt-4 p-3 bg-gray-100 rounded">
+                  <h3 className="font-semibold mb-2">Validation Details:</h3>
+                  <pre className="text-xs overflow-x-auto">
                     {JSON.stringify(debugInfo.connection.validationResult, null, 2)}
                   </pre>
                 </div>
               )}
-              
               {debugInfo.connection.authTestResult && (
-                <div>
-                  <strong>Auth Test:</strong>
-                  <pre className="mt-2 p-3 bg-gray-100 rounded text-sm overflow-auto">
+                <div className="mt-4 p-3 bg-gray-100 rounded">
+                  <h3 className="font-semibold mb-2">Auth Test Details:</h3>
+                  <pre className="text-xs overflow-x-auto">
                     {JSON.stringify(debugInfo.connection.authTestResult, null, 2)}
                   </pre>
                 </div>
@@ -215,10 +164,131 @@ export default function DebugVercelPage() {
             </div>
           </Card>
 
+          {/* Troubleshooting Steps */}
+          {getTroubleshootingSteps().length > 0 && (
+            <Card className="p-6 bg-yellow-50 border-yellow-200">
+              <h2 className="text-xl font-semibold text-yellow-800 mb-4">🔧 Troubleshooting Steps</h2>
+              <div className="space-y-2">
+                {getTroubleshootingSteps().map((step, index) => (
+                  <div key={index} className="text-sm text-yellow-700">
+                    {step}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-white rounded border">
+                <h3 className="font-semibold mb-2">📋 Quick Fixes:</h3>
+                <ol className="text-sm space-y-1">
+                  <li>1. Go to <a href="https://vercel.com/dashboard" target="_blank" className="text-blue-600 underline">Vercel Dashboard</a></li>
+                  <li>2. Select your project</li>
+                  <li>3. Go to Settings → Environment Variables</li>
+                  <li>4. Add/update these variables:</li>
+                  <li className="ml-4">• NEXT_PUBLIC_SUPABASE_URL</li>
+                  <li className="ml-4">• NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
+                  <li className="ml-4">• NEXT_PUBLIC_SITE_URL = https://www.anemimeets.com</li>
+                  <li>5. Redeploy your project</li>
+                </ol>
+              </div>
+            </Card>
+          )}
+
+          {/* Supabase Variables */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">🔑 Supabase Variables</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>NEXT_PUBLIC_SUPABASE_URL:</span>
+                <span className="font-mono">{debugInfo.supabase.url}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>NEXT_PUBLIC_SUPABASE_ANON_KEY:</span>
+                <span className="font-mono">{debugInfo.supabase.anonKey}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>SUPABASE_SERVICE_ROLE_KEY:</span>
+                <span className="font-mono">{debugInfo.supabase.serviceKey}</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Domain Info */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">🌐 Domain Information</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Current Domain:</span>
+                <span className="font-mono">{debugInfo.domain.currentDomain}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Custom Domain:</span>
+                <span className="font-mono">{debugInfo.domain.customDomain}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Vercel URL:</span>
+                <span className="font-mono">{debugInfo.domain.vercelUrl}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Site URL Env:</span>
+                <span className="font-mono">{debugInfo.domain.siteUrlEnv}</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Environment Info */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">🌍 Environment</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>NODE_ENV:</span>
+                <span className="font-mono">{debugInfo.environment.NODE_ENV}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>VERCEL:</span>
+                <span className="font-mono">{debugInfo.environment.VERCEL}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>VERCEL_URL:</span>
+                <span className="font-mono">{debugInfo.environment.VERCEL_URL}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>VERCEL_ENV:</span>
+                <span className="font-mono">{debugInfo.environment.VERCEL_ENV}</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Other Variables */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">⚙️ Other Variables</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>DATABASE_URL:</span>
+                <span className="font-mono">{debugInfo.other.databaseUrl}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>RESEND_API_KEY:</span>
+                <span className="font-mono">{debugInfo.other.resendApiKey}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>EMAIL_FROM:</span>
+                <span className="font-mono">{debugInfo.other.emailFrom}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>GOOGLE_MAPS_API_KEY:</span>
+                <span className="font-mono">{debugInfo.other.googleMapsKey}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>NEXT_PUBLIC_SITE_URL:</span>
+                <span className="font-mono">{debugInfo.other.siteUrl}</span>
+              </div>
+            </div>
+          </Card>
+
           {/* Timestamp */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">⏰ Last Updated</h2>
-            <p>{debugInfo.timestamp}</p>
+            <div className="text-sm">
+              <span className="font-mono">{new Date(debugInfo.timestamp).toLocaleString()}</span>
+            </div>
           </Card>
         </div>
       )}

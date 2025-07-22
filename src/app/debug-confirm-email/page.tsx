@@ -118,7 +118,7 @@ export default function DebugConfirmEmailPage() {
         <CardContent>
           <ol className="list-decimal list-inside space-y-2 text-sm">
             <li>Enter the email address you want to confirm</li>
-            <li>Click "Confirm Email"</li>
+            <li>Click &quot;Confirm Email&quot;</li>
             <li>If successful, you can now sign in with that email</li>
             <li>Go to <a href="/auth/signin" className="text-blue-600 hover:underline">Sign In</a> to test</li>
           </ol>

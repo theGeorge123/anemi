@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
+import { Home } from 'lucide-react'
 
 interface MeetupInvite {
   id: string
@@ -199,6 +200,19 @@ export default function Dashboard() {
 
   return (
     <main className="max-w-4xl mx-auto p-4">
+      {/* Back to Home Button */}
+      <div className="mb-6">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
+          </Button>
+        </Link>
+      </div>
+
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center mb-4">
           <span className="text-4xl mr-3">☕</span>

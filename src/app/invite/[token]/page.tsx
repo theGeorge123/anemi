@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DeclineModal } from '@/components/meetups/DeclineModal'
-import { Calendar, MapPin, Star, Clock, Users } from 'lucide-react'
+import { Calendar, MapPin, Star, Clock, Users, Home } from 'lucide-react'
+import Link from 'next/link'
 
 interface InviteData {
   token: string
@@ -249,6 +250,19 @@ export default function InvitePage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
+          </Button>
+        </Link>
+      </div>
+
       <Card className="w-full max-w-2xl">
         <CardContent className="p-8">
           <div className="text-center mb-8">

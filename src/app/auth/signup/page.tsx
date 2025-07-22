@@ -12,6 +12,7 @@ import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
+import { Home } from 'lucide-react'
 
 function SignUpPageContent() {
   const { supabase } = useSupabase()
@@ -145,81 +146,92 @@ function SignUpPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Maak je account aan</CardTitle>
-            <CardDescription className="text-base text-gray-500">
-              {redirectUrl 
-                ? 'Registreer om door te gaan naar je bestemming'
-                : 'Registreer in seconden en ontgrendel een wereld van koffie meetups, reconnect met vrienden, en goede vibes. ☕️✨'
-              }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignUp} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Voer je e-mail in"
-                  value={form.values.email}
-                  onChange={form.handleChange('email')}
-                  onBlur={form.handleBlur('email')}
-                  required
-                />
-                {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Wachtwoord</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Maak een wachtwoord aan"
-                  value={form.values.password}
-                  onChange={form.handleChange('password')}
-                  onBlur={form.handleBlur('password')}
-                  required
-                  minLength={8}
-                />
-                {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Bevestig je wachtwoord"
-                  value={form.values.confirmPassword}
-                  onChange={form.handleChange('confirmPassword')}
-                  onBlur={form.handleBlur('confirmPassword')}
-                  required
-                />
-                {form.errors.confirmPassword && <p className="text-red-500">{form.errors.confirmPassword}</p>}
-                              </div>
-                
-                {/* Specific error message */}
-                {specificError && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-700 text-sm">{specificError}</p>
-                  </div>
-                )}
-                
-                <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
-                {signUpLoading ? 'Account aanmaken...' : 'Account Aanmaken'}
-              </Button>
-            </form>
-            <div className="mt-6 text-center text-sm text-gray-600">
-              Heb je al een account?{' '}
-              <Link href={`/auth/signin${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
-                Log in
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
+          </Button>
+        </Link>
       </div>
+
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Maak je account aan</CardTitle>
+          <CardDescription className="text-base text-gray-500">
+            {redirectUrl 
+              ? 'Registreer om door te gaan naar je bestemming'
+              : 'Registreer in seconden en ontgrendel een wereld van koffie meetups, reconnect met vrienden, en goede vibes. ☕️✨'
+            }
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSignUp} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Voer je e-mail in"
+                value={form.values.email}
+                onChange={form.handleChange('email')}
+                onBlur={form.handleBlur('email')}
+                required
+              />
+              {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Wachtwoord</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Maak een wachtwoord aan"
+                value={form.values.password}
+                onChange={form.handleChange('password')}
+                onBlur={form.handleBlur('password')}
+                required
+                minLength={8}
+              />
+              {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Bevestig je wachtwoord"
+                value={form.values.confirmPassword}
+                onChange={form.handleChange('confirmPassword')}
+                onBlur={form.handleBlur('confirmPassword')}
+                required
+              />
+              {form.errors.confirmPassword && <p className="text-red-500">{form.errors.confirmPassword}</p>}
+            </div>
+            
+            {/* Specific error message */}
+            {specificError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm">{specificError}</p>
+              </div>
+            )}
+            
+            <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
+              {signUpLoading ? 'Account aanmaken...' : 'Account Aanmaken'}
+            </Button>
+          </form>
+          <div className="mt-6 text-center text-sm text-gray-600">
+            Heb je al een account?{' '}
+            <Link href={`/auth/signin${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
+              Log in
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -12,6 +12,7 @@ import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
+import { Home } from 'lucide-react'
 
 function SignInPageContent() {
   const { supabase } = useSupabase()
@@ -108,9 +109,21 @@ function SignInPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
+          </Button>
+        </Link>
+      </div>
+
+      <Card className="w-full max-w-md">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Welkom Terug!</CardTitle>
             <CardDescription className="text-base text-gray-500">
@@ -186,7 +199,6 @@ function SignInPageContent() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }

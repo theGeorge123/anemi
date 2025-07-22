@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useSupabase } from '@/components/SupabaseProvider'
 import { ErrorService } from '@/lib/error-service'
 import { useCallback } from 'react'
+import { Home } from 'lucide-react'
 
 function VerifyPageContent() {
   const { supabase } = useSupabase()
@@ -311,9 +312,21 @@ function VerifyPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
-      <div className="w-full max-w-md">
-        <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
+          </Button>
+        </Link>
+      </div>
+
+      <Card className="w-full max-w-md">
           <CardHeader className="text-center pb-2">
             <div className="text-6xl mb-4">☕</div>
             <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Verifying Your Email</CardTitle>
@@ -346,7 +359,6 @@ function VerifyPageContent() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 } 

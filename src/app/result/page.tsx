@@ -1,292 +1,318 @@
 "use client"
 
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useState, Suspense } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Coffee, MapPin, Clock, Star, Shuffle, Send, ArrowLeft } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
-import { getOrSetCsrfToken } from '@/lib/csrf'
-import { useAsyncOperation } from '@/lib/use-async-operation'
-import { ErrorService } from '@/lib/error-service'
-import { useSupabase } from '@/components/SupabaseProvider'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { ArrowLeft, Send, Shuffle, Star, Home } from 'lucide-react'
 
 interface Cafe {
   id: string
   name: string
+  description: string
   address: string
-  priceRange: string
+  city: string
   rating: number
-  hours: string
-  isVerified: boolean
-  description?: string
-  photos?: string[]
+  reviewCount: number
+  priceRange: string
+  features: string[]
 }
 
-function ResultPageContent() {
+interface MeetupData {
+  token: string
+  organizerName: string
+  organizerEmail: string
+  availableDates: string[]
+  availableTimes: string[]
+}
+
+export default function ResultPage() {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const { session } = useSupabase();
+  const [cafe, setCafe] = useState<Cafe | null>(null)
+  const [meetupData, setMeetupData] = useState<MeetupData | null>(null)
+  const [shuffleLoading, setShuffleLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Always parse params, even if invalid, to keep hooks order stable
-  const cafeParam = searchParams.get('cafe')
-  const formParam = searchParams.get('form')
-  let cafe: Cafe | null = null
-  let formData: any = null
-  try {
-    if (cafeParam) cafe = JSON.parse(decodeURIComponent(cafeParam))
-    if (formParam) formData = JSON.parse(decodeURIComponent(formParam))
-  } catch {}
+  useEffect(() => {
+    const cafeId = searchParams.get('cafeId')
+    const meetupToken = searchParams.get('token')
 
-  // Always call hooks unconditionally
-  const {
-    execute: shuffleAgainAsync,
-    isLoading: shuffleLoading,
-    error: shuffleError,
-  } = useAsyncOperation(async () => {
-    const response = await fetch('/api/shuffle-cafe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': getOrSetCsrfToken(),
-      },
-      body: JSON.stringify({
-        priceRange: formData?.priceRange,
-        city: formData?.city
-      })
-    });
-    if (!response.ok) {
-      throw new Error('Failed to find another cafe.');
+    if (!cafeId || !meetupToken) {
+      setError('Ongeldige aanvraag')
+      return
     }
-    return response.json();
-  }, {
-    onSuccess: (newCafe) => {
-      router.push(`/result?cafe=${encodeURIComponent(JSON.stringify(newCafe))}&form=${encodeURIComponent(JSON.stringify(formData))}`);
-    },
-    onError: (err) => {
-      ErrorService.showToast(ErrorService.handleError(err), 'error');
-    },
-  });
 
-  const {
-    execute: sendInviteAsync,
-    isLoading: inviteLoading,
-    error: inviteError,
-  } = useAsyncOperation(async () => {
-    const response = await fetch('/api/send-invite', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-csrf-token': getOrSetCsrfToken(),
-      },
-      body: JSON.stringify({
-        cafe,
-        formData,
-        dates: formData?.dates,
-        times: formData?.times,
-        userId: session?.user.id,
-      })
-    });
-    if (!response.ok) {
-      throw new Error('Failed to send invite.');
+    // Fetch cafe and meetup data
+    const fetchData = async () => {
+      try {
+        const [cafeResponse, meetupResponse] = await Promise.all([
+          fetch(`/api/cafes/${cafeId}`),
+          fetch(`/api/meetups/${meetupToken}`)
+        ])
+
+        if (!cafeResponse.ok || !meetupResponse.ok) {
+          throw new Error('Failed to fetch data')
+        }
+
+        const cafeData = await cafeResponse.json()
+        const meetupData = await meetupResponse.json()
+
+        setCafe(cafeData.cafe)
+        setMeetupData(meetupData.meetup)
+      } catch (err) {
+        setError('Failed to load data')
+      }
     }
-    return response.json();
-  }, {
-    onSuccess: (result) => {
-      router.push(`/confirmed?inviteLink=${encodeURIComponent(result.inviteLink)}`);
-    },
-    onError: (err) => {
-      ErrorService.showToast(ErrorService.handleError(err), 'error');
-    },
-  });
 
-  if (!cafe || !formData) {
+    fetchData()
+  }, [searchParams])
+
+  const handleShuffle = async () => {
+    if (!meetupData) return
+
+    setShuffleLoading(true)
+    try {
+      const response = await fetch('/api/shuffle-cafe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: meetupData.token,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to shuffle')
+      }
+
+      const data = await response.json()
+      setCafe(data.cafe)
+    } catch (err) {
+      setError('Failed to shuffle cafe')
+    } finally {
+      setShuffleLoading(false)
+    }
+  }
+
+  const handleSendInvite = async () => {
+    if (!meetupData) return
+
+    try {
+      const response = await fetch('/api/send-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: meetupData.token,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send invite')
+      }
+
+      alert('Uitnodiging succesvol verstuurd! 📧')
+    } catch (err) {
+      setError('Failed to send invite')
+    }
+  }
+
+  if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Ongeldige Aanvraag</h1>
-          <p className="text-muted-foreground mb-6">Begin opnieuw en maak een nieuwe meetup.</p>
-          <Button asChild>
-            <Link href="/create">Nieuwe Meetup Maken</Link>
-          </Button>
+      <main className="max-w-4xl mx-auto p-4">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link href="/">
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            >
+              <Home className="w-4 h-4" />
+              ← Terug naar Home
+            </Button>
+          </Link>
         </div>
-      </div>
+
+        <div className="text-center py-16">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Ongeldige Aanvraag</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Link href="/create">
+            <Button className="bg-amber-500 hover:bg-amber-600">
+              Nieuwe Meetup Maken
+            </Button>
+          </Link>
+        </div>
+      </main>
     )
   }
 
-  const handleShuffleAgain = () => {
-    shuffleAgainAsync();
-  };
+  if (!cafe || !meetupData) {
+    return (
+      <main className="max-w-4xl mx-auto p-4">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link href="/">
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            >
+              <Home className="w-4 h-4" />
+              ← Terug naar Home
+            </Button>
+          </Link>
+        </div>
 
-  const handleSendInvite = () => {
-    sendInviteAsync();
-  };
-
-  const getPriceDisplay = (priceRange: string) => {
-    switch (priceRange) {
-      case 'BUDGET': return '$'
-      case 'MODERATE': return '$$'
-      case 'EXPENSIVE': return '$$$'
-      case 'LUXURY': return '$$$$'
-      default: return '$$'
-    }
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Je perfecte match laden...</p>
+        </div>
+      </main>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <Button variant="ghost" asChild className="mb-4">
-            <Link href="/create" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Terug naar Maken
-            </Link>
+    <main className="max-w-4xl mx-auto p-4">
+      {/* Back to Home Button */}
+      <div className="mb-6">
+        <Link href="/">
+          <Button 
+            variant="ghost" 
+            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+          >
+            <Home className="w-4 h-4" />
+            ← Terug naar Home
           </Button>
-          
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Perfecte Match!</h1>
-            <p className="text-gray-600">Hier is je koffie shop voor de meetup</p>
-          </div>
-        </div>
+        </Link>
+      </div>
 
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Perfecte Match!</h1>
+        <p className="text-gray-600">Hier is je koffie shop voor de meetup</p>
+      </div>
+
+      <div className="grid gap-6">
         {/* Cafe Card */}
-        <Card className="shadow-lg mb-8">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Coffee className="w-5 h-5 text-amber-600" />
-                  {cafe.name}
-                </CardTitle>
-                <CardDescription className="mt-2">
+        <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{cafe.name}</h2>
+                <p className="text-gray-600 mb-3">
                   {cafe.description || 'Een geweldige plek voor je meetup'}
-                </CardDescription>
-              </div>
-              {cafe.isVerified && (
-                <Badge variant="secondary" className="bg-green-100 text-green-700">
-                  <Star className="w-3 h-3 mr-1" />
-                  Geverifieerd
-                </Badge>
-              )}
-            </div>
-          </CardHeader>
-          
-          {/* Cafe Photos */}
-          {cafe.photos && cafe.photos.length > 0 && (
-            <div className="px-6 pb-4">
-              <div className="grid grid-cols-2 gap-3">
-                {cafe.photos.slice(0, 2).map((photo, index) => (
-                  <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
-                    <Image
-                      src={photo}
-                      alt={`${cafe.name} - Photo ${index + 1}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
+                </p>
+                
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span>{cafe.rating.toFixed(1)}</span>
+                    <span className="text-gray-500">({cafe.reviewCount} reviews)</span>
                   </div>
-                ))}
+                  <span className="text-lg">{getPriceEmoji(cafe.priceRange)}</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    <Star className="w-3 h-3 mr-1" />
+                    Geverifieerd
+                  </Badge>
+                </div>
+
+                <p className="text-sm text-gray-600">
+                  📍 {cafe.address}, {cafe.city}
+                </p>
+
+                {cafe.features.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {cafe.features.map((feature) => (
+                      <span
+                        key={feature}
+                        className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          )}
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-4 h-4" />
-              <span>{cafe.address}</span>
-            </div>
+          </CardContent>
+        </Card>
+
+        {/* Meetup Details */}
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">📋 Meetup Details</h3>
             
-            <div className="flex items-center gap-2 text-gray-600">
-              <Clock className="w-4 h-4" />
-              <span>{cafe.hours}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-500 fill-current" />
-              <span className="text-gray-600">{cafe.rating}/5</span>
-              <Badge variant="outline" className="ml-auto">
-                {getPriceDisplay(cafe.priceRange)}
-              </Badge>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">👤</span>
+                <span><strong>Organisator:</strong> {meetupData.organizerName}</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">📅</span>
+                <span><strong>Beschikbare data:</strong> {meetupData.availableDates.length} opties</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">⏰</span>
+                <span><strong>Beschikbare tijden:</strong> {meetupData.availableTimes.length} opties</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Action Buttons */}
-        <div className="space-y-4">
+        <div className="flex gap-4 justify-center">
           <Button
             onClick={handleSendInvite}
-            disabled={shuffleLoading || inviteLoading}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3"
+            className="bg-green-500 hover:bg-green-600"
+            size="lg"
           >
-            {shuffleLoading || inviteLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {shuffleLoading ? 'Schudden...' : 'Uitnodiging Versturen...'}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                Uitnodiging Versturen
-              </div>
-            )}
+            <Send className="w-4 h-4 mr-2" />
+            Uitnodiging Versturen
           </Button>
           
           <Button
-            onClick={handleShuffleAgain}
+            onClick={handleShuffle}
             disabled={shuffleLoading}
             variant="outline"
-            className="w-full py-3"
+            size="lg"
+            className="border-amber-300 text-amber-700 hover:bg-amber-50"
           >
-            <div className="flex items-center gap-2">
-              <Shuffle className="w-4 h-4" />
-              Opnieuw Schudden
-            </div>
+            {shuffleLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-600 mr-2"></div>
+                Schudden...
+              </>
+            ) : (
+              <>
+                <Shuffle className="w-4 h-4 mr-2" />
+                Opnieuw Schudden
+              </>
+            )}
           </Button>
         </div>
 
-        {/* Meetup Details */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="text-lg">Meetup Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Organisator:</span>
-              <span className="font-medium">{formData.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Prijsbereik:</span>
-              <span className="font-medium">{getPriceDisplay(formData.priceRange)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Stad:</span>
-              <span className="font-medium">{formData.city}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Beschikbare Data:</span>
-              <span className="font-medium">{formData.dates.length} data geselecteerd</span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Navigation */}
+        <div className="text-center">
+          <Link href="/create" className="flex items-center gap-2 justify-center text-amber-600 hover:text-amber-700">
+            <ArrowLeft className="w-4 h-4" />
+            Terug naar Maken
+          </Link>
+        </div>
       </div>
-    </div>
+    </main>
   )
 }
 
-export default function ResultPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Je perfecte match laden...</p>
-        </div>
-      </div>
-    }>
-      <ResultPageContent />
-    </Suspense>
-  )
+function getPriceEmoji(priceRange: string) {
+  switch (priceRange) {
+    case 'BUDGET': return '💰'
+    case 'MODERATE': return '☕'
+    case 'EXPENSIVE': return '✨'
+    case 'LUXURY': return '💎'
+    default: return '☕'
+  }
 } 

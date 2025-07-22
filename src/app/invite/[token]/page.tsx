@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DeclineModal } from '@/components/meetups/DeclineModal'
+import { Calendar, MapPin, Star, Clock, Users } from 'lucide-react'
 
 interface InviteData {
   token: string
@@ -17,6 +18,18 @@ interface InviteData {
   availableTimes: string[]
   status: string
   expiresAt: string
+  cafe: {
+    id: string
+    name: string
+    description: string
+    address: string
+    rating: number
+    reviewCount: number
+    priceRange: string
+    features: string[]
+    latitude: number
+    longitude: number
+  }
 }
 
 export default function InvitePage() {
@@ -32,6 +45,7 @@ export default function InvitePage() {
   const [declining, setDeclining] = useState(false)
   const [showDeclineModal, setShowDeclineModal] = useState(false)
   const [declineReason, setDeclineReason] = useState('')
+  const [showCafeDetails, setShowCafeDetails] = useState(false)
 
   useEffect(() => {
     const fetchInvite = async () => {
@@ -121,6 +135,75 @@ export default function InvitePage() {
     }
   }
 
+  const addToCalendar = () => {
+    if (!invite) return
+
+    // Get first available date and time
+    const firstDate = invite.availableDates[0]
+    const firstTime = invite.availableTimes[0]
+    
+    if (!firstDate || !firstTime) {
+      alert('Geen beschikbare data of tijden gevonden')
+      return
+    }
+
+    // Parse date and time
+    const date = new Date(firstDate)
+    const timeParts = firstTime.split(':').map(Number)
+    const hours = timeParts[0] || 0
+    const minutes = timeParts[1] || 0
+    date.setHours(hours, minutes, 0, 0)
+    
+    // End time (1 hour later)
+    const endDate = new Date(date)
+    endDate.setHours(endDate.getHours() + 1)
+
+    // Format for Google Calendar (YYYYMMDDTHHMMSSZ)
+    const formatDate = (d: Date) => {
+      return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+    }
+
+    const startDateTime = formatDate(date)
+    const endDateTime = formatDate(endDate)
+
+    // Create calendar event data
+    const event = {
+      title: `☕ Koffie meetup met ${invite.organizerName}`,
+      description: `Koffie meetup bij ${invite.cafe.name}\n\nAdres: ${invite.cafe.address}\n\nBeschikbare data: ${invite.availableDates.join(', ')}\nBeschikbare tijden: ${invite.availableTimes.join(', ')}`,
+      location: invite.cafe.address,
+      startDateTime,
+      endDateTime
+    }
+
+    // Create Google Calendar URL
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}&dates=${event.startDateTime}/${event.endDateTime}`
+
+    // Open in new tab
+    window.open(googleCalendarUrl, '_blank')
+  }
+
+  const openInMaps = () => {
+    if (!invite?.cafe) return
+    
+    const { latitude, longitude } = invite.cafe
+    const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`
+    window.open(mapsUrl, '_blank')
+  }
+
+  const getPriceEmoji = (priceRange: string) => {
+    switch (priceRange) {
+      case 'BUDGET': return '💰'
+      case 'MODERATE': return '☕'
+      case 'EXPENSIVE': return '✨'
+      case 'LUXURY': return '💎'
+      default: return '☕'
+    }
+  }
+
+  const getRatingStars = (rating: number) => {
+    return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
@@ -187,9 +270,80 @@ export default function InvitePage() {
               <p className="text-gray-700">{invite.organizerName}</p>
             </div>
 
+            {/* Cafe Details */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    ☕ {invite.cafe.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    {invite.cafe.description || 'Een gezellige koffie shop met geweldige sfeer'}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span>{getRatingStars(invite.cafe.rating)} {invite.cafe.rating.toFixed(1)}</span>
+                      <span className="text-gray-500">({invite.cafe.reviewCount} reviews)</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg">{getPriceEmoji(invite.cafe.priceRange)}</span>
+                      <span>{invite.cafe.priceRange}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <span>{invite.cafe.address}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cafe Features */}
+              {invite.cafe.features.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {invite.cafe.features.map((feature) => (
+                    <span
+                      key={feature}
+                      className="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Action Buttons for Cafe */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={openInMaps}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <MapPin className="w-4 h-4" />
+                  Open in Maps
+                </Button>
+                
+                <Button
+                  onClick={addToCalendar}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Toevoegen aan Kalender
+                </Button>
+              </div>
+            </div>
+
             {/* Available Dates */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Beschikbare data:</h3>
+              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Beschikbare data:
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {invite.availableDates.map((date) => (
                   <div key={date} className="bg-gray-100 p-2 rounded text-sm text-center">
@@ -205,7 +359,10 @@ export default function InvitePage() {
 
             {/* Available Times */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Beschikbare tijden:</h3>
+              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Beschikbare tijden:
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {invite.availableTimes.map((time) => (
                   <span key={time} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
@@ -217,7 +374,10 @@ export default function InvitePage() {
 
             {/* Your Info */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900">Jouw gegevens:</h3>
+              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Jouw gegevens:
+              </h3>
               
               <div>
                 <Label htmlFor="name">Naam</Label>

@@ -11,16 +11,16 @@ interface PriceSelectorProps {
 
 export function PriceSelector({ value, onChange, city }: PriceSelectorProps) {
   const priceOptions = [
-    { value: 'BUDGET', label: 'Budget friendly', emoji: '💰', description: 'Great value spots' },
-    { value: 'MODERATE', label: 'Standard', emoji: '☕', description: 'Quality coffee shops' },
+    { value: 'BUDGET', label: 'Budget vriendelijk', emoji: '💰', description: 'Goede waarde plekken' },
+    { value: 'MODERATE', label: 'Standaard', emoji: '☕', description: 'Kwaliteit koffie shops' },
     { value: 'EXPENSIVE', label: 'Premium', emoji: '✨', description: 'Fancy cafes & roasters' },
-    { value: 'LUXURY', label: 'Luxury', emoji: '💎', description: 'High-end experiences' }
+    { value: 'LUXURY', label: 'Luxe', emoji: '💎', description: 'High-end ervaringen' }
   ]
 
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
-        What&apos;s your budget? 💰
+        Wat is je budget? 💰
       </label>
       <div className="space-y-3">
         {priceOptions.map((option) => (
@@ -46,8 +46,8 @@ export function PriceSelector({ value, onChange, city }: PriceSelectorProps) {
       </div>
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
-          <span className="font-medium">💡 Tip:</span> You can also pick your own cafe! 
-          We&apos;ll show you a nice list of cafes in {city} with pictures and descriptions.
+          <span className="font-medium">💡 Tip:</span> Je kunt ook je eigen cafe kiezen! 
+          We laten je een mooie lijst van cafes in {city} zien met foto&apos;s en beschrijvingen.
         </p>
       </div>
     </div>

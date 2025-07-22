@@ -18,7 +18,7 @@ export function StepNavigation({
   onNext, 
   onBack, 
   isNextDisabled = false,
-  nextLabel = 'Next'
+  nextLabel = 'Volgende'
 }: StepNavigationProps) {
   return (
     <div className="flex justify-between items-center pt-6">
@@ -29,7 +29,7 @@ export function StepNavigation({
         className="flex items-center gap-2"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back
+        Terug
       </Button>
       
       <Button

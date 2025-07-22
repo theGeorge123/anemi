@@ -10,7 +10,7 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Anemi Meets</h3>
             <p className="text-sm text-muted-foreground">
-              Connect with your community over coffee. Discover local meetups and coffee shops.
+              Verbind met je community over koffie. Ontdek lokale meetups en koffie shops.
             </p>
           </div>
           
@@ -19,7 +19,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/create" className="text-muted-foreground hover:text-foreground">
-                  Create Meetup
+                  Meetup Maken
                 </Link>
               </li>
               <li>
@@ -31,32 +31,32 @@ export function Footer() {
           </div>
           
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Support</h4>
+            <h4 className="text-sm font-semibold">Ondersteuning</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <a href="mailto:team@anemimeets.com" className="text-muted-foreground hover:text-foreground">
-                  Contact Us
+                  Contact
                 </a>
               </li>
               <li>
                 <a href="/api/health" className="text-muted-foreground hover:text-foreground">
-                  System Status
+                  Systeem Status
                 </a>
               </li>
             </ul>
           </div>
           
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Legal</h4>
+            <h4 className="text-sm font-semibold">Rechtelijk</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground">
-                  Privacy Policy
+                  Privacybeleid
                 </Link>
               </li>
               <li>
                 <Link href="/legal/terms" className="text-muted-foreground hover:text-foreground">
-                  Terms of Service
+                  Gebruiksvoorwaarden
                 </Link>
               </li>
             </ul>
@@ -65,7 +65,7 @@ export function Footer() {
         
         <div className="mt-8 pt-8 border-t">
           <p className="text-center text-sm text-muted-foreground">
-            © 2024 Anemi Meets. All rights reserved.
+            © 2024 Anemi Meets. Alle rechten voorbehouden.
           </p>
         </div>
       </div>

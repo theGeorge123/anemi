@@ -107,10 +107,10 @@ function ResultPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Invalid Request</h1>
-          <p className="text-muted-foreground mb-6">Please start over and create a new meetup.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Ongeldige Aanvraag</h1>
+          <p className="text-muted-foreground mb-6">Begin opnieuw en maak een nieuwe meetup.</p>
           <Button asChild>
-            <Link href="/create">Create New Meetup</Link>
+            <Link href="/create">Nieuwe Meetup Maken</Link>
           </Button>
         </div>
       </div>
@@ -142,13 +142,13 @@ function ResultPageContent() {
           <Button variant="ghost" asChild className="mb-4">
             <Link href="/create" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Back to Create
+              Terug naar Maken
             </Link>
           </Button>
           
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Perfect Match!</h1>
-            <p className="text-gray-600">Here&apos;s your coffee shop for the meetup</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Perfecte Match!</h1>
+            <p className="text-gray-600">Hier is je koffie shop voor de meetup</p>
           </div>
         </div>
 
@@ -162,13 +162,13 @@ function ResultPageContent() {
                   {cafe.name}
                 </CardTitle>
                 <CardDescription className="mt-2">
-                  {cafe.description || 'A great place for your meetup'}
+                  {cafe.description || 'Een geweldige plek voor je meetup'}
                 </CardDescription>
               </div>
               {cafe.isVerified && (
                 <Badge variant="secondary" className="bg-green-100 text-green-700">
                   <Star className="w-3 h-3 mr-1" />
-                  Verified
+                  Geverifieerd
                 </Badge>
               )}
             </div>
@@ -224,12 +224,12 @@ function ResultPageContent() {
             {shuffleLoading || inviteLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {shuffleLoading ? 'Shuffling...' : 'Sending Invite...'}
+                {shuffleLoading ? 'Schudden...' : 'Uitnodiging Versturen...'}
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Send className="w-4 h-4" />
-                Send Invite
+                Uitnodiging Versturen
               </div>
             )}
           </Button>
@@ -242,7 +242,7 @@ function ResultPageContent() {
           >
             <div className="flex items-center gap-2">
               <Shuffle className="w-4 h-4" />
-              Shuffle Again
+              Opnieuw Schudden
             </div>
           </Button>
         </div>
@@ -254,20 +254,20 @@ function ResultPageContent() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Organizer:</span>
+              <span className="text-gray-600">Organisator:</span>
               <span className="font-medium">{formData.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Price Range:</span>
+              <span className="text-gray-600">Prijsbereik:</span>
               <span className="font-medium">{getPriceDisplay(formData.priceRange)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">City:</span>
+              <span className="text-gray-600">Stad:</span>
               <span className="font-medium">{formData.city}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Available Dates:</span>
-              <span className="font-medium">{formData.dates.length} dates selected</span>
+              <span className="text-gray-600">Beschikbare Data:</span>
+              <span className="font-medium">{formData.dates.length} data geselecteerd</span>
             </div>
           </CardContent>
         </Card>
@@ -282,7 +282,7 @@ export default function ResultPage() {
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading your perfect match...</p>
+          <p className="text-gray-600">Je perfecte match laden...</p>
         </div>
       </div>
     }>

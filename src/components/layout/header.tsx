@@ -20,7 +20,7 @@ export function Header() {
         <nav className="hidden md:flex items-center space-x-6">
           {supabase && session && (
             <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-              My Meetups
+              Mijn Meetups
             </Link>
           )}
         </nav>
@@ -28,7 +28,7 @@ export function Header() {
         {supabase && session && (
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-600">
-              Welcome, {session.user.email}
+              Welkom, {session.user.email}
             </div>
             <Button
               onClick={async () => {
@@ -39,7 +39,7 @@ export function Header() {
               variant="outline"
               size="sm"
             >
-              Sign Out
+              Uitloggen
             </Button>
           </div>
         )}
@@ -53,7 +53,7 @@ export function Header() {
         ) : (
           <Link href="/auth/signin">
             <Button variant="outline" size="sm">
-              Sign In
+              Inloggen
             </Button>
           </Link>
         )}

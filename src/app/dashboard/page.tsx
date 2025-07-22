@@ -129,9 +129,9 @@ const Dashboard = withAuth(() => {
       <div className="mb-8 text-center">
         <div className="flex items-center justify-center mb-4">
           <span className="text-4xl mr-3">☕</span>
-          <h1 className="text-4xl font-bold text-gray-900">Hey there!</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Hé daar!</h1>
         </div>
-        <p className="text-gray-600 text-lg">Ready to discover some amazing coffee spots? 🚀</p>
+        <p className="text-gray-600 text-lg">Klaar om geweldige koffie plekken te ontdekken? 🚀</p>
       </div>
       
       {isLoading ? (
@@ -139,15 +139,15 @@ const Dashboard = withAuth(() => {
           <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
             <span className="text-3xl">☕</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading your coffee adventures...</h2>
-          <p className="text-gray-500">Brewing up something special for you! ✨</p>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Je koffie avonturen laden...</h2>
+          <p className="text-gray-500">Iets speciaals voor je aan het zetten! ✨</p>
         </div>
       ) : error ? (
         <div className="text-center py-16">
           <div className="w-20 h-20 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-3xl">😅</span>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oops! Something went wrong</h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oeps! Er ging iets mis</h2>
           <p className="text-gray-500 mb-6 max-w-md mx-auto">
             {error}
           </p>
@@ -156,10 +156,10 @@ const Dashboard = withAuth(() => {
               onClick={() => window.location.reload()} 
               className="bg-amber-600 hover:bg-amber-700 px-6 py-3"
             >
-              🔄 Try Again
+              🔄 Probeer Opnieuw
             </Button>
             <div className="text-sm text-gray-400">
-              or <Link href="/debug-vercel" className="text-amber-600 hover:underline">check what&apos;s up</Link>
+              of <Link href="/debug-vercel" className="text-amber-600 hover:underline">kijk wat er aan de hand is</Link>
             </div>
           </div>
         </div>
@@ -168,18 +168,18 @@ const Dashboard = withAuth(() => {
           <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-3xl">🌟</span>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Your coffee journey starts here!</h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Je koffie reis begint hier!</h2>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">
-            No meetups yet, but that&apos;s totally fine! Let&apos;s create your first coffee adventure and discover amazing spots with new friends.
+            Nog geen meetups, maar dat is helemaal prima! Laten we je eerste koffie avontuur maken en geweldige plekken ontdekken met nieuwe vrienden.
           </p>
           <div className="space-y-4">
             <Link href="/create">
               <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 text-lg font-semibold">
-                ☕ Start Your First Coffee Adventure
+                ☕ Start Je Eerste Koffie Avontuur
               </Button>
             </Link>
             <div className="text-sm text-gray-400">
-              or <Link href="/" className="text-amber-600 hover:underline">explore what we&apos;re all about</Link>
+              of <Link href="/" className="text-amber-600 hover:underline">ontdek waar we voor staan</Link>
             </div>
           </div>
         </div>
@@ -187,12 +187,12 @@ const Dashboard = withAuth(() => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Your Coffee Adventures ({meetups.length})</h2>
-              <p className="text-gray-500">All your meetups in one cozy place ☕</p>
+              <h2 className="text-2xl font-semibold text-gray-900">Je Koffie Avonturen ({meetups.length})</h2>
+              <p className="text-gray-500">Al je meetups op één gezellige plek ☕</p>
             </div>
             <Link href="/create">
               <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-                ✨ New Adventure
+                ✨ Nieuw Avontuur
               </Button>
             </Link>
           </div>
@@ -205,7 +205,7 @@ const Dashboard = withAuth(() => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
                         <h3 className="text-xl font-semibold text-gray-900">
-                          ☕ Coffee at {meetup.cafe.name}
+                          ☕ Koffie bij {meetup.cafe.name}
                         </h3>
                         {getStatusBadge(meetup.status)}
                       </div>
@@ -217,31 +217,31 @@ const Dashboard = withAuth(() => {
                         </p>
                         <p className="flex items-center gap-2">
                           <span className="text-amber-600">👤</span> 
-                          Organized by: {meetup.organizerName}
+                          Georganiseerd door: {meetup.organizerName}
                         </p>
                         <p className="flex items-center gap-2">
                           <span className="text-amber-600">📅</span> 
-                          {meetup.availableDates.length} dates available
+                          {meetup.availableDates.length} data beschikbaar
                         </p>
                         <p className="flex items-center gap-2">
                           <span className="text-amber-600">⏰</span> 
-                          {meetup.availableTimes.length} time slots
+                          {meetup.availableTimes.length} tijdsloten
                         </p>
                         {meetup.chosenDate && (
                           <p className="flex items-center gap-2 text-green-600 font-medium">
                             <span>✅</span> 
-                            Confirmed for: {formatDate(meetup.chosenDate)}
+                            Bevestigd voor: {formatDate(meetup.chosenDate)}
                           </p>
                         )}
                         {meetup.inviteeName && (
                           <p className="flex items-center gap-2">
                             <span className="text-amber-600">👥</span> 
-                            Meeting with: {meetup.inviteeName}
+                            Afspraak met: {meetup.inviteeName}
                           </p>
                         )}
                         <div className="flex gap-4 text-xs text-gray-400 mt-3">
-                          <span>📅 Created: {formatDate(meetup.createdAt)}</span>
-                          <span>⏰ Expires: {formatDate(meetup.expiresAt)}</span>
+                          <span>📅 Aangemaakt: {formatDate(meetup.createdAt)}</span>
+                          <span>⏰ Verloopt: {formatDate(meetup.expiresAt)}</span>
                         </div>
                       </div>
                     </div>
@@ -257,10 +257,10 @@ const Dashboard = withAuth(() => {
                           onClick={() => {
                             const link = getInviteLink(meetup.token)
                             navigator.clipboard.writeText(link)
-                            alert('Invite link copied! Share it with your coffee buddy ☕')
+                            alert('Uitnodigingslink gekopieerd! Deel het met je koffie maatje ☕')
                           }}
                         >
-                          📋 Copy Invite Link
+                          📋 Kopieer Uitnodigingslink
                         </Button>
                         <Button 
                           variant="outline" 
@@ -271,7 +271,7 @@ const Dashboard = withAuth(() => {
                             window.open(link, '_blank')
                           }}
                         >
-                          👁️ View Invite
+                          👁️ Bekijk Uitnodiging
                         </Button>
                       </>
                     )}
@@ -281,10 +281,10 @@ const Dashboard = withAuth(() => {
                         size="sm"
                         className="border-green-200 text-green-700 hover:bg-green-50"
                         onClick={() => {
-                          alert('Calendar integration coming soon! 📅')
+                          alert('Kalender integratie komt binnenkort! 📅')
                         }}
                       >
-                        📅 Add to Calendar
+                        📅 Toevoegen aan Kalender
                       </Button>
                     )}
                   </div>

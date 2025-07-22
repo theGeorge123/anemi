@@ -18,8 +18,8 @@ const CreateMeetupPage = withAuth(() => {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">☕ Create a Meetup</h1>
-          <p className="text-muted-foreground">Let&apos;s find you the perfect coffee spot!</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">☕ Maak een Meetup</h1>
+          <p className="text-muted-foreground">Laten we de perfecte koffie plek voor je vinden!</p>
         </div>
         <MeetupWizard />
       </div>

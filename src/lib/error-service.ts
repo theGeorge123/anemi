@@ -1,6 +1,6 @@
 // Centralized error handling service
 export class ErrorService {
-  static handleError(error: any, fallbackMessage: string = 'Something went wrong'): string {
+  static handleError(error: any, fallbackMessage: string = 'Er ging iets mis'): string {
     console.error('Application error:', error);
     // Extract meaningful error message
     if (error?.message) return error.message;

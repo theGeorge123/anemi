@@ -9,46 +9,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
-    // Create Supabase client with service role key for admin operations
+    // Create Supabase client with anon key for normal signup
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
       }
     })
 
-    // Create user with admin privileges and send verification email
-    const { data, error } = await supabase.auth.admin.createUser({
+    // Use normal signup flow which automatically sends verification email
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      email_confirm: false, // Require email confirmation
-      user_metadata: {
-        custom_email_verification: true
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify`
       }
     })
 
     if (error) {
       console.error('User creation error:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-
-    // Send verification email using Supabase's built-in email system
-    const { error: emailError } = await supabase.auth.admin.generateLink({
-      type: 'signup',
-      email: email,
-      password: password,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify`
-      }
-    })
-
-    if (emailError) {
-      console.error('Email verification error:', emailError)
-      // Don't fail the request, just log the error
-      console.warn('Failed to send verification email, but user was created')
     }
 
     return NextResponse.json({ 

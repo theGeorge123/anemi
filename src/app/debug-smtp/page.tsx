@@ -54,7 +54,7 @@ export default function DebugSMTP() {
         <CardHeader>
           <CardTitle>🧪 Test SMTP Settings</CardTitle>
           <CardDescription>
-            Test your SMTP configuration and see what's happening
+            Test your SMTP configuration and see what&apos;s happening
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -83,7 +83,7 @@ export default function DebugSMTP() {
         <CardHeader>
           <CardTitle>📧 Manual Email Confirmation</CardTitle>
           <CardDescription>
-            If SMTP is not working, manually confirm a user's email
+            If SMTP is not working, manually confirm a user&apos;s email
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

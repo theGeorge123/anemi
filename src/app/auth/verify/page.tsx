@@ -17,8 +17,9 @@ function VerifyPageContent() {
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
   const [email, setEmail] = useState<string>('')
 
-  const token = searchParams.get('token')
+  const token = searchParams.get('token_hash') || searchParams.get('token')
   const emailParam = searchParams.get('email')
+  const type = searchParams.get('type')
 
   useEffect(() => {
     if (emailParam) {
@@ -34,7 +35,7 @@ function VerifyPageContent() {
       // Verify the token with Supabase
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash: token,
-        type: 'email'
+        type: type || 'email'
       })
 
       if (error) {

@@ -31,6 +31,16 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('User creation error:', error)
+      
+      // Check if it's an email sending error
+      if (error.message.includes('email') || error.message.includes('confirmation')) {
+        console.warn('Email sending failed, but user might have been created')
+        return NextResponse.json({ 
+          error: 'User created but email verification failed. Please contact support or try again later.',
+          details: error.message 
+        }, { status: 400 })
+      }
+      
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 

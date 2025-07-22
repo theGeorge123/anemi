@@ -86,7 +86,7 @@ function VerifyPageContent() {
     } finally {
       setIsVerifying(false)
     }
-  }, [token, email, router, supabase])
+  }, [token, email, router, supabase, type])
 
   useEffect(() => {
     if (token && email) {

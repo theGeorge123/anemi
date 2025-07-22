@@ -121,7 +121,7 @@ export default function DebugVerificationUrl() {
             <h3 className="font-semibold text-amber-800 mb-2">🚨 Common Issues:</h3>
             <ul className="space-y-1 text-amber-700">
               <li>• <strong>Missing token_hash</strong> - Email template might be wrong</li>
-              <li>• <strong>Missing type</strong> - Should be "email" for verification</li>
+              <li>• <strong>Missing type</strong> - Should be &quot;email&quot; for verification</li>
               <li>• <strong>Wrong SiteURL</strong> - Check Supabase email template</li>
               <li>• <strong>Expired token</strong> - Tokens expire after 1 hour</li>
             </ul>

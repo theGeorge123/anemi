@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
 import { Home } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 interface MeetupInvite {
   id: string
@@ -161,8 +162,7 @@ export default function Dashboard() {
 
       // Remove from local state
       setMeetups(meetups.filter(meetup => meetup.id !== meetupId))
-
-      alert('🗑️ Meetup succesvol verwijderd!')
+      alert('✅ Meetup succesvol verwijderd!')
     } catch (error) {
       console.error('Error deleting meetup:', error)
       throw error
@@ -213,184 +213,229 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      <div className="mb-8 text-center">
+      {/* Fun Header Section */}
+      <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-4">
-          <span className="text-4xl mr-3">☕</span>
-          <h1 className="text-4xl font-bold text-gray-900">Hé daar!</h1>
+          <span className="text-6xl mr-4">☕</span>
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+              Hé daar!
+            </h1>
+            <p className="text-gray-600 text-lg mt-2">Klaar om geweldige koffie plekken te ontdekken? 🚀</p>
+          </div>
         </div>
-        <p className="text-gray-600 text-lg">Klaar om geweldige koffie plekken te ontdekken? 🚀</p>
       </div>
-      
-      {isLoading ? (
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <span className="text-3xl">☕</span>
+
+      {/* Stats Section */}
+      {meetups.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 text-center">
+            <div className="text-2xl mb-2">📊</div>
+            <div className="text-2xl font-bold text-green-700">{meetups.length}</div>
+            <div className="text-sm text-green-600">Totaal Avonturen</div>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Je koffie avonturen laden...</h2>
-          <p className="text-gray-500">Iets speciaals voor je aan het zetten! ✨</p>
-        </div>
-      ) : error ? (
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">😅</span>
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Oeps! Er ging iets mis</h2>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            {error}
-          </p>
-          <div className="space-y-4">
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="bg-amber-600 hover:bg-amber-700 px-6 py-3"
-            >
-              🔄 Probeer Opnieuw
-            </Button>
-            <div className="text-sm text-gray-400">
-              of <Link href="/debug-vercel" className="text-amber-600 hover:underline">kijk wat er aan de hand is</Link>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 text-center">
+            <div className="text-2xl mb-2">✅</div>
+            <div className="text-2xl font-bold text-blue-700">
+              {meetups.filter(m => m.status === 'confirmed').length}
             </div>
+            <div className="text-sm text-blue-600">Bevestigd</div>
           </div>
-        </div>
-      ) : meetups.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">🌟</span>
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-3">Je koffie reis begint hier!</h2>
-          <p className="text-gray-500 mb-8 max-w-md mx-auto">
-            Nog geen meetups, maar dat is helemaal prima! Laten we je eerste koffie avontuur maken en geweldige plekken ontdekken met nieuwe vrienden.
-          </p>
-          <div className="space-y-4">
-            <Link href="/create">
-              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 text-lg font-semibold">
-                ☕ Start Je Eerste Koffie Avontuur
-              </Button>
-            </Link>
-            <div className="text-sm text-gray-400">
-              or <Link href="/" className="text-amber-600 hover:underline">ontdek waar we voor staan</Link>
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 text-center">
+            <div className="text-2xl mb-2">⏳</div>
+            <div className="text-2xl font-bold text-amber-700">
+              {meetups.filter(m => m.status === 'pending').length}
             </div>
+            <div className="text-sm text-amber-600">Wachtend</div>
           </div>
         </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
+      )}
+
+      {/* Meetups Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full flex items-center justify-center">
+              <span className="text-xl">☕</span>
+            </div>
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Je Koffie Avonturen ({meetups.length})</h2>
-              <p className="text-gray-500">Al je meetups op één gezellige plek ☕</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Je Koffie Avonturen ({meetups.length})
+              </h2>
+              <p className="text-gray-600">Al je meetups op één gezellige plek ☕</p>
             </div>
-            <Link href="/create">
-              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-                ✨ Nieuw Avontuur
-              </Button>
-            </Link>
           </div>
           
+          <Link href="/create">
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-lg"
+            >
+              <span className="mr-2">✨</span>
+              <span className="mr-2">✨</span>
+              Nieuw Avontuur
+            </Button>
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+              <span className="text-gray-600">Je avonturen laden... 🚀</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <span className="text-2xl">😅</span>
+              <h3 className="text-lg font-semibold text-red-800">Oeps! Er ging iets mis</h3>
+            </div>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              🔄 Opnieuw proberen
+            </Button>
+          </div>
+        ) : meetups.length === 0 ? (
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-8 text-center">
+            <div className="text-6xl mb-4">☕</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen avonturen!</h3>
+            <p className="text-gray-600 mb-6">
+              Tijd om je eerste koffie meetup te maken en geweldige plekken te ontdekken! 🚀
+            </p>
+            <Link href="/create">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold"
+              >
+                <span className="mr-2">✨</span>
+                Je Eerste Avontuur Maken
+              </Button>
+            </Link>
+          </div>
+        ) : (
           <div className="grid gap-6">
             {meetups.map((meetup) => (
-              <Card key={meetup.id} className="hover:shadow-lg transition-all duration-300 border-amber-100">
+              <Card 
+                key={meetup.id} 
+                className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          ☕ Koffie bij {meetup.cafe.name}
+                        <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
+                          <span className="text-sm">☕</span>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">
+                          Koffie bij {meetup.cafe.name}
                         </h3>
-                        {getStatusBadge(meetup.status)}
+                        <Badge 
+                          variant={meetup.status === 'confirmed' ? 'default' : 'secondary'}
+                          className={`${
+                            meetup.status === 'confirmed' 
+                              ? 'bg-green-100 text-green-700 border-green-200' 
+                              : 'bg-amber-100 text-amber-700 border-amber-200'
+                          }`}
+                        >
+                          {meetup.status === 'confirmed' ? '✅ Bevestigd!' : '⏳ Wachtend'}
+                        </Badge>
                       </div>
-                      
-                      <div className="text-sm text-gray-600 space-y-2">
-                        <p className="flex items-center gap-2">
-                          <span className="text-amber-600">📍</span> 
-                          {meetup.cafe.address}, {meetup.cafe.city}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <span className="text-amber-600">👤</span> 
-                          Georganiseerd door: {meetup.organizerName}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <span className="text-amber-600">📅</span> 
-                          {meetup.availableDates.length} data beschikbaar
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <span className="text-amber-600">⏰</span> 
-                          {meetup.availableTimes.length} tijdsloten
-                        </p>
-                        {meetup.chosenDate && (
-                          <p className="flex items-center gap-2 text-green-600 font-medium">
-                            <span>✅</span> 
-                            Bevestigd voor: {formatDate(meetup.chosenDate)}
-                          </p>
-                        )}
-                        {meetup.inviteeName && (
-                          <p className="flex items-center gap-2">
-                            <span className="text-amber-600">👥</span> 
-                            Afspraak met: {meetup.inviteeName}
-                          </p>
-                        )}
-                        <div className="flex gap-4 text-xs text-gray-400 mt-3">
-                          <span>📅 Aangemaakt: {formatDate(meetup.createdAt)}</span>
-                          <span>⏰ Verloopt: {formatDate(meetup.expiresAt)}</span>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="text-red-500">📍</span>
+                            <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="text-blue-500">👤</span>
+                            <span>Georganiseerd door: {meetup.organizerName}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="text-green-500">📅</span>
+                            <span>{meetup.availableDates.length} data beschikbaar</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="text-red-500">⏰</span>
+                            <span>{meetup.availableTimes.length} tijdsloten</span>
+                          </div>
+                          {meetup.inviteeName && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <span className="text-blue-500">👥</span>
+                              <span>Afspraak met: {meetup.inviteeName}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="text-purple-500">📅</span>
+                            <span>Aangemaakt: {new Date(meetup.createdAt).toLocaleDateString('nl-NL', { 
+                              weekday: 'short', 
+                              day: 'numeric', 
+                              month: 'short', 
+                              year: 'numeric' 
+                            })}</span>
+                          </div>
                         </div>
                       </div>
+
+                      {meetup.expiresAt && (
+                        <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                          <div className="flex items-center gap-2 text-orange-700">
+                            <span className="text-red-500">⏰</span>
+                            <span className="text-sm font-medium">
+                              Verloopt: {new Date(meetup.expiresAt).toLocaleDateString('nl-NL', { 
+                                weekday: 'short', 
+                                day: 'numeric', 
+                                month: 'short', 
+                                year: 'numeric' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  
-                  <div className="flex gap-3">
-                    {meetup.status === 'pending' && (
-                      <>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="border-amber-200 text-amber-700 hover:bg-amber-50"
-                          onClick={() => {
-                            const link = getInviteLink(meetup.token)
-                            navigator.clipboard.writeText(link)
-                            alert('Uitnodigingslink gekopieerd! Deel het met je koffie maatje ☕')
-                          }}
-                        >
-                          📋 Kopieer Uitnodigingslink
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="border-amber-200 text-amber-700 hover:bg-amber-50"
-                          onClick={() => {
-                            const link = getInviteLink(meetup.token)
-                            window.open(link, '_blank')
-                          }}
-                        >
-                          👁️ Bekijk Uitnodiging
-                        </Button>
-                      </>
-                    )}
-                    {meetup.status === 'confirmed' && (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-green-200 text-green-700 hover:bg-green-50"
-                        onClick={() => {
-                          alert('Kalender integratie komt binnenkort! 📅')
-                        }}
-                      >
-                        📅 Toevoegen aan Kalender
-                      </Button>
-                    )}
+
+                  <div className="flex gap-3 pt-4 border-t border-amber-200">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-green-300 text-green-700 hover:bg-green-50"
+                      onClick={() => {
+                        const eventUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Koffie bij ${meetup.cafe.name}&dates=${encodeURIComponent(
+                          new Date(meetup.availableDates[0] || new Date()).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+                        )}/${encodeURIComponent(
+                          new Date(meetup.availableDates[0] || new Date()).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+                        )}&details=Koffie meetup bij ${meetup.cafe.name} - ${meetup.cafe.address}&location=${encodeURIComponent(meetup.cafe.address)}`
+                        window.open(eventUrl, '_blank')
+                      }}
+                    >
+                      <span className="mr-2">📅</span>
+                      Toevoegen aan Kalender
+                    </Button>
                     
-                    {/* Edit Button */}
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className="border-blue-200 text-blue-700 hover:bg-blue-50"
                       onClick={() => handleEditMeetup(meetup)}
                     >
-                      ✏️ Bewerken
+                      <span className="mr-2">✏️</span>
+                      Bewerken
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Edit Modal */}
       <EditMeetupModal

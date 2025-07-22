@@ -128,7 +128,7 @@ export function MapView({ selectedCity, selectedCafeId, onCafeSelect, onSkip }: 
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Skip voor nu
+          Voor nu overslaan
         </button>
       </div>
     )
@@ -142,7 +142,7 @@ export function MapView({ selectedCity, selectedCafeId, onCafeSelect, onSkip }: 
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Skip voor nu
+          Voor nu overslaan
         </button>
       </div>
     )

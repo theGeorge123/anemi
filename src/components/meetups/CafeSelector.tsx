@@ -77,7 +77,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Skip for now
+          Voor nu overslaan
         </button>
       </div>
     )
@@ -86,12 +86,12 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
   if (cafes.length === 0) {
     return (
       <div className="text-center p-6">
-        <p className="text-gray-600 mb-4">No cafes found in {selectedCity}</p>
+        <p className="text-gray-600 mb-4">Geen cafes gevonden in {selectedCity}</p>
         <button
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Skip for now
+          Voor nu overslaan
         </button>
       </div>
     )
@@ -101,10 +101,10 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
     <div className="space-y-4">
       <div className="text-center mb-6">
         <h4 className="text-lg font-semibold text-gray-900 mb-2">
-          🏪 Pick your favorite cafe in {selectedCity}
+          🏪 Kies je favoriete cafe in {selectedCity}
         </h4>
         <p className="text-sm text-gray-600">
-          Choose a cafe or skip to let us pick for you
+          Kies een cafe of sla over om ons te laten kiezen
         </p>
       </div>
 
@@ -154,7 +154,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
 
                 {/* Description */}
                 <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                  {cafe.description || 'A cozy coffee shop with great atmosphere'}
+                  {cafe.description || 'Een gezellige koffie shop met geweldige sfeer'}
                 </p>
 
                 {/* Address */}
@@ -186,7 +186,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           onClick={onSkip}
           className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
         >
-          Skip - let you pick for me
+          Overslaan - laat jullie kiezen voor mij
         </button>
       </div>
     </div>

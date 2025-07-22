@@ -227,8 +227,9 @@ export function StepContent({
           onNext()
         }}
         onChooseOwn={() => {
-          // Don't go to next step yet, show view selector first
+          // Set cafe selection flag and advance to next step
           setShowCafeSelection(true)
+          onNext()
         }}
       />
     </div>

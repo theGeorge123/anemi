@@ -34,11 +34,12 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
       } else {
         setLoading(true)
       }
+      setError(null) // Clear previous errors
       console.log('Fetching random cafe for city:', selectedCity)
       const response = await fetch(`/api/cafes?city=${selectedCity}&random=true`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch random cafe')
+        throw new Error('Kon geen cafe ophalen')
       }
 
       const data = await response.json()
@@ -50,7 +51,7 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
         setError('Geen cafes gevonden in deze stad')
       }
     } catch (err) {
-      setError('Failed to load random cafe')
+      setError('Kon geen random cafe laden')
       console.error('Error fetching random cafe:', err)
     } finally {
       setLoading(false)
@@ -92,6 +93,13 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
             className="flex-1 bg-amber-500 hover:bg-amber-600"
           >
             Zelf een cafe kiezen
+          </Button>
+          <Button 
+            onClick={() => fetchRandomCafe(true)}
+            variant="outline"
+            className="flex-1"
+          >
+            🔄 Opnieuw proberen
           </Button>
         </div>
       </div>

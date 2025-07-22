@@ -117,17 +117,40 @@ export async function validateSupabaseConnection() {
   
   try {
     console.log('🔍 Testing Supabase connection...');
+    
+    // Test 1: Basic client creation
+    console.log('✅ Client created successfully');
+    
+    // Test 2: Try to get session
     const { data, error } = await client.auth.getSession();
+    console.log('Session data:', data);
+    console.log('Session error:', error);
+    
     if (error) {
       console.error('❌ Supabase connection validation failed:', error);
-      return { valid: false, error: error.message };
+      return { 
+        valid: false, 
+        error: error.message,
+        details: {
+          code: error.status,
+          message: error.message,
+          name: error.name
+        }
+      };
     }
     
     console.log('✅ Supabase connection validated successfully');
     return { valid: true, session: data.session };
   } catch (error) {
     console.error('❌ Unexpected error validating Supabase connection:', error);
-    return { valid: false, error: 'Unexpected error' };
+    return { 
+      valid: false, 
+      error: 'Unexpected error',
+      details: {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      }
+    };
   }
 }
 

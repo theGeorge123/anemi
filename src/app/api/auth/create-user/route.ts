@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Use normal signup flow which automatically sends verification email
+    // Try normal signup first
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -32,23 +32,33 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('User creation error:', error)
       
-      // Check if it's an email sending error
+      // If it's an email/SMTP error, try creating user without email confirmation
       if (error.message.includes('email') || error.message.includes('confirmation') || error.message.includes('smtp')) {
-        console.warn('Email sending failed, but user might have been created')
+        console.warn('Email sending failed, trying to create user without email confirmation')
         
-        // Check if user was actually created
-        if (data?.user) {
-          return NextResponse.json({ 
-            error: 'Account created successfully! However, the verification email could not be sent. Please check your email settings or contact support.',
-            userCreated: true,
-            details: error.message 
-          }, { status: 400 })
-        } else {
+        // Try creating user with email_confirm: true to bypass email
+        const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: { name: email.split('@')[0] }
+        })
+        
+        if (adminError) {
+          console.error('Admin user creation error:', adminError)
           return NextResponse.json({ 
             error: 'Failed to create account due to email configuration issues. Please try again later or contact support.',
-            details: error.message 
+            details: adminError.message 
           }, { status: 400 })
         }
+        
+        return NextResponse.json({ 
+          success: true,
+          user: adminData.user,
+          message: 'Account created successfully! Email verification was skipped due to SMTP issues.',
+          userCreated: true,
+          emailSkipped: true
+        })
       }
       
       return NextResponse.json({ error: error.message }, { status: 400 })

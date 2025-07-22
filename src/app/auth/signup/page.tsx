@@ -84,10 +84,15 @@ function SignUpPageContent() {
     // The user profile will be created automatically by the SQL trigger
     // No need to call the API endpoint manually
   }, {
-    onSuccess: () => {
-      ErrorService.showToast('🎉 Account created! Please check your email to verify your account before signing in.', 'success')
-      // Redirect to verification page instead of dashboard
-      router.push('/auth/verify?email=' + encodeURIComponent(form.values.email))
+    onSuccess: (data: any) => {
+      // Check if email was skipped due to SMTP issues
+      if (data?.emailSkipped) {
+        ErrorService.showToast('🎉 Account created! Email verification was skipped due to SMTP issues. You can now sign in directly.', 'success')
+        router.push('/auth/signin?message=account_created')
+      } else {
+        ErrorService.showToast('🎉 Account created! Please check your email to verify your account before signing in.', 'success')
+        router.push('/auth/verify?email=' + encodeURIComponent(form.values.email))
+      }
     },
     onError: (err) => {
       console.error('Signup error:', err)

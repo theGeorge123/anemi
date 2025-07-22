@@ -141,22 +141,22 @@ function SignUpPageContent() {
       <div className="w-full max-w-md">
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Create your account</CardTitle>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Maak je account aan</CardTitle>
             <CardDescription className="text-base text-gray-500">
               {redirectUrl 
-                ? 'Sign up to continue to your destination'
-                : 'Sign up in seconds and unlock a world of coffee meetups, reconnect with friends, and good vibes. ☕️✨'
+                ? 'Registreer om door te gaan naar je bestemming'
+                : 'Registreer in seconden en ontgrendel een wereld van koffie meetups, reconnect met vrienden, en goede vibes. ☕️✨'
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Voer je e-mail in"
                   value={form.values.email}
                   onChange={form.handleChange('email')}
                   onBlur={form.handleBlur('email')}
@@ -165,11 +165,11 @@ function SignUpPageContent() {
                 {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Wachtwoord</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="Maak een wachtwoord aan"
                   value={form.values.password}
                   onChange={form.handleChange('password')}
                   onBlur={form.handleBlur('password')}
@@ -179,11 +179,11 @@ function SignUpPageContent() {
                 {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirm your password"
+                  placeholder="Bevestig je wachtwoord"
                   value={form.values.confirmPassword}
                   onChange={form.handleChange('confirmPassword')}
                   onBlur={form.handleBlur('confirmPassword')}
@@ -200,13 +200,13 @@ function SignUpPageContent() {
                 )}
                 
                 <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
-                {signUpLoading ? 'Creating account...' : 'Create Account'}
+                {signUpLoading ? 'Account aanmaken...' : 'Account Aanmaken'}
               </Button>
             </form>
             <div className="mt-6 text-center text-sm text-gray-600">
-              Already have an account?{' '}
+              Heb je al een account?{' '}
               <Link href={`/auth/signin${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
-                Sign in
+                Log in
               </Link>
             </div>
           </CardContent>

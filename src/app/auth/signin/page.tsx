@@ -112,11 +112,11 @@ function SignInPageContent() {
       <div className="w-full max-w-md">
         <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Welcome Back!</CardTitle>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Welkom Terug!</CardTitle>
             <CardDescription className="text-base text-gray-500">
               {redirectUrl 
-                ? 'Sign in to continue to your destination'
-                : 'Ready for your next coffee adventure?'
+                ? 'Log in om door te gaan naar je bestemming'
+                : 'Klaar voor je volgende koffie avontuur?'
               }
             </CardDescription>
           </CardHeader>
@@ -130,11 +130,11 @@ function SignInPageContent() {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="Voer je e-mail in"
                   value={form.values.email}
                   onChange={(e) => form.handleChange('email')(e)}
                   onBlur={form.handleBlur('email')}
@@ -143,11 +143,11 @@ function SignInPageContent() {
                 {form.errors.email && <p className="text-red-500 text-sm">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Wachtwoord</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Voer je wachtwoord in"
                   value={form.values.password}
                   onChange={(e) => form.handleChange('password')(e)}
                   onBlur={form.handleBlur('password')}
@@ -168,14 +168,14 @@ function SignInPageContent() {
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg font-semibold" 
                 disabled={signInLoading}
               >
-                {signInLoading ? '🔄 Signing in...' : '☕ Sign In'}
+                {signInLoading ? '🔄 Inloggen...' : '☕ Log In'}
               </Button>
             </form>
             
             <div className="mt-6 text-center text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
+              Heb je nog geen account?{' '}
               <Link href="/auth/signup" className="text-amber-700 hover:underline font-medium">
-                Sign up here
+                Registreer hier
               </Link>
             </div>
             

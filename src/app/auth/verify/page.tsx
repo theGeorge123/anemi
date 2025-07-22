@@ -98,18 +98,20 @@ function VerifyPageContent() {
     if (!email) return
 
     try {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      // Use Supabase's built-in resend functionality
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/verify`
+        }
       })
 
-      if (response.ok) {
-        ErrorService.showToast('📧 Verification email sent! Check your inbox.', 'success')
-      } else {
+      if (error) {
+        console.error('Resend error:', error)
         ErrorService.showToast('Failed to send verification email. Please try again.', 'error')
+      } else {
+        ErrorService.showToast('📧 Verification email sent! Check your inbox.', 'success')
       }
     } catch (error) {
       console.error('Resend error:', error)

@@ -20,13 +20,13 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Create user with admin privileges but REQUIRE email confirmation
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: false, // Require email confirmation
-      user_metadata: {
-        custom_email_verification: true
+    // Generate a signup link that will create the user and send verification email
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'signup',
+      email: email,
+      password: password,
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify`
       }
     })
 

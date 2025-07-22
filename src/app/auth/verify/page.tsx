@@ -21,6 +21,14 @@ function VerifyPageContent() {
   const emailParam = searchParams.get('email')
   const type = searchParams.get('type')
 
+  // Debug: Log all parameters
+  console.log('Verification parameters:', {
+    token,
+    emailParam,
+    type,
+    allParams: Object.fromEntries(searchParams.entries())
+  })
+
   useEffect(() => {
     if (emailParam) {
       setEmail(emailParam)
@@ -28,10 +36,17 @@ function VerifyPageContent() {
   }, [emailParam])
 
   const handleVerification = useCallback(async () => {
-    if (!token || !email) return
+    if (!token || !email) {
+      console.error('Missing token or email:', { token, email })
+      setVerificationStatus('error')
+      ErrorService.showToast('Missing verification parameters. Please check your email link.', 'error')
+      return
+    }
 
     setIsVerifying(true)
     try {
+      console.log('Attempting verification with:', { token, email, type })
+      
       // Verify the token with Supabase
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash: token,

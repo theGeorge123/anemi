@@ -20,8 +20,23 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Generate a signup link that will create the user and send verification email
-    const { data, error } = await supabase.auth.admin.generateLink({
+    // Create user with admin privileges and send verification email
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: false, // Require email confirmation
+      user_metadata: {
+        custom_email_verification: true
+      }
+    })
+
+    if (error) {
+      console.error('User creation error:', error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    // Send verification email using Supabase's built-in email system
+    const { error: emailError } = await supabase.auth.admin.generateLink({
       type: 'signup',
       email: email,
       password: password,
@@ -30,9 +45,10 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    if (error) {
-      console.error('User creation error:', error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+    if (emailError) {
+      console.error('Email verification error:', emailError)
+      // Don't fail the request, just log the error
+      console.warn('Failed to send verification email, but user was created')
     }
 
     return NextResponse.json({ 

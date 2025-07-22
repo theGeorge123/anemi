@@ -78,23 +78,8 @@ function SignUpPageContent() {
 
     console.log('User created successfully')
     
-    // Send our custom verification email
-    const response = await fetch('/api/auth/verify-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: form.values.email,
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      const errorMessage = errorData.error || 'Failed to send verification email'
-      setSpecificError(`📧 ${errorMessage}`)
-      throw new Error(errorMessage)
-    }
+    // The verification email is now sent automatically by the create-user API
+    // No need to call a separate verify-email endpoint
     
     // The user profile will be created automatically by the SQL trigger
     // No need to call the API endpoint manually

@@ -1,10 +1,11 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import { withAuth } from '@/components/withAuth'
+
+import { useState, useEffect } from 'react'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
 
 interface MeetupInvite {
   id: string
@@ -27,11 +28,13 @@ interface MeetupInvite {
   inviteeEmail?: string
 }
 
-const Dashboard = withAuth(() => {
-  const { session, supabase } = useSupabase()
+export default function Dashboard() {
+  const { supabase, session } = useSupabase()
   const [meetups, setMeetups] = useState<MeetupInvite[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [editingMeetup, setEditingMeetup] = useState<MeetupInvite | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   useEffect(() => {
     if (!session) {
@@ -40,60 +43,123 @@ const Dashboard = withAuth(() => {
       setIsLoading(false)
       return
     }
-    
+
     const fetchMeetups = async () => {
       setIsLoading(true)
       setError(null)
-      
+
       try {
         console.log('🔍 Fetching meetups for user:', session.user.email)
-        
-        // Get the access token
+
         const { data: { session: currentSession } } = await supabase.auth.getSession()
         const accessToken = currentSession?.access_token
-        
+
         if (!accessToken) {
           throw new Error('🔐 No access token available. Please sign in again.')
         }
-        
+
         console.log('🔑 Access token length:', accessToken.length)
-        
+
         const response = await fetch('/api/meetups', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json'
           }
         })
-        console.log('📊 Response status:', response.status)
-        
+
         if (!response.ok) {
-          const errorText = await response.text()
-          console.error('❌ API Error:', errorText)
-          
-          // Provide specific error messages
-          if (response.status === 401) {
-            throw new Error('🔐 Not authorized. Please sign in again.')
-          } else if (response.status === 500) {
-            throw new Error('🔧 Server error. Please try again in a moment.')
-          } else {
-            throw new Error(`Failed to load meetups: ${response.status} ${errorText}`)
-          }
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to fetch meetups')
         }
-        
+
         const data = await response.json()
-        console.log('✅ Meetups data:', data)
-        
-        setMeetups(data.meetups || [])
+        console.log('📊 Fetched meetups:', data.meetups.length)
+        setMeetups(data.meetups)
       } catch (error) {
         console.error('❌ Error fetching meetups:', error)
-        setError(error instanceof Error ? error.message : 'Failed to load meetups')
+        setError(error instanceof Error ? error.message : 'Failed to fetch meetups')
       } finally {
         setIsLoading(false)
       }
     }
-    
+
     fetchMeetups()
-  }, [session])
+  }, [session, supabase])
+
+  const handleEditMeetup = (meetup: MeetupInvite) => {
+    setEditingMeetup(meetup)
+    setIsEditModalOpen(true)
+  }
+
+  const handleSaveMeetup = async (meetupId: string, updates: any) => {
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      const accessToken = currentSession?.access_token
+
+      if (!accessToken) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/meetups/${meetupId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update meetup')
+      }
+
+      // Refresh meetups list
+      const updatedMeetups = meetups.map(meetup => 
+        meetup.id === meetupId 
+          ? { ...meetup, ...updates }
+          : meetup
+      )
+      setMeetups(updatedMeetups)
+
+      alert('✅ Meetup succesvol bijgewerkt!')
+    } catch (error) {
+      console.error('Error updating meetup:', error)
+      throw error
+    }
+  }
+
+  const handleDeleteMeetup = async (meetupId: string) => {
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      const accessToken = currentSession?.access_token
+
+      if (!accessToken) {
+        throw new Error('No access token available')
+      }
+
+      const response = await fetch(`/api/meetups/${meetupId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete meetup')
+      }
+
+      // Remove from local state
+      setMeetups(meetups.filter(meetup => meetup.id !== meetupId))
+
+      alert('🗑️ Meetup succesvol verwijderd!')
+    } catch (error) {
+      console.error('Error deleting meetup:', error)
+      throw error
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -179,7 +245,7 @@ const Dashboard = withAuth(() => {
               </Button>
             </Link>
             <div className="text-sm text-gray-400">
-              of <Link href="/" className="text-amber-600 hover:underline">ontdek waar we voor staan</Link>
+              or <Link href="/" className="text-amber-600 hover:underline">ontdek waar we voor staan</Link>
             </div>
           </div>
         </div>
@@ -287,6 +353,16 @@ const Dashboard = withAuth(() => {
                         📅 Toevoegen aan Kalender
                       </Button>
                     )}
+                    
+                    {/* Edit Button */}
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                      onClick={() => handleEditMeetup(meetup)}
+                    >
+                      ✏️ Bewerken
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -294,8 +370,18 @@ const Dashboard = withAuth(() => {
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <EditMeetupModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setEditingMeetup(null)
+        }}
+        meetup={editingMeetup}
+        onSave={handleSaveMeetup}
+        onDelete={handleDeleteMeetup}
+      />
     </main>
   )
-})
-
-export default Dashboard 
+} 

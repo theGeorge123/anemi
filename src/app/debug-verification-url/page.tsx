@@ -4,9 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 
-export default function DebugVerificationUrl() {
+function DebugVerificationUrlContent() {
   const searchParams = useSearchParams()
   const { supabase } = useSupabase()
   const [result, setResult] = useState<any>(null)
@@ -136,5 +136,25 @@ export default function DebugVerificationUrl() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function DebugVerificationUrl() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto p-6 max-w-4xl">
+        <h1 className="text-3xl font-bold mb-6">🔍 Debug Verification URL</h1>
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Loading debug information...</p>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <DebugVerificationUrlContent />
+    </Suspense>
   )
 } 

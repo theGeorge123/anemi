@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
@@ -28,7 +28,7 @@ interface MeetupData {
   availableTimes: string[]
 }
 
-export default function ResultPage() {
+function ResultPageContent() {
   const searchParams = useSearchParams()
   const [cafe, setCafe] = useState<Cafe | null>(null)
   const [meetupData, setMeetupData] = useState<MeetupData | null>(null)
@@ -315,4 +315,19 @@ function getPriceEmoji(priceRange: string) {
     case 'LUXURY': return '💎'
     default: return '☕'
   }
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
+      </div>
+    }>
+      <ResultPageContent />
+    </Suspense>
+  )
 } 

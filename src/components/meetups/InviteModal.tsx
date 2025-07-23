@@ -14,7 +14,7 @@ interface InviteModalProps {
 export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
   const [copied, setCopied] = useState(false)
   
-  const inviteUrl = `${window.location.origin}/invite/${inviteCode}`
+  const inviteUrl = typeof window !== 'undefined' ? `${window.location.origin}/invite/${inviteCode}` : ''
   const whatsappMessage = `Hey! ☕ Ik heb een meetup gemaakt via Anemi. Wil je meedoen? Hier is de link: ${inviteUrl}`
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`
 
@@ -28,8 +28,10 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
     }
   }
 
-  const shareViaWhatsApp = () => {
-    window.open(whatsappUrl, '_blank')
+  const handleWhatsAppShare = () => {
+    if (typeof window !== 'undefined') {
+      window.open(whatsappUrl, '_blank')
+    }
   }
 
   if (!isOpen) return null
@@ -88,15 +90,19 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
 
             <div className="space-y-3">
               <Button
-                onClick={shareViaWhatsApp}
+                onClick={handleWhatsAppShare}
                 className="w-full bg-green-500 hover:bg-green-600 text-white"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Deel via WhatsApp
               </Button>
               
-              <Button
-                onClick={() => window.open(inviteUrl, '_blank')}
+              <Button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open(inviteUrl, '_blank')
+                  }
+                }}
                 variant="outline"
                 className="w-full"
               >

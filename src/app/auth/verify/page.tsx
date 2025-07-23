@@ -128,12 +128,12 @@ function VerifyPageContent() {
 
     try {
       // Use Supabase's built-in resend functionality
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/verify` : undefined
+      const { data, error } = await supabase.auth.signInWithOtp({
         email: email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/verify`
-        }
+        options: redirectUrl ? {
+          emailRedirectTo: redirectUrl
+        } : {}
       })
 
       if (error) {

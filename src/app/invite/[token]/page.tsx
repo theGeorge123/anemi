@@ -93,8 +93,10 @@ export default function InvitePage() {
         throw new Error('Failed to accept invite')
       }
 
-      // Redirect to success page
-      window.location.href = '/confirmed?status=accepted'
+      // Redirect to confirmed page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/confirmed?status=accepted'
+      }
     } catch (error) {
       setError('Kon invite niet accepteren. Probeer het opnieuw.')
     } finally {
@@ -126,8 +128,10 @@ export default function InvitePage() {
         throw new Error('Failed to decline invite')
       }
 
-      // Redirect to decline page
-      window.location.href = '/confirmed?status=declined'
+      // Redirect to confirmed page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/confirmed?status=declined'
+      }
     } catch (error) {
       setError('Kon invite niet afwijzen. Probeer het opnieuw.')
     } finally {
@@ -234,7 +238,11 @@ export default function InvitePage() {
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Oeps! Invite niet gevonden</h2>
               <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => window.location.href = '/'}>
+              <Button onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/'
+                }
+              }}>
                 Terug naar home
               </Button>
             </div>

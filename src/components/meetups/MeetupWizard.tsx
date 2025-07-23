@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from 'react';
 import { StepContent } from './StepContent';
 import { StepIndicator } from './StepIndicator';
@@ -56,7 +58,9 @@ function MeetupWizardContent() {
       if (!session?.user?.email) {
         console.error('User not logged in');
         // Redirect to login with return URL
-        window.location.href = `/auth/signin?redirect=${encodeURIComponent('/create')}`;
+        if (typeof window !== 'undefined') {
+          window.location.href = `/auth/signin?redirect=${encodeURIComponent('/create')}`;
+        }
         return;
       }
 

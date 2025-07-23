@@ -47,15 +47,23 @@ function ConfirmedPageContent() {
             </div>
 
             <div className="space-y-3">
-              <Button
-                onClick={() => window.location.href = '/dashboard'}
+              <Button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/dashboard'
+                  }
+                }}
                 className="w-full bg-green-500 hover:bg-green-600 text-white"
               >
                 Bekijk mijn meetups
               </Button>
               
-              <Button
-                onClick={() => window.location.href = '/'}
+              <Button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/'
+                  }
+                }}
                 variant="outline"
                 className="w-full"
               >
@@ -98,8 +106,12 @@ function ConfirmedPageContent() {
             </div>
 
             <div className="space-y-3">
-              <Button
-                onClick={() => window.location.href = '/'}
+              <Button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/'
+                  }
+                }}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white"
               >
                 Terug naar home
@@ -138,15 +150,23 @@ function ConfirmedPageContent() {
           </div>
 
           <div className="space-y-3">
-            <Button
-              onClick={() => window.location.href = '/create'}
+            <Button 
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/create'
+                }
+              }}
               className="w-full bg-amber-500 hover:bg-amber-600 text-white"
             >
               Maak je eerste meetup
             </Button>
             
-            <Button
-              onClick={() => window.location.href = '/'}
+            <Button 
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/'
+                }
+              }}
               variant="outline"
               className="w-full"
             >

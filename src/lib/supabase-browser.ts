@@ -1,58 +1,36 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
+import { logger } from './logger'
 
-let supabaseClient: SupabaseClient | null = null
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Clear stale auth tokens for production domains
-if (typeof window !== 'undefined') {
-  const currentDomain = window.location.hostname
-  if (currentDomain !== 'localhost' && currentDomain !== '127.0.0.1') {
-    // Clear any localhost tokens that might be stored
-    Object.keys(localStorage).forEach(key => {
-      if (key.includes('supabase') && key.includes('localhost')) {
-        localStorage.removeItem(key)
-      }
-    })
-    
-    // Clear cookies that might be from localhost
-    document.cookie.split(';').forEach(cookie => {
-      const [name] = cookie.split('=')
-      if (name && name.trim().includes('supabase') && name.trim().includes('localhost')) {
-        document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-      }
-    })
-  }
+interface SupabaseConnectionResult {
+  success: boolean
+  error?: string
+  details?: any
 }
 
-export function getSupabaseClient(): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  // Validate environment variables
-  if (!url || !key) {
-    console.error('❌ getSupabaseClient: Missing environment variables')
+export function getSupabaseClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    logger.error('Missing Supabase environment variables', new Error('Missing Supabase environment variables'), {
+      supabaseUrl: !!supabaseUrl,
+      supabaseAnonKey: !!supabaseAnonKey
+    }, 'SUPABASE')
     throw new Error('Missing Supabase environment variables')
   }
 
-  // Validate URL format
-  if (!url.startsWith('https://')) {
-    console.error('❌ Invalid Supabase URL format. Should start with https://')
-    throw new Error('Invalid Supabase URL format')
+  if (!supabaseUrl.startsWith('https://')) {
+    logger.error('Invalid Supabase URL format', new Error('Invalid Supabase URL format'), { url: supabaseUrl }, 'SUPABASE')
+    throw new Error('Invalid Supabase URL format. Should start with https://')
   }
 
-  // Validate key length (basic check)
-  if (key.length < 50) {
-    console.error('❌ Supabase key seems too short. Expected a long string.')
-    throw new Error('Invalid Supabase key format')
+  if (supabaseAnonKey.length < 50) {
+    logger.error('Supabase key seems too short', new Error('Supabase key seems too short'), { keyLength: supabaseAnonKey.length }, 'SUPABASE')
+    throw new Error('Supabase key seems too short. Expected a long string.')
   }
 
-  // Return existing client if available
-  if (supabaseClient) {
-    return supabaseClient
-  }
-
-  // Create new client
   try {
-    supabaseClient = createClient(url, key, {
+    const client = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
@@ -60,37 +38,51 @@ export function getSupabaseClient(): SupabaseClient {
       }
     })
 
-    return supabaseClient
+    logger.info('Supabase client created successfully', {
+      url: supabaseUrl,
+      hasKey: !!supabaseAnonKey
+    }, 'SUPABASE')
+
+    return client
   } catch (error) {
-    console.error('❌ getSupabaseClient: Error creating client:', error)
-    throw new Error('Failed to create Supabase client')
+    logger.error('Error creating Supabase client', error as Error, {
+      url: supabaseUrl,
+      hasKey: !!supabaseAnonKey
+    }, 'SUPABASE')
+    throw error
   }
 }
 
-export async function validateSupabaseConnection(): Promise<{ success: boolean; error?: string; details?: any }> {
+export async function validateSupabaseConnection(): Promise<SupabaseConnectionResult> {
   try {
-    const supabase = getSupabaseClient()
+    const client = getSupabaseClient()
     
-    // Test basic connection by getting session
-    const { data, error } = await supabase.auth.getSession()
+    // Test the connection by making a simple query
+    const { data, error } = await client.from('coffee_shops').select('count').limit(1)
     
     if (error) {
+      logger.error('Supabase connection test failed', error, {}, 'SUPABASE')
       return {
         success: false,
-        error: 'Supabase connection validation failed',
-        details: { message: error.message, stack: error.stack }
+        error: error.message,
+        details: error
       }
     }
 
+    logger.info('Supabase connection test successful', {
+      dataCount: data?.length || 0
+    }, 'SUPABASE')
+
     return {
       success: true,
-      details: { session: data.session }
+      details: { data }
     }
   } catch (error) {
+    logger.error('Supabase connection validation failed', error as Error, {}, 'SUPABASE')
     return {
       success: false,
-      error: 'Unexpected error validating Supabase connection',
-      details: { message: error instanceof Error ? error.message : 'Unknown error', stack: error instanceof Error ? error.stack : undefined }
+      error: error instanceof Error ? error.message : 'Unknown error',
+      details: error
     }
   }
 }

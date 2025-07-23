@@ -1,10 +1,11 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { useState, Suspense } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import type { EmailOtpType } from '@supabase/supabase-js'
 
 function DebugVerificationContent() {
   const searchParams = useSearchParams()
@@ -27,7 +28,7 @@ function DebugVerificationContent() {
       
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash: token,
-        type: type || 'email'
+        type: (type as EmailOtpType) || 'email'
       })
 
       setResult({ data, error })

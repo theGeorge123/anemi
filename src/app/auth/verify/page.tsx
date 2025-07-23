@@ -1,14 +1,14 @@
 "use client"
 
-import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { ErrorService } from '@/lib/error-service'
-import { useCallback } from 'react'
-import { Home } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle } from 'lucide-react'
+import type { EmailOtpType } from '@supabase/supabase-js'
+import Link from 'next/link'
 
 function VerifyPageContent() {
   const { supabase } = useSupabase()
@@ -51,7 +51,7 @@ function VerifyPageContent() {
       // Verify the token with Supabase
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash: token,
-        type: type || 'email'
+        type: (type as EmailOtpType) || 'email'
       })
 
       if (error) {
@@ -320,7 +320,7 @@ function VerifyPageContent() {
             variant="ghost" 
             className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
           >
-            <Home className="w-4 h-4" />
+            <Mail className="w-4 h-4" />
             ← Terug naar Home
           </Button>
         </Link>

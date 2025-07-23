@@ -94,7 +94,7 @@ export async function validateStartup(): Promise<StartupResult> {
         environment: process.env.NODE_ENV
       })
     } else {
-      logger.error('❌ Application startup failed', {
+      logger.error('❌ Application startup failed', new Error('Startup validation failed'), {
         errors: result.errors,
         checks: result.checks
       })

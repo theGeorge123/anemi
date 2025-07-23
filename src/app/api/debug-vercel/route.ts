@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       other,
       emailVerification,
       connection: {
-        supabaseClient: connectionResult.valid ? '✅ Created' : '❌ Failed',
+        supabaseClient: connectionResult.success ? '✅ Created' : '❌ Failed',
         validationResult: connectionResult,
         authTestResult: authTestResult,
       },

@@ -108,32 +108,38 @@ export function EditMeetupModal({ isOpen, onClose, meetup, onSave, onDelete }: E
 
   const addDate = () => {
     const today = new Date()
-    const newDate = new Date(today.getTime() + (availableDates.length + 1) * 24 * 60 * 60 * 1000)
-    const dateString = newDate.toISOString().split('T')[0]
-    setAvailableDates([...availableDates, dateString])
+    const currentDates = availableDates || []
+    const newDate = new Date(today.getTime() + (currentDates.length + 1) * 24 * 60 * 60 * 1000)
+    const dateString = newDate.toISOString().split('T')[0] || ''
+    setAvailableDates([...currentDates, dateString])
   }
 
   const removeDate = (index: number) => {
-    setAvailableDates(availableDates.filter((_, i) => i !== index))
+    const currentDates = availableDates || []
+    setAvailableDates(currentDates.filter((_, i) => i !== index))
   }
 
   const addTime = () => {
+    const currentTimes = availableTimes || []
     const newTime = '14:00'
-    setAvailableTimes([...availableTimes, newTime])
+    setAvailableTimes([...currentTimes, newTime])
   }
 
   const removeTime = (index: number) => {
-    setAvailableTimes(availableTimes.filter((_, i) => i !== index))
+    const currentTimes = availableTimes || []
+    setAvailableTimes(currentTimes.filter((_, i) => i !== index))
   }
 
   const updateDate = (index: number, value: string) => {
-    const newDates = [...availableDates]
+    const currentDates = availableDates || []
+    const newDates = [...currentDates]
     newDates[index] = value || ''
     setAvailableDates(newDates)
   }
 
   const updateTime = (index: number, value: string) => {
-    const newTimes = [...availableTimes]
+    const currentTimes = availableTimes || []
+    const newTimes = [...currentTimes]
     newTimes[index] = value || ''
     setAvailableTimes(newTimes)
   }

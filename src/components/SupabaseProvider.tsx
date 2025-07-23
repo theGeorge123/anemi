@@ -1,75 +1,76 @@
 "use client"
+
 import { createContext, useContext, useEffect, useState } from 'react'
+import { Session, User } from '@supabase/supabase-js'
 import { getSupabaseClient } from '@/lib/supabase-browser'
-import type { User, Session } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 interface SupabaseContextType {
+  supabase: ReturnType<typeof getSupabaseClient>
   session: Session | null
   user: User | null
   loading: boolean
-  supabase: any
 }
 
-const SupabaseContext = createContext<SupabaseContextType>({
-  session: null,
-  user: null,
-  loading: true,
-  supabase: null,
-})
+const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+  const [supabase, setSupabase] = useState<ReturnType<typeof getSupabaseClient> | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [supabase, setSupabase] = useState<any>(null)
 
   useEffect(() => {
     let subscription: any = null
+    
+    try {
+      logger.info('Initializing Supabase provider', {}, 'SUPABASE')
+      
+      const client = getSupabaseClient()
+      setSupabase(client)
+      
+      logger.info('Supabase client set in provider', {}, 'SUPABASE')
 
-    const initializeSupabase = async () => {
-      try {
-        console.log('🔧 Initializing Supabase provider...')
-        const client = getSupabaseClient()
-        
-        if (!client) {
-          console.error('❌ Failed to create Supabase client')
-          setLoading(false)
-          return
-        }
-
-        setSupabase(client)
-        console.log('✅ Supabase client set in provider')
-
-        // Get initial session
-        const { data: { session: initialSession }, error } = await client.auth.getSession()
-        
-        if (error) {
-          console.error('❌ Error getting initial session:', error)
-        } else {
-          console.log('✅ Initial session retrieved:', !!initialSession)
+      // Get initial session
+      const getInitialSession = async () => {
+        try {
+          const { data: { session: initialSession } } = await client.auth.getSession()
           setSession(initialSession)
           setUser(initialSession?.user ?? null)
+          
+          logger.info('Initial session retrieved', { 
+            hasSession: !!initialSession,
+            userId: initialSession?.user?.id 
+          }, 'SUPABASE')
+        } catch (error) {
+          logger.error('Error getting initial session', error as Error, {}, 'SUPABASE')
+        } finally {
+          setLoading(false)
         }
-
-        // Listen for auth changes
-        const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange(
-          async (event: string, session: Session | null) => {
-            console.log('🔔 Auth state changed:', event, !!session)
-            setSession(session)
-            setUser(session?.user ?? null)
-            setLoading(false)
-          }
-        )
-
-        subscription = authSubscription
-        setLoading(false)
-      } catch (error) {
-        console.error('❌ Error initializing Supabase provider:', error)
-        setLoading(false)
       }
-    }
 
-    initializeSupabase()
+      getInitialSession()
+
+      // Listen for auth changes
+      const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange(
+        async (event, session) => {
+          logger.info('Auth state changed', { 
+            event, 
+            hasSession: !!session,
+            userId: session?.user?.id 
+          }, 'SUPABASE')
+          
+          setSession(session)
+          setUser(session?.user ?? null)
+          setLoading(false)
+        }
+      )
+
+      subscription = authSubscription
+    } catch (error) {
+      logger.error('Error initializing Supabase provider', error as Error, {}, 'SUPABASE')
+      setLoading(false)
+    }
 
     return () => {
       if (subscription) {
@@ -79,10 +80,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const value = {
+    supabase: supabase!,
     session,
     user,
-    loading,
-    supabase,
+    loading
   }
 
   return (

@@ -9,7 +9,7 @@ import { DateTimePreferences } from './DateTimePreferences'
 import { PriceSelector } from './PriceSelector'
 import { CafeSelector } from './CafeSelector'
 import { ViewSelector } from './ViewSelector'
-import { MapView } from './MapView'
+import MapView from './MapView'
 import { CafeChoiceStep } from './CafeChoiceStep'
 import { StepNavigation } from './StepNavigation'
 import { type FormData } from './formValidation'
@@ -264,9 +264,7 @@ export function StepContent({
       {formData.viewType === 'map' ? (
         <MapView
           selectedCity={formData.city}
-          selectedCafeId={formData.cafeId}
-          onCafeSelect={(cafeId) => onFormDataChange({ cafeId })}
-          onSkip={() => onFormDataChange({ cafeId: '' })}
+          onCafeSelect={(cafe) => onFormDataChange({ cafeId: cafe.id })}
         />
       ) : (
         <CafeSelector

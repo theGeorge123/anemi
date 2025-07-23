@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { EnvironmentBanner, EnvironmentStatus } from '@/components/EnvironmentBanner'
+import { validateStartup } from '@/lib/startup'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -61,6 +62,14 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+}
+
+// Initialize startup validation
+if (typeof window === 'undefined') {
+  // Server-side startup validation
+  validateStartup().catch(error => {
+    console.error('❌ Startup validation failed:', error)
+  })
 }
 
 export default function RootLayout({

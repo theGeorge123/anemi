@@ -3,29 +3,21 @@
 interface StepIndicatorProps {
   currentStep: number
   totalSteps: number
+  showDateTimePreferences?: boolean
 }
 
-export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+export function StepIndicator({ currentStep, totalSteps, showDateTimePreferences = false }: StepIndicatorProps) {
   const getStepLabel = (stepNumber: number) => {
     switch (stepNumber) {
       case 1: return { label: 'Wie ben je?', emoji: '👋' }
       case 2: return { label: 'Waar?', emoji: '🌍' }
       case 3: return { label: 'Wanneer?', emoji: '📅' }
       case 4: 
-        if (totalSteps >= 6) return { label: 'Tijden per datum', emoji: '🗓️' }
+        if (showDateTimePreferences) return { label: 'Tijden per datum', emoji: '🗓️' }
         return { label: 'Cafe?', emoji: '☕' }
       case 5:
-        if (totalSteps >= 7) return { label: 'Cafe?', emoji: '☕' }
-        if (totalSteps === 6) return { label: 'Cafe?', emoji: '☕' }
+        if (showDateTimePreferences) return { label: 'Cafe?', emoji: '☕' }
         return { label: 'Klaar!', emoji: '🎉' }
-      case 6:
-        if (totalSteps >= 8) return { label: 'Cafe selectie', emoji: '📋' }
-        if (totalSteps === 7) return { label: 'Cafe selectie', emoji: '📋' }
-        return { label: 'Klaar!', emoji: '🎉' }
-      case 7:
-        if (totalSteps === 8) return { label: 'Klaar!', emoji: '🎉' }
-        return { label: 'Cafe selectie', emoji: '📋' }
-      case 8: return { label: 'Klaar!', emoji: '🎉' }
       default: return { label: 'Stap', emoji: '📝' }
     }
   }

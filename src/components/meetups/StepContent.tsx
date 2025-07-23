@@ -56,24 +56,45 @@ export function StepContent({
     }
   }, [onTotalStepsChange])
 
+  // Check if we should show date/time preferences step
+  const shouldShowDateTimePreferences = () => {
+    return formData.dates.length > 1 || formData.times.length > 1
+  }
+
+  // Check if we should show cafe selection step
+  const shouldShowCafeSelection = () => {
+    return showCafeSelection
+  }
+
+  // Get the actual step content based on current step and user choices
+  const getActualStep = () => {
+    if (currentStep === 4 && shouldShowDateTimePreferences()) {
+      return 'dateTimePreferences'
+    } else if (currentStep === 4 && !shouldShowDateTimePreferences()) {
+      return 'cafeChoice'
+    } else if (currentStep === 5 && shouldShowDateTimePreferences()) {
+      return 'cafeChoice'
+    } else if (currentStep === 5 && !shouldShowDateTimePreferences()) {
+      return 'summary'
+    }
+    return currentStep
+  }
+
   const isStepValid = () => {
-    switch (currentStep) {
+    const actualStep = getActualStep()
+    
+    switch (actualStep) {
       case 1: return formData.name.trim() && formData.email.trim()
       case 2: return formData.city.trim()
       case 3: return formData.dates.length > 0 && formData.times.length > 0
-      case 4: 
-        if (showDateTimePreferences) {
-          return Object.keys(formData.dateTimePreferences).length > 0
-        }
-        return true // Cafe choice step is always valid
-      case 5: 
-        if (showDateTimePreferences) {
-          return true // Cafe choice step is always valid
-        }
+      case 'dateTimePreferences': 
+        return Object.keys(formData.dateTimePreferences).length > 0
+      case 'cafeChoice': 
         if (showCafeSelection) {
           return formData.cafeId // Cafe selection step requires cafeId
         }
-        return true // Summary step is always valid
+        return true // Cafe choice step is always valid
+      case 'summary': return true // Summary step is always valid
       default: return true
     }
   }
@@ -213,6 +234,10 @@ export function StepContent({
           onChooseOwn={() => {
             // Go directly to cafe selection without adding extra steps
             setShowCafeSelection(true)
+            // Set default view type to list if not already set
+            if (!formData.viewType) {
+              onFormDataChange({ viewType: 'list' })
+            }
             // Stay on the same step but show cafe selection
           }}
         />
@@ -339,24 +364,15 @@ export function StepContent({
   )
 
   const renderStep = () => {
-    switch (currentStep) {
+    const actualStep = getActualStep()
+    
+    switch (actualStep) {
       case 1: return renderStep1()
       case 2: return renderStep2()
       case 3: return renderStep3()
-      case 4:
-        if (showDateTimePreferences) {
-          return renderDateTimePreferences()
-        } else {
-          return renderCafeChoice()
-        }
-      case 5:
-        if (showDateTimePreferences) {
-          return renderCafeChoice()
-        } else if (showCafeSelection) {
-          return renderCafeSelection()
-        } else {
-          return renderSummary()
-        }
+      case 'dateTimePreferences': return renderDateTimePreferences()
+      case 'cafeChoice': return renderCafeChoice()
+      case 'summary': return renderSummary()
       default: return renderSummary()
     }
   }

@@ -102,11 +102,20 @@ function MeetupWizardContent() {
   // Total steps will be calculated dynamically in StepContent
   const [totalSteps, setTotalSteps] = useState(5);
 
+  // Check if we should show date/time preferences step
+  const shouldShowDateTimePreferences = () => {
+    return formData.dates.length > 1 || formData.times.length > 1
+  }
+
   return (
     <div className="meetup-wizard">
       <Card className="shadow-lg animate-bounceIn max-w-4xl mx-auto">
         <CardContent className="p-4 sm:p-6 lg:p-8">
-          <StepIndicator currentStep={currentStep} totalSteps={totalSteps} />
+          <StepIndicator 
+            currentStep={currentStep} 
+            totalSteps={totalSteps} 
+            showDateTimePreferences={shouldShowDateTimePreferences()}
+          />
           <StepContent
             currentStep={currentStep}
             formData={formData as FormData}

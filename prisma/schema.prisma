@@ -160,6 +160,7 @@ model MeetupInvite {
   organizerEmail  String
   inviteeName     String?
   inviteeEmail    String?
+  inviteeUserId   String?   // User ID of invitee (if they have an account)
   cafeId          String
   availableDates  String[]  // Array of ISO date strings
   availableTimes  String[]  // Array of time preferences
@@ -182,6 +183,7 @@ model MeetupInvite {
   @@index([expiresAt])
   @@index([deletedAt])
   @@index([createdBy])
+  @@index([inviteeUserId])
 }
 
 model CoffeeShop {

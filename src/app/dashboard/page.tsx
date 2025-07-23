@@ -28,6 +28,8 @@ interface MeetupInvite {
   chosenDate?: string
   inviteeName?: string
   inviteeEmail?: string
+  inviteeUserId?: string
+  createdBy?: string
 }
 
 export default function Dashboard() {
@@ -160,11 +162,21 @@ export default function Dashboard() {
         throw new Error(errorData.error || 'Failed to delete meetup')
       }
 
+      const result = await response.json()
+      console.log('🗑️ Delete result:', result)
+
       // Remove from local state
       setMeetups(meetups.filter(meetup => meetup.id !== meetupId))
-      alert('✅ Meetup succesvol verwijderd!')
+      
+      // Show success message with email info
+      if (result.cancellationEmailSent) {
+        alert('✅ Meetup succesvol verwijderd! 📧 Annulering email is verzonden naar de deelnemer.')
+      } else {
+        alert('✅ Meetup succesvol verwijderd! (Geen email verzonden - geen deelnemer gevonden)')
+      }
     } catch (error) {
       console.error('Error deleting meetup:', error)
+      alert(`❌ Fout bij verwijderen: ${error instanceof Error ? error.message : 'Onbekende fout'}`)
       throw error
     }
   }
@@ -333,16 +345,28 @@ export default function Dashboard() {
                         <h3 className="text-xl font-bold text-gray-900">
                           Koffie bij {meetup.cafe.name}
                         </h3>
-                        <Badge 
-                          variant={meetup.status === 'confirmed' ? 'default' : 'secondary'}
-                          className={`${
-                            meetup.status === 'confirmed' 
-                              ? 'bg-green-100 text-green-700 border-green-200' 
-                              : 'bg-amber-100 text-amber-700 border-amber-200'
-                          }`}
-                        >
-                          {meetup.status === 'confirmed' ? '✅ Bevestigd!' : '⏳ Wachtend'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={meetup.status === 'confirmed' ? 'default' : 'secondary'}
+                            className={`${
+                              meetup.status === 'confirmed' 
+                                ? 'bg-green-100 text-green-700 border-green-200' 
+                                : 'bg-amber-100 text-amber-700 border-amber-200'
+                            }`}
+                          >
+                            {meetup.status === 'confirmed' ? '✅ Bevestigd!' : '⏳ Wachtend'}
+                          </Badge>
+                          <Badge 
+                            variant="outline"
+                            className={`${
+                              meetup.createdBy === session?.user?.email
+                                ? 'bg-blue-100 text-blue-700 border-blue-200'
+                                : 'bg-purple-100 text-purple-700 border-purple-200'
+                            }`}
+                          >
+                            {meetup.createdBy === session?.user?.email ? '👤 Organisator' : '👥 Deelnemer'}
+                          </Badge>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -351,10 +375,15 @@ export default function Dashboard() {
                             <span className="text-red-500">📍</span>
                             <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <span className="text-blue-500">👤</span>
-                            <span>Georganiseerd door: {meetup.organizerName}</span>
-                          </div>
+                                                  <div className="flex items-center gap-2 text-gray-600">
+                          <span className="text-blue-500">👤</span>
+                          <span>
+                            {meetup.createdBy === session?.user?.email 
+                              ? `Georganiseerd door: ${meetup.organizerName} (jij)`
+                              : `Georganiseerd door: ${meetup.organizerName}`
+                            }
+                          </span>
+                        </div>
                           <div className="flex items-center gap-2 text-gray-600">
                             <span className="text-green-500">📅</span>
                             <span>{meetup.availableDates.length} data beschikbaar</span>

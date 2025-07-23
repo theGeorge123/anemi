@@ -5,6 +5,7 @@ import { Coffee, Users, LogIn, Calendar, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useSupabase } from '@/components/SupabaseProvider';
 import { useEffect, useState } from 'react';
+import { FindMyMeetups } from '@/components/FindMyMeetups';
 
 export default function HomePage() {
   const { session, supabase } = useSupabase();
@@ -126,6 +127,21 @@ export default function HomePage() {
         <p className="mt-6 text-sm text-muted-foreground">
           Heb je al meetups? <Link href="/auth/signin" className="text-amber-600 hover:underline">Log in om ze te bekijken</Link>
         </p>
+
+        {/* Find My Meetups Section */}
+        <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">🔍</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Vind je Meetups</h3>
+            <p className="text-gray-600">
+              Heb je een meetup geaccepteerd maar geen account? Vind ze hier terug!
+            </p>
+          </div>
+          
+          <FindMyMeetups />
+        </div>
       </div>
     </div>
   );

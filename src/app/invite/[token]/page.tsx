@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DeclineModal } from '@/components/meetups/DeclineModal'
-import { Calendar, MapPin, Star, Clock, Users, Home } from 'lucide-react'
+import { Calendar, MapPin, Star, Clock, Users, Home, LogIn, UserPlus } from 'lucide-react'
 import Link from 'next/link'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 interface InviteData {
   token: string
@@ -36,6 +37,7 @@ interface InviteData {
 export default function InvitePage() {
   const params = useParams()
   const token = params.token as string
+  const { session, supabase } = useSupabase()
   
   const [invite, setInvite] = useState<InviteData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -47,6 +49,9 @@ export default function InvitePage() {
   const [showDeclineModal, setShowDeclineModal] = useState(false)
   const [declineReason, setDeclineReason] = useState('')
   const [showCafeDetails, setShowCafeDetails] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string>('')
+  const [selectedTime, setSelectedTime] = useState<string>('')
+  const [showAuthOptions, setShowAuthOptions] = useState(false)
 
   useEffect(() => {
     const fetchInvite = async () => {
@@ -76,6 +81,11 @@ export default function InvitePage() {
       return
     }
 
+    if (!selectedDate || !selectedTime) {
+      setError('Kies een datum en tijd')
+      return
+    }
+
     try {
       setAccepting(true)
       const response = await fetch(`/api/invite/${token}/accept`, {
@@ -86,6 +96,9 @@ export default function InvitePage() {
         body: JSON.stringify({
           inviteeName,
           inviteeEmail,
+          selectedDate,
+          selectedTime,
+          userId: session?.user?.id || null,
         }),
       })
 
@@ -143,18 +156,18 @@ export default function InvitePage() {
   const addToCalendar = () => {
     if (!invite) return
 
-    // Get first available date and time
-    const firstDate = invite.availableDates[0]
-    const firstTime = invite.availableTimes[0]
+    // Use selected date and time if available, otherwise use first available
+    const dateToUse = selectedDate || invite.availableDates[0]
+    const timeToUse = selectedTime || invite.availableTimes[0]
     
-    if (!firstDate || !firstTime) {
-      alert('Geen beschikbare data of tijden gevonden')
+    if (!dateToUse || !timeToUse) {
+      alert('Kies eerst een datum en tijd')
       return
     }
 
     // Parse date and time
-    const date = new Date(firstDate)
-    const timeParts = firstTime.split(':').map(Number)
+    const date = new Date(dateToUse)
+    const timeParts = timeToUse.split(':').map(Number)
     const hours = timeParts[0] || 0
     const minutes = timeParts[1] || 0
     date.setHours(hours, minutes, 0, 0)
@@ -174,7 +187,7 @@ export default function InvitePage() {
     // Create calendar event data
     const event = {
       title: `☕ Koffie meetup met ${invite.organizerName}`,
-      description: `Koffie meetup bij ${invite.cafe.name}\n\nAdres: ${invite.cafe.address}\n\nBeschikbare data: ${invite.availableDates.join(', ')}\nBeschikbare tijden: ${invite.availableTimes.join(', ')}`,
+      description: `Koffie meetup bij ${invite.cafe.name}\n\nAdres: ${invite.cafe.address}\n\nGekozen datum: ${dateToUse}\nGekozen tijd: ${timeToUse}`,
       location: invite.cafe.address,
       startDateTime,
       endDateTime
@@ -240,9 +253,9 @@ export default function InvitePage() {
               <p className="text-sm sm:text-base text-gray-600 mb-4">{error}</p>
               <Button 
                 onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/'
-                  }
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/'
+                }
                 }}
                 className="h-10 sm:h-auto"
               >
@@ -260,13 +273,13 @@ export default function InvitePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2 sm:p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-2 sm:p-4">
       {/* Back to Home Button */}
-      <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
         <Link href="/">
           <Button 
             variant="ghost" 
-            className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs sm:text-sm"
+            className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs sm:text-sm backdrop-blur-sm bg-white/80"
           >
             <Home className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">← Terug naar Home</span>
@@ -275,29 +288,32 @@ export default function InvitePage() {
         </Link>
       </div>
 
-      <Card className="w-full max-w-2xl mx-2 sm:mx-4">
+      <Card className="w-full max-w-2xl mx-2 sm:mx-4 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
         <CardContent className="p-4 sm:p-6 lg:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg animate-pulse">
               <span className="text-3xl sm:text-4xl">☕</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
               Je bent uitgenodigd voor een koffie! 🎉
             </h1>
             <p className="text-sm sm:text-base lg:text-lg text-gray-600">
-              <strong>{invite.organizerName}</strong> heeft een meetup gepland en nodigt je uit
+              <strong className="text-amber-700">{invite.organizerName}</strong> heeft een meetup gepland en nodigt je uit
             </p>
           </div>
 
           <div className="space-y-4 sm:space-y-6">
             {/* Organizer Info */}
-            <div className="bg-amber-50 p-3 sm:p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Uitnodiging van:</h3>
-              <p className="text-gray-700 text-sm sm:text-base">{invite.organizerName}</p>
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-3 sm:p-4 rounded-lg border border-amber-200">
+              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base flex items-center gap-2">
+                <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+                Uitnodiging van:
+              </h3>
+              <p className="text-gray-700 text-sm sm:text-base font-medium">{invite.organizerName}</p>
             </div>
 
             {/* Cafe Details */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
@@ -366,69 +382,147 @@ export default function InvitePage() {
               </div>
             </div>
 
-            {/* Available Dates */}
+            {/* Date Selection */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                Beschikbare data:
+                Kies een datum:
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
-                {invite.availableDates.map((date) => (
-                  <div key={date} className="bg-gray-100 p-2 rounded text-xs sm:text-sm text-center">
-                    {new Date(date).toLocaleDateString('nl-NL', { 
-                      weekday: 'short', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                {invite.availableDates.map((date) => {
+                  const isSelected = selectedDate === date
+                  const formattedDate = new Date(date).toLocaleDateString('nl-NL', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })
+                  return (
+                    <button
+                      key={date}
+                      onClick={() => setSelectedDate(date)}
+                      className={`p-3 rounded-lg border-2 transition-all duration-200 text-xs sm:text-sm font-medium ${
+                        isSelected 
+                          ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
+                      }`}
+                    >
+                      {formattedDate}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
-            {/* Available Times */}
+            {/* Time Selection */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
                 <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                Beschikbare tijden:
+                Kies een tijd:
               </h3>
-              <div className="flex flex-wrap gap-1 sm:gap-2">
-                {invite.availableTimes.map((time) => (
-                  <span key={time} className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
-                    {time}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                {invite.availableTimes.map((time) => {
+                  const isSelected = selectedTime === time
+                  return (
+                    <button
+                      key={time}
+                      onClick={() => setSelectedTime(time)}
+                      className={`px-4 py-2 rounded-full border-2 transition-all duration-200 text-xs sm:text-sm font-medium ${
+                        isSelected 
+                          ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
-            {/* Your Info */}
+            {/* Account Status & Info */}
             <div className="space-y-3 sm:space-y-4">
               <h3 className="font-semibold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
                 <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                 Jouw gegevens:
               </h3>
-              
-              <div>
-                <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
-                <Input
-                  id="name"
-                  value={inviteeName}
-                  onChange={(e) => setInviteeName(e.target.value)}
-                  placeholder="Jouw naam"
-                  className="mt-1"
-                />
-              </div>
 
-              <div>
-                <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={inviteeEmail}
-                  onChange={(e) => setInviteeEmail(e.target.value)}
-                  placeholder="jouw@email.com"
-                  className="mt-1"
-                />
-              </div>
+              {session ? (
+                // User is logged in
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="text-green-700 font-medium text-sm sm:text-base">✅ Ingelogd als {session.user.email}</span>
+                  </div>
+                  <p className="text-green-600 text-xs sm:text-sm">
+                    Je meetup zal verschijnen in je dashboard na acceptatie!
+                  </p>
+                  
+                  <div className="mt-3">
+                    <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
+                    <Input
+                      id="name"
+                      value={inviteeName}
+                      onChange={(e) => setInviteeName(e.target.value)}
+                      placeholder="Jouw naam"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              ) : (
+                // User is not logged in
+                <div className="space-y-3">
+                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+                      <span className="text-amber-700 font-medium text-sm sm:text-base">💡 Maak een account om je meetups te beheren</span>
+                    </div>
+                    <p className="text-amber-600 text-xs sm:text-sm mb-3">
+                      Met een account kun je al je meetups zien, beheren en nieuwe avonturen maken!
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button
+                        onClick={() => setShowAuthOptions(true)}
+                        className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white h-10 sm:h-auto"
+                      >
+                        <UserPlus className="w-4 h-4 mr-2" />
+                        Account maken
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowAuthOptions(true)}
+                        className="flex-1 border-amber-300 text-amber-700 hover:bg-amber-50 h-10 sm:h-auto"
+                      >
+                        <LogIn className="w-4 h-4 mr-2" />
+                        Inloggen
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
+                    <Input
+                      id="name"
+                      value={inviteeName}
+                      onChange={(e) => setInviteeName(e.target.value)}
+                      placeholder="Jouw naam"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={inviteeEmail}
+                      onChange={(e) => setInviteeEmail(e.target.value)}
+                      placeholder="jouw@email.com"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Error Message */}
@@ -442,21 +536,72 @@ export default function InvitePage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <Button
                 onClick={handleAccept}
-                disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white h-10 sm:h-auto"
+                disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim() || !selectedDate || !selectedTime}
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white h-12 sm:h-auto font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
-                {accepting ? 'Accepteren...' : '✅ Ja, ik ga mee!'}
+                {accepting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Accepteren...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">✅</span>
+                    Ja, ik ga mee!
+                  </div>
+                )}
               </Button>
               
               <Button
                 variant="outline"
                 onClick={() => setShowDeclineModal(true)}
                 disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
-                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-10 sm:h-auto"
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-12 sm:h-auto font-semibold transition-all duration-200"
               >
-                {declining ? 'Afwijzen...' : '❌ Nee, helaas'}
+                {declining ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                    Afwijzen...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">❌</span>
+                    Nee, helaas
+                  </div>
+                )}
               </Button>
             </div>
+
+            {/* Selection Summary */}
+            {(selectedDate || selectedTime) && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 sm:p-4 animate-in slide-in-from-bottom-2 duration-300">
+                <h4 className="font-semibold text-green-800 mb-2 text-sm sm:text-base flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  Jouw keuze:
+                </h4>
+                <div className="space-y-2 text-xs sm:text-sm">
+                  {selectedDate && (
+                    <div className="flex items-center gap-2 bg-white/50 p-2 rounded">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                      <span className="text-green-700 font-medium">
+                        {new Date(selectedDate).toLocaleDateString('nl-NL', { 
+                          weekday: 'long', 
+                          year: 'numeric',
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  {selectedTime && (
+                    <div className="flex items-center gap-2 bg-white/50 p-2 rounded">
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                      <span className="text-green-700 font-medium">{selectedTime}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="text-center text-xs text-gray-500 mt-4">
               <p>Deze invite verloopt op {new Date(invite.expiresAt).toLocaleDateString('nl-NL')}</p>
@@ -471,6 +616,57 @@ export default function InvitePage() {
         onConfirm={handleDecline}
         isDeclining={declining}
       />
+
+      {/* Auth Options Modal */}
+      {showAuthOptions && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-md shadow-2xl">
+            <CardContent className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">☕</span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Word lid van Anemi Meets!</h3>
+                <p className="text-gray-600 text-sm">
+                  Maak een account om je meetups te beheren en nieuwe avonturen te ontdekken
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <Link href={`/auth/signup?redirect=${encodeURIComponent(`/invite/${token}`)}`}>
+                  <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white h-12">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Account maken
+                  </Button>
+                </Link>
+                
+                <Link href={`/auth/signin?redirect=${encodeURIComponent(`/invite/${token}`)}`}>
+                  <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 h-12">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Inloggen
+                  </Button>
+                </Link>
+                
+                <div className="text-center">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setShowAuthOptions(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    Later doen
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500 text-center">
+                  Je kunt ook zonder account deelnemen, maar dan zie je je meetups niet in je dashboard
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 } 

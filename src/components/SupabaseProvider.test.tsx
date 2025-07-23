@@ -16,11 +16,11 @@ jest.mock('@/lib/supabase-browser', () => ({
 
 // Test component to use the hook
 const TestComponent = () => {
-  const { session, client } = useSupabase()
+  const { session, supabase } = useSupabase()
   return (
     <div>
       <span data-testid="session">{session ? 'authenticated' : 'not-authenticated'}</span>
-      <span data-testid="client">{client ? 'client-available' : 'no-client'}</span>
+      <span data-testid="client">{supabase ? 'client-available' : 'no-client'}</span>
     </div>
   )
 }

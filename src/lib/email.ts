@@ -55,6 +55,8 @@ export interface MeetupConfirmationEmailData {
   };
   availableDates: string[];
   availableTimes: string[];
+  chosenDate?: string;
+  chosenTime?: string;
 }
 
 export interface InviteEmailData {
@@ -233,9 +235,17 @@ export async function sendMeetupConfirmationEmail(data: MeetupConfirmationEmailD
         </div>
         
         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
-          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">📅 Available Options</h3>
-          <p style="color: #0c4a6e; margin: 8px 0;"><strong>Dates:</strong> ${data.availableDates.map(date => new Date(date).toLocaleDateString('nl-NL')).join(', ')}</p>
-          <p style="color: #0c4a6e; margin: 8px 0;"><strong>Times:</strong> ${data.availableTimes.join(', ')}</p>
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">📅 Meetup Details</h3>
+          ${data.chosenDate && data.chosenTime ? `
+            <div style="background-color: #dcfce7; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #16a34a;">
+              <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px;">✅ Confirmed Date & Time</h4>
+              <p style="color: #166534; margin: 5px 0;"><strong>Date:</strong> ${new Date(data.chosenDate).toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p style="color: #166534; margin: 5px 0;"><strong>Time:</strong> ${data.chosenTime}</p>
+            </div>
+          ` : `
+            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Available Dates:</strong> ${data.availableDates.map(date => new Date(date).toLocaleDateString('nl-NL')).join(', ')}</p>
+            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Available Times:</strong> ${data.availableTimes.join(', ')}</p>
+          `}
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
@@ -477,6 +487,8 @@ export async function sendMeetupCancellation(
   meetupDate: string,
   reason?: string
 ) {
+  console.log('📧 sendMeetupCancellation called with:', { to, meetupTitle, meetupDate, reason })
+  
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #ef4444;">☕ Meetup Cancelled</h2>
@@ -495,11 +507,19 @@ export async function sendMeetupCancellation(
     </div>
   `;
 
-  return sendEmail({
-    to,
-    subject: `☕ Cancelled: ${meetupTitle}`,
-    html,
-  });
+  try {
+    const result = await sendEmail({
+      to,
+      subject: `☕ Cancelled: ${meetupTitle}`,
+      html,
+    })
+    
+    console.log('✅ sendMeetupCancellation email sent successfully to:', to)
+    return result
+  } catch (error) {
+    console.error('❌ sendMeetupCancellation failed:', error)
+    throw error
+  }
 }
 
 /**

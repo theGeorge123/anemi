@@ -182,11 +182,15 @@ export async function DELETE(
     // Send cancellation email to invitee if they exist
     if (meetup.inviteeEmail) {
       try {
+        console.log('📧 Sending cancellation email to:', meetup.inviteeEmail)
+        
         const { sendMeetupCancellation } = await import('@/lib/email')
         
         const meetupDate = meetup.availableDates.length > 0 && meetup.availableDates[0] 
           ? meetup.availableDates[0] 
           : 'Niet gepland'
+        
+        console.log('📅 Meetup date for cancellation email:', meetupDate)
         
         await sendMeetupCancellation(
           meetup.inviteeEmail,
@@ -194,10 +198,19 @@ export async function DELETE(
           meetupDate,
           'De organisator heeft deze meetup geannuleerd'
         )
+        
+        console.log('✅ Cancellation email sent successfully')
       } catch (emailError) {
-        console.error('Error sending cancellation email:', emailError)
+        console.error('❌ Error sending cancellation email:', emailError)
+        console.error('❌ Error details:', {
+          inviteeEmail: meetup.inviteeEmail,
+          cafeName: meetup.cafe.name,
+          error: emailError instanceof Error ? emailError.message : 'Unknown error'
+        })
         // Don't fail the deletion if email fails
       }
+    } else {
+      console.log('ℹ️ No invitee email found, skipping cancellation email')
     }
 
     return NextResponse.json({

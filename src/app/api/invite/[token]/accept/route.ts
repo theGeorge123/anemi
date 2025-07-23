@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendMeetupConfirmationEmail } from '@/lib/email'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(
   request: NextRequest,
@@ -8,12 +9,20 @@ export async function POST(
 ) {
   try {
     const { token } = params
-    const { inviteeName, inviteeEmail } = await request.json()
+    const { inviteeName, inviteeEmail, selectedDate, selectedTime, userId } = await request.json()
 
     // Validate required fields
     if (!inviteeName || !inviteeEmail) {
       return NextResponse.json(
         { error: 'Name and email are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate date and time selection
+    if (!selectedDate || !selectedTime) {
+      return NextResponse.json(
+        { error: 'Date and time selection are required' },
         { status: 400 }
       )
     }
@@ -56,7 +65,10 @@ export async function POST(
         status: 'confirmed',
         inviteeName,
         inviteeEmail,
-        confirmedAt: new Date()
+        chosenDate: selectedDate,
+        chosenTime: selectedTime,
+        confirmedAt: new Date(),
+        ...(userId && { inviteeUserId: userId }) // Store user ID if provided
       },
       include: {
         cafe: true
@@ -76,7 +88,9 @@ export async function POST(
           ...(invite.cafe.description && { description: invite.cafe.description })
         },
         availableDates: invite.availableDates,
-        availableTimes: invite.availableTimes
+        availableTimes: invite.availableTimes,
+        chosenDate: selectedDate,
+        chosenTime: selectedTime
       })
     } catch (emailError) {
       console.error('Error sending confirmation emails:', emailError)

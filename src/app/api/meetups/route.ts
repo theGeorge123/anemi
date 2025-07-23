@@ -40,7 +40,10 @@ export async function GET(request: NextRequest) {
 
     const meetups = await prisma.meetupInvite.findMany({
       where: {
-        createdBy: user.email,
+        OR: [
+          { createdBy: user.email },
+          { inviteeUserId: user.id }
+        ],
         deletedAt: null
       },
       include: {
@@ -65,7 +68,9 @@ export async function GET(request: NextRequest) {
         availableTimes: meetup.availableTimes,
         chosenDate: meetup.chosenDate,
         inviteeName: meetup.inviteeName,
-        inviteeEmail: meetup.inviteeEmail
+        inviteeEmail: meetup.inviteeEmail,
+        inviteeUserId: meetup.inviteeUserId,
+        createdBy: meetup.createdBy
       }))
     })
   } catch (error) {

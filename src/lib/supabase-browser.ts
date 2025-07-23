@@ -1,228 +1,145 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// Custom storage to handle stale tokens
-const customStorage = {
-  getItem: (key: string) => {
-    // Clear stale tokens when switching from localhost to production
-    if (typeof window !== 'undefined') {
-      const currentDomain = window.location.hostname;
-      const isProduction = currentDomain !== 'localhost' && !currentDomain.includes('127.0.0.1');
-      
-      if (isProduction && key.includes('sb-') && key.includes('auth-token')) {
-        // Check if token is from localhost
-        const stored = localStorage.getItem(key);
-        if (stored) {
-          try {
-            const tokenData = JSON.parse(stored);
-            // If token was created for localhost, clear it
-            if (tokenData.currentSession?.access_token) {
-              console.log('🧹 Clearing stale auth token for production domain');
-              localStorage.removeItem(key);
-              return null;
-            }
-          } catch (e) {
-            // If parsing fails, clear it anyway
-            localStorage.removeItem(key);
-            return null;
-          }
-        }
+let supabaseClient: SupabaseClient | null = null
+
+// Clear stale auth tokens for production domains
+if (typeof window !== 'undefined') {
+  const currentDomain = window.location.hostname
+  if (currentDomain !== 'localhost' && currentDomain !== '127.0.0.1') {
+    // Clear any localhost tokens that might be stored
+    Object.keys(localStorage).forEach(key => {
+      if (key.includes('supabase') && key.includes('localhost')) {
+        localStorage.removeItem(key)
       }
-    }
-    return localStorage.getItem(key);
-  },
-  setItem: (key: string, value: string) => {
-    localStorage.setItem(key, value);
-  },
-  removeItem: (key: string) => {
-    localStorage.removeItem(key);
+    })
+    
+    // Clear cookies that might be from localhost
+    document.cookie.split(';').forEach(cookie => {
+      const [name] = cookie.split('=')
+      if (name && name.trim().includes('supabase') && name.trim().includes('localhost')) {
+        document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+      }
+    })
   }
-};
+}
 
-// Create a singleton instance
-let supabaseClient: any = null;
+export function getSupabaseClient(): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export function getSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  console.log('🔍 getSupabaseClient called:')
-  console.log('URL exists:', !!url)
-  console.log('Key exists:', !!key)
-  console.log('URL starts with https:', url?.startsWith('https://'))
-  console.log('Key length:', key?.length)
-  console.log('Is Vercel environment:', !!process.env.VERCEL_URL)
-  console.log('NODE_ENV:', process.env.NODE_ENV)
-  
+  // Validate environment variables
   if (!url || !key) {
-    console.error('❌ getSupabaseClient: Missing environment variables');
-    console.error('NEXT_PUBLIC_SUPABASE_URL:', url ? '✅ Set' : '❌ Missing');
-    console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', key ? '✅ Set' : '❌ Missing');
-    console.error('VERCEL_URL:', process.env.VERCEL_URL);
-    console.error('VERCEL_ENV:', process.env.VERCEL_ENV);
-    return null;
+    console.error('❌ getSupabaseClient: Missing environment variables')
+    throw new Error('Missing Supabase environment variables')
   }
 
   // Validate URL format
   if (!url.startsWith('https://')) {
-    console.error('❌ Invalid Supabase URL format. Should start with https://');
-    return null;
+    console.error('❌ Invalid Supabase URL format. Should start with https://')
+    throw new Error('Invalid Supabase URL format')
   }
 
-  // Validate key format (should be a long string)
-  if (key.length < 100) {
-    console.error('❌ Supabase key seems too short. Expected a long string.');
-    return null;
+  // Validate key length (basic check)
+  if (key.length < 50) {
+    console.error('❌ Supabase key seems too short. Expected a long string.')
+    throw new Error('Invalid Supabase key format')
   }
-  
-  // Return existing client if already created
+
+  // Return existing client if available
   if (supabaseClient) {
-    console.log('✅ Returning existing Supabase client');
-    return supabaseClient;
+    return supabaseClient
   }
-  
+
+  // Create new client
   try {
-    console.log('🔧 Creating new Supabase client...');
-    console.log('🔧 URL:', url);
-    console.log('🔧 Key starts with:', key.substring(0, 10) + '...');
-    
     supabaseClient = createClient(url, key, {
       auth: {
-        persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: customStorage, // Use custom storage to handle stale tokens
-      },
-      global: {
-        headers: {
-          'apikey': key,
-          'Authorization': `Bearer ${key}`,
-        },
-      },
-    });
-    
-    console.log('✅ Supabase client created successfully');
-    return supabaseClient;
-  } catch (error) {
-    console.error('❌ getSupabaseClient: Error creating client:', error);
-    return null;
-  }
-}
-
-// Helper function to validate Supabase connection
-export async function validateSupabaseConnection() {
-  const client = getSupabaseClient();
-  if (!client) {
-    return { valid: false, error: 'Supabase client not configured' };
-  }
-  
-  try {
-    console.log('🔍 Testing Supabase connection...');
-    
-    // Test 1: Basic client creation
-    console.log('✅ Client created successfully');
-    
-    // Test 2: Try to get session
-    const { data, error } = await client.auth.getSession();
-    console.log('Session data:', data);
-    console.log('Session error:', error);
-    
-    if (error) {
-      console.error('❌ Supabase connection validation failed:', error);
-      return { 
-        valid: false, 
-        error: error.message,
-        details: {
-          code: error.status,
-          message: error.message,
-          name: error.name
-        }
-      };
-    }
-    
-    console.log('✅ Supabase connection validated successfully');
-    return { valid: true, session: data.session };
-  } catch (error) {
-    console.error('❌ Unexpected error validating Supabase connection:', error);
-    return { 
-      valid: false, 
-      error: 'Unexpected error',
-      details: {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        persistSession: true,
+        detectSessionInUrl: true
       }
-    };
+    })
+
+    return supabaseClient
+  } catch (error) {
+    console.error('❌ getSupabaseClient: Error creating client:', error)
+    throw new Error('Failed to create Supabase client')
   }
 }
 
-// Specific auth test function
-export async function testSupabaseAuth() {
-  const client = getSupabaseClient();
-  if (!client) {
-    return { valid: false, error: 'Supabase client not configured' };
-  }
-  
+export async function validateSupabaseConnection(): Promise<{ success: boolean; error?: string; details?: any }> {
   try {
-    console.log('🔍 Testing Supabase auth specifically...');
+    const supabase = getSupabaseClient()
     
-    // Test 1: Check if we can create a client
-    console.log('✅ Client created successfully');
-    
-    // Test 2: Try to get session (this is what's failing)
-    const { data, error } = await client.auth.getSession();
-    console.log('Session data:', data);
-    console.log('Session error:', error);
+    // Test basic connection by getting session
+    const { data, error } = await supabase.auth.getSession()
     
     if (error) {
-      console.error('❌ Auth test failed:', error);
-      return { 
-        valid: false, 
-        error: error.message,
-        details: {
-          code: error.status,
-          message: error.message,
-          name: error.name
-        }
-      };
+      return {
+        success: false,
+        error: 'Supabase connection validation failed',
+        details: { message: error.message, stack: error.stack }
+      }
     }
-    
-    console.log('✅ Auth test passed');
-    return { valid: true, session: data.session };
+
+    return {
+      success: true,
+      details: { session: data.session }
+    }
   } catch (error) {
-    console.error('❌ Unexpected error in auth test:', error);
-    return { valid: false, error: 'Unexpected error in auth test' };
+    return {
+      success: false,
+      error: 'Unexpected error validating Supabase connection',
+      details: { message: error instanceof Error ? error.message : 'Unknown error', stack: error instanceof Error ? error.stack : undefined }
+    }
   }
 }
 
-// Function to manually clear stale tokens
-export function clearStaleTokens() {
-  if (typeof window === 'undefined') return;
-  
-  console.log('🧹 Clearing stale Supabase tokens...');
-  
-  // Clear all Supabase-related localStorage items
-  const keysToRemove = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && (key.includes('sb-') || key.includes('supabase'))) {
-      keysToRemove.push(key);
+export async function testSupabaseAuth(): Promise<{ success: boolean; error?: string; details?: any }> {
+  try {
+    const supabase = getSupabaseClient()
+    
+    // Test auth specifically
+    const { data, error } = await supabase.auth.getSession()
+    
+    if (error) {
+      return {
+        success: false,
+        error: 'Auth test failed',
+        details: { message: error.message, stack: error.stack }
+      }
+    }
+
+    return {
+      success: true,
+      details: { session: data.session }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Unexpected error in auth test',
+      details: { message: error instanceof Error ? error.message : 'Unknown error', stack: error instanceof Error ? error.stack : undefined }
     }
   }
-  
-  keysToRemove.forEach(key => {
-    console.log(`🗑️ Removing: ${key}`);
-    localStorage.removeItem(key);
-  });
-  
-  // Clear cookies
-  const cookies = document.cookie.split(';');
-  cookies.forEach(cookie => {
-    const [name] = cookie.split('=');
-    if (name && name.trim().includes('sb-')) {
-      const cookieName = name.trim();
-      console.log(`🗑️ Removing cookie: ${cookieName}`);
-      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+// Clear stale tokens function
+export function clearStaleTokens(): void {
+  if (typeof window === 'undefined') return
+
+  // Clear localStorage items
+  Object.keys(localStorage).forEach(key => {
+    if (key.includes('supabase') && (key.includes('localhost') || key.includes('127.0.0.1'))) {
+      localStorage.removeItem(key)
     }
-  });
-  
-  console.log('✅ Stale tokens cleared');
+  })
+
+  // Clear cookies
+  document.cookie.split(';').forEach(cookie => {
+    const [name] = cookie.split('=')
+    const cookieName = name?.trim()
+    if (cookieName && cookieName.includes('supabase') && (cookieName.includes('localhost') || cookieName.includes('127.0.0.1'))) {
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+    }
+  })
 } 

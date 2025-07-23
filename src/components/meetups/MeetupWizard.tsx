@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSupabase } from '@/components/SupabaseProvider';
 import { type FormData } from './formValidation';
 import { PriceRange } from '@prisma/client';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export interface MeetupFormData {
   name: string;
@@ -30,7 +31,7 @@ const initialFormData: MeetupFormData = {
   priceRange: PriceRange.MODERATE,
 };
 
-export function MeetupWizard() {
+function MeetupWizardContent() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<MeetupFormData>(initialFormData);
   const [inviteCode, setInviteCode] = useState<string>('');
@@ -120,5 +121,13 @@ export function MeetupWizard() {
         onClose={() => setShowInviteModal(false)}
       />
     </div>
+  );
+}
+
+export function MeetupWizard() {
+  return (
+    <ErrorBoundary>
+      <MeetupWizardContent />
+    </ErrorBoundary>
   );
 } 

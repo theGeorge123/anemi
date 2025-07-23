@@ -1,1 +1,185 @@
-{"welcome":"Welkom bij Anemi!"}
+{
+  "welcome": "Welkom bij Anemi!",
+  "homepage": {
+    "title": "Plan koffie meetups met vrienden",
+    "subtitle": "Ontdek geweldige lokale koffieplekken en maak leuke afspraken",
+    "createMeetup": "Maak een meetup",
+    "joinMeetup": "Deelname aan meetup",
+    "discoverCafes": "Ontdek cafés"
+  },
+  "auth": {
+    "signin": "Inloggen",
+    "signup": "Registreren",
+    "signout": "Uitloggen",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "confirmPassword": "Bevestig wachtwoord",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "noAccount": "Nog geen account?",
+    "hasAccount": "Al een account?",
+    "verifyEmail": "E-mailadres verifiëren",
+    "verificationSent": "Verificatie e-mail verzonden",
+    "checkEmail": "Controleer je e-mail voor de verificatie link"
+  },
+  "meetup": {
+    "create": "Meetup maken",
+    "edit": "Meetup bewerken",
+    "delete": "Meetup verwijderen",
+    "organizer": "Organisator",
+    "invitee": "Uitgenodigde",
+    "cafe": "Café",
+    "date": "Datum",
+    "time": "Tijd",
+    "location": "Locatie",
+    "status": {
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "declined": "Afgewezen",
+      "cancelled": "Geannuleerd"
+    },
+    "steps": {
+      "name": "Naam en e-mail",
+      "city": "Stad selecteren",
+      "datetime": "Datum en tijd",
+      "cafe": "Café kiezen",
+      "view": "Weergave selecteren",
+      "selection": "Café selecteren",
+      "summary": "Samenvatting"
+    }
+  },
+  "cafe": {
+    "name": "Café naam",
+    "address": "Adres",
+    "rating": "Beoordeling",
+    "priceRange": "Prijsniveau",
+    "features": "Voorzieningen",
+    "hours": "Openingstijden",
+    "website": "Website",
+    "phone": "Telefoon",
+    "random": "Willekeurig café",
+    "chooseOwn": "Zelf kiezen",
+    "shuffle": "Nieuwe suggestie"
+  },
+  "form": {
+    "name": "Naam",
+    "email": "E-mailadres",
+    "city": "Stad",
+    "dates": "Beschikbare data",
+    "times": "Beschikbare tijden",
+    "priceRange": "Prijsniveau",
+    "next": "Volgende",
+    "back": "Terug",
+    "finish": "Voltooien",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "delete": "Verwijderen",
+    "confirm": "Bevestigen",
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Succesvol opgeslagen"
+  },
+  "validation": {
+    "required": "Dit veld is verplicht",
+    "email": "Voer een geldig e-mailadres in",
+    "minLength": "Minimaal {{min}} karakters",
+    "maxLength": "Maximaal {{max}} karakters",
+    "invalidFormat": "Ongeldig formaat"
+  },
+  "error": {
+    "general": "Er is een fout opgetreden",
+    "network": "Netwerkfout",
+    "notFound": "Pagina niet gevonden",
+    "unauthorized": "Niet geautoriseerd",
+    "serverError": "Serverfout",
+    "tryAgain": "Probeer opnieuw",
+    "goHome": "Ga naar home"
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacybeleid",
+      "lastUpdated": "Laatst bijgewerkt: {{date}}",
+      "intro": "Dit privacybeleid beschrijft hoe Anemi Meets uw persoonlijke gegevens verzamelt, gebruikt en beschermt.",
+      "dataCollection": "Gegevensverzameling",
+      "dataUsage": "Gebruik van gegevens",
+      "dataProtection": "Gegevensbescherming",
+      "cookies": "Cookies",
+      "thirdParty": "Derde partijen",
+      "yourRights": "Uw rechten",
+      "contact": "Contact"
+    },
+    "terms": {
+      "title": "Algemene voorwaarden",
+      "lastUpdated": "Laatst bijgewerkt: {{date}}",
+      "intro": "Door het gebruik van Anemi Meets gaat u akkoord met deze algemene voorwaarden.",
+      "usage": "Gebruik van de dienst",
+      "content": "Inhoud en gedrag",
+      "intellectualProperty": "Intellectueel eigendom",
+      "liability": "Aansprakelijkheid",
+      "termination": "Beëindiging",
+      "changes": "Wijzigingen",
+      "contact": "Contact"
+    },
+    "cookies": {
+      "title": "Cookiebeleid",
+      "intro": "Anemi Meets gebruikt cookies om uw ervaring te verbeteren.",
+      "necessary": "Noodzakelijke cookies",
+      "analytics": "Analytische cookies",
+      "marketing": "Marketing cookies",
+      "manage": "Cookies beheren",
+      "accept": "Accepteren",
+      "decline": "Weigeren"
+    }
+  },
+  "footer": {
+    "privacy": "Privacybeleid",
+    "terms": "Algemene voorwaarden",
+    "cookies": "Cookiebeleid",
+    "contact": "Contact",
+    "copyright": "© 2025 Anemi Meets. Alle rechten voorbehouden."
+  },
+  "email": {
+    "invite": {
+      "subject": "☕ Koffie meetup uitnodiging",
+      "greeting": "Hé {{name}}! ☕",
+      "intro": "{{organizer}} nodigt je uit voor een koffie meetup:",
+      "details": "📍 Café: {{cafe}}\n📍 Adres: {{address}}\n📅 Data: {{dates}}\n⏰ Tijden: {{times}}",
+      "action": "Bekijk de uitnodiging en bevestig je deelname:",
+      "link": "Bekijk uitnodiging",
+      "signature": "Tot koffie! ☕✨\n\nMet vriendelijke groet,\nHet Anemi Meets team"
+    },
+    "change": {
+      "subject": "☕ Koffie meetup gewijzigd",
+      "greeting": "Hé {{name}}! ☕",
+      "intro": "{{organizer}} heeft de koffie meetup gewijzigd:",
+      "changes": "{{changes}}",
+      "action": "Bekijk de gewijzigde details:",
+      "link": "Bekijk wijzigingen"
+    },
+    "confirmation": {
+      "subject": "☕ Meetup bevestigd",
+      "greeting": "Hé {{name}}! ☕",
+      "intro": "Je meetup is bevestigd:",
+      "details": "📍 Café: {{cafe}}\n📍 Adres: {{address}}\n📅 Datum: {{date}}\n⏰ Tijd: {{time}}",
+      "signature": "Veel plezier bij je koffie meetup! ☕✨"
+    }
+  },
+  "ui": {
+    "loading": "Laden...",
+    "error": "Fout",
+    "success": "Succes",
+    "warning": "Waarschuwing",
+    "info": "Informatie",
+    "close": "Sluiten",
+    "retry": "Opnieuw proberen",
+    "refresh": "Vernieuwen",
+    "copy": "Kopiëren",
+    "share": "Delen",
+    "search": "Zoeken",
+    "filter": "Filter",
+    "sort": "Sorteren",
+    "view": "Weergave",
+    "list": "Lijst",
+    "map": "Kaart",
+    "grid": "Raster"
+  }
+}

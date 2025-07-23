@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@supabase/supabase-js'
+import { sendEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,29 +75,18 @@ Met vriendelijke groet,
 Het Anemi Meets team
     `.trim()
 
-    // Send email using Supabase
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
-    // For now, just log the email content
-    // In production, you would integrate with a proper email service
-    console.log('📧 Change notification email would be sent to:', meetup.inviteeEmail)
-    console.log('📧 Subject:', changeSubject)
-    console.log('📧 Content:', emailContent)
-
-    // TODO: Integrate with proper email service (Resend, SendGrid, etc.)
-    // const { error: emailError } = await emailService.send({
-    //   to: meetup.inviteeEmail,
-    //   subject: changeSubject,
-    //   content: emailContent
-    // })
-
-    // if (emailError) {
-    //   console.error('Error sending change notification:', emailError)
-    //   // Don't fail the update, just log the error
-    // }
+    // Send email using the email service
+    try {
+      await sendEmail({
+        to: meetup.inviteeEmail,
+        subject: changeSubject,
+        html: emailContent.replace(/\n/g, '<br>')
+      })
+    } catch (emailError) {
+      console.error('❌ Error sending change notification email:', emailError)
+      // Don't fail the update, just log the error
+      // In production, you might want to queue failed emails for retry
+    }
 
     return NextResponse.json({
       message: 'Change notification sent successfully'

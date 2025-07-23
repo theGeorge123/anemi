@@ -43,12 +43,10 @@ export function StepContent({
 
   // Calculate total steps based on user choices
   useEffect(() => {
-    let steps = 5 // Base steps
+    let steps = 5 // Base steps - always keep it at 5
     
-    if (showDateTimePreferences) steps++ // Extra step for date/time preferences
-    if (showCafeChoice) steps++ // Extra step for cafe choice
-    if (showCafeSelection) steps++ // Extra step for view selector
-    if (showCafeSelection) steps++ // Extra step for cafe selection
+    // Don't add extra steps for cafe selection or multiple times
+    // Everything stays within the 5 base steps
     
     setTotalSteps(steps)
     
@@ -56,7 +54,7 @@ export function StepContent({
     if (onTotalStepsChange) {
       onTotalStepsChange(steps)
     }
-  }, [showDateTimePreferences, showCafeChoice, showCafeSelection, onTotalStepsChange])
+  }, [onTotalStepsChange])
 
   const isStepValid = () => {
     switch (currentStep) {
@@ -73,26 +71,9 @@ export function StepContent({
           return true // Cafe choice step is always valid
         }
         if (showCafeSelection) {
-          return formData.viewType // View selector step requires viewType
+          return formData.cafeId // Cafe selection step requires cafeId
         }
         return true // Summary step is always valid
-      case 6: 
-        if (showDateTimePreferences && showCafeChoice) {
-          return formData.viewType // View selector step requires viewType
-        } else if (showDateTimePreferences) {
-          return true // Cafe choice step is always valid
-        } else if (showCafeSelection) {
-          return true // Cafe selection step is always valid
-        }
-        return true // Summary step is always valid
-      case 7: 
-        if (showDateTimePreferences && showCafeChoice) {
-          return true // Cafe selection step is always valid
-        } else if (showDateTimePreferences && showCafeSelection) {
-          return true // Cafe selection step is always valid
-        }
-        return true // Summary step is always valid
-      case 8: return true // Summary step is always valid
       default: return true
     }
   }
@@ -210,27 +191,34 @@ export function StepContent({
     </div>
   )
 
-  const renderCafeChoice = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">☕ Kies je cafe!</h3>
-        <p className="text-gray-600">We hebben een perfecte plek gevonden of kies zelf</p>
+  const renderCafeChoice = () => {
+    // If user chose to select their own cafe, show cafe selection directly
+    if (showCafeSelection) {
+      return renderCafeSelection()
+    }
+    
+    return (
+      <div className="space-y-6 animate-fadeIn">
+        <div className="text-center mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">☕ Kies je cafe!</h3>
+          <p className="text-gray-600">We hebben een perfecte plek gevonden of kies zelf</p>
+        </div>
+        <CafeChoiceStep
+          selectedCity={formData.city}
+          onCafeSelect={(cafeId) => {
+            onFormDataChange({ cafeId })
+            // If user accepts random cafe, go directly to summary
+            onNext()
+          }}
+          onChooseOwn={() => {
+            // Go directly to cafe selection without adding extra steps
+            setShowCafeSelection(true)
+            // Stay on the same step but show cafe selection
+          }}
+        />
       </div>
-      <CafeChoiceStep
-        selectedCity={formData.city}
-        onCafeSelect={(cafeId) => {
-          onFormDataChange({ cafeId })
-          // If user accepts random cafe, go directly to summary
-          onNext()
-        }}
-        onChooseOwn={() => {
-          // Set cafe selection flag and advance to view selector
-          setShowCafeSelection(true)
-          onNext()
-        }}
-      />
-    </div>
-  )
+    )
+  }
 
   const renderViewSelector = () => (
     <div className="space-y-6 animate-fadeIn">
@@ -365,35 +353,16 @@ export function StepContent({
         if (showDateTimePreferences) {
           return renderCafeChoice()
         } else if (showCafeSelection) {
-          return renderViewSelector()
-        } else {
-          return renderSummary()
-        }
-      case 6:
-        if (showDateTimePreferences && showCafeChoice) {
-          return renderViewSelector()
-        } else if (showDateTimePreferences) {
-          return renderCafeChoice()
-        } else if (showCafeSelection) {
           return renderCafeSelection()
         } else {
           return renderSummary()
         }
-      case 7:
-        if (showDateTimePreferences && showCafeChoice) {
-          return renderCafeSelection()
-        } else if (showDateTimePreferences && showCafeSelection) {
-          return renderCafeSelection()
-        } else {
-          return renderSummary()
-        }
-      case 8: return renderSummary()
-      default: return null
+      default: return renderSummary()
     }
   }
 
   return (
-    <div>
+    <div className="px-2 sm:px-0">
       {renderStep()}
       <StepNavigation
         currentStep={currentStep}

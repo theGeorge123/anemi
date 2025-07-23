@@ -37,30 +37,30 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
   })
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex items-center justify-between mb-4 px-2">
         {steps.map((step, index) => (
           <div key={step.number} className="flex items-center">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${
+            <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-all ${
               step.number <= currentStep
                 ? 'bg-amber-500 border-amber-500 text-white'
                 : 'bg-background border-muted text-muted-foreground'
             }`}>
-              <span className="text-sm font-bold">{step.emoji}</span>
+              <span className="text-xs sm:text-sm font-bold">{step.emoji}</span>
             </div>
             {index < steps.length - 1 && (
-              <div className={`w-10 h-1 mx-2 transition-all ${
+              <div className={`w-6 sm:w-10 h-1 mx-1 sm:mx-2 transition-all ${
                 step.number < currentStep ? 'bg-amber-500' : 'bg-muted'
               }`} />
             )}
           </div>
         ))}
       </div>
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-foreground mb-1">
+      <div className="text-center px-4">
+        <h2 className="text-lg sm:text-xl font-bold text-foreground mb-1">
           {steps[currentStep - 1]?.label}
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Step {currentStep} of {totalSteps}
         </p>
       </div>

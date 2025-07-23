@@ -152,12 +152,15 @@ export async function DELETE(
 
     const { id } = params
 
-    // Verify the meetup belongs to the user
+    // Get the meetup with cafe info before deleting
     const meetup = await prisma.meetupInvite.findFirst({
       where: {
         id,
         createdBy: user.email,
         deletedAt: null
+      },
+      include: {
+        cafe: true
       }
     })
 
@@ -176,8 +179,30 @@ export async function DELETE(
       }
     })
 
+    // Send cancellation email to invitee if they exist
+    if (meetup.inviteeEmail) {
+      try {
+        const { sendMeetupCancellation } = await import('@/lib/email')
+        
+        const meetupDate = meetup.availableDates.length > 0 && meetup.availableDates[0] 
+          ? meetup.availableDates[0] 
+          : 'Niet gepland'
+        
+        await sendMeetupCancellation(
+          meetup.inviteeEmail,
+          `Koffie meetup - ${meetup.cafe.name}`,
+          meetupDate,
+          'De organisator heeft deze meetup geannuleerd'
+        )
+      } catch (emailError) {
+        console.error('Error sending cancellation email:', emailError)
+        // Don't fail the deletion if email fails
+      }
+    }
+
     return NextResponse.json({
-      message: 'Meetup deleted successfully'
+      message: 'Meetup deleted successfully',
+      cancellationEmailSent: !!meetup.inviteeEmail
     })
   } catch (error) {
     console.error('Error deleting meetup:', error)

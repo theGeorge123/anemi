@@ -36,12 +36,6 @@ export function EnvironmentBanner() {
         description: 'Supabase anonymous key'
       },
       {
-        name: 'RESEND_API_KEY',
-        value: process.env.RESEND_API_KEY,
-        required: true,
-        description: 'Resend API key for email sending'
-      },
-      {
         name: 'EMAIL_FROM',
         value: process.env.EMAIL_FROM,
         required: false,
@@ -130,12 +124,6 @@ export function EnvironmentStatus() {
         value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         required: true,
         description: 'Supabase Key'
-      },
-      {
-        name: 'RESEND_API_KEY',
-        value: process.env.RESEND_API_KEY,
-        required: true,
-        description: 'Email API Key'
       }
     ]
 

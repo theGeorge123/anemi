@@ -5,7 +5,7 @@ import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { Toaster } from '@/components/ui/toaster'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { EnvironmentBanner, EnvironmentStatus } from '@/components/EnvironmentBanner'
+import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { validateStartup } from '@/lib/startup'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -88,7 +88,7 @@ export default function RootLayout({
             </LayoutWrapper>
             <Toaster />
           </SupabaseProvider>
-          <EnvironmentStatus />
+
         </ErrorBoundary>
       </body>
     </html>

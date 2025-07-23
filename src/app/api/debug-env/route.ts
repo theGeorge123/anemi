@@ -19,11 +19,7 @@ export async function GET(request: NextRequest) {
         set: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Not set'
       },
-      RESEND_API_KEY: {
-        set: !!process.env.RESEND_API_KEY,
-        value: process.env.RESEND_API_KEY ? 'Set' : 'Not set',
-        startsWithRe: process.env.RESEND_API_KEY?.startsWith('re_') || false
-      },
+
       EMAIL_FROM: {
         set: !!process.env.EMAIL_FROM,
         value: process.env.EMAIL_FROM || 'Not set'
@@ -39,7 +35,6 @@ export async function GET(request: NextRequest) {
 
     // Additional checks
     const checks = {
-      resendKeyFormat: process.env.RESEND_API_KEY?.startsWith('re_') || false,
       supabaseUrlFormat: process.env.NEXT_PUBLIC_SUPABASE_URL?.startsWith('https://') || false,
       supabaseKeyLength: (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0) > 50
     }

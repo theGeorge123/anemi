@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
 
     const other = {
       databaseUrl: process.env.DATABASE_URL ? '✅ Set' : '❌ Missing',
-      resendApiKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
       emailFrom: process.env.EMAIL_FROM ? '✅ Set' : '❌ Missing',
       googleMapsKey: process.env.GOOGLE_MAPS_API_KEY ? '✅ Set' : '❌ Missing',
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '❌ Missing',
@@ -30,7 +29,6 @@ export async function GET(request: NextRequest) {
     // Email verification specific checks
     const emailVerification = {
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '❌ Missing - Critical for email verification',
-      resendKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing - For custom SMTP',
       emailFrom: process.env.EMAIL_FROM || '❌ Missing - For custom sender',
       vercelUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '❌ Missing',
     }
@@ -63,7 +61,6 @@ export async function GET(request: NextRequest) {
       },
       recommendations: {
         siteUrl: !process.env.NEXT_PUBLIC_SITE_URL ? 'Set NEXT_PUBLIC_SITE_URL to your Vercel domain' : '✅ OK',
-        smtp: !process.env.RESEND_API_KEY ? 'Consider using Resend for better email delivery' : '✅ OK',
         redirectUrls: 'Make sure Supabase redirect URLs include your Vercel domain',
         emailTemplate: 'Check Supabase email template uses correct SiteURL variable'
       }

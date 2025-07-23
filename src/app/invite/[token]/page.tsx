@@ -211,15 +211,15 @@ export default function InvitePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2 sm:p-4">
+        <Card className="w-full max-w-md mx-2 sm:mx-4">
+          <CardContent className="p-4 sm:p-6">
             <div className="text-center">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">☕</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <span className="text-xl sm:text-2xl">☕</span>
               </div>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Even geduld, we laden je invite...</p>
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-amber-500 mx-auto mb-3 sm:mb-4"></div>
+              <p className="text-sm sm:text-base text-gray-600">Even geduld, we laden je invite...</p>
             </div>
           </CardContent>
         </Card>
@@ -229,20 +229,23 @@ export default function InvitePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2 sm:p-4">
+        <Card className="w-full max-w-md mx-2 sm:mx-4">
+          <CardContent className="p-4 sm:p-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl">😕</span>
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <span className="text-2xl sm:text-3xl">😕</span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Oeps! Invite niet gevonden</h2>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.location.href = '/'
-                }
-              }}>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Oeps! Invite niet gevonden</h2>
+              <p className="text-sm sm:text-base text-gray-600 mb-4">{error}</p>
+              <Button 
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/'
+                  }
+                }}
+                className="h-10 sm:h-auto"
+              >
                 Terug naar home
               </Button>
             </div>
@@ -257,74 +260,75 @@ export default function InvitePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2 sm:p-4">
       {/* Back to Home Button */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
         <Link href="/">
           <Button 
             variant="ghost" 
-            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs sm:text-sm"
           >
-            <Home className="w-4 h-4" />
-            ← Terug naar Home
+            <Home className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">← Terug naar Home</span>
+            <span className="sm:hidden">← Home</span>
           </Button>
         </Link>
       </div>
 
-      <Card className="w-full max-w-2xl">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">☕</span>
+      <Card className="w-full max-w-2xl mx-2 sm:mx-4">
+        <CardContent className="p-4 sm:p-6 lg:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <span className="text-3xl sm:text-4xl">☕</span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Je bent uitgenodigd voor een koffie! 🎉
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600">
               <strong>{invite.organizerName}</strong> heeft een meetup gepland en nodigt je uit
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Organizer Info */}
-            <div className="bg-amber-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">Uitnodiging van:</h3>
-              <p className="text-gray-700">{invite.organizerName}</p>
+            <div className="bg-amber-50 p-3 sm:p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">Uitnodiging van:</h3>
+              <p className="text-gray-700 text-sm sm:text-base">{invite.organizerName}</p>
             </div>
 
             {/* Cafe Details */}
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                     ☕ {invite.cafe.name}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-3">
+                  <p className="text-gray-600 text-xs sm:text-sm mb-3">
                     {invite.cafe.description || 'Een gezellige koffie shop met geweldige sfeer'}
                   </p>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-3">
                     <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
+                      <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
                       <span>{getRatingStars(invite.cafe.rating)} {invite.cafe.rating.toFixed(1)}</span>
                       <span className="text-gray-500">({invite.cafe.reviewCount} reviews)</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-lg">{getPriceEmoji(invite.cafe.priceRange)}</span>
+                      <span className="text-base sm:text-lg">{getPriceEmoji(invite.cafe.priceRange)}</span>
                       <span>{invite.cafe.priceRange}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span>{invite.cafe.address}</span>
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="break-words">{invite.cafe.address}</span>
                   </div>
                 </div>
               </div>
 
               {/* Cafe Features */}
               {invite.cafe.features.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1 sm:gap-2 mb-4">
                   {invite.cafe.features.map((feature) => (
                     <span
                       key={feature}
@@ -337,38 +341,40 @@ export default function InvitePage() {
               )}
 
               {/* Action Buttons for Cafe */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button
                   onClick={openInMaps}
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 h-8 sm:h-auto"
                 >
-                  <MapPin className="w-4 h-4" />
-                  Open in Maps
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Open in Maps</span>
+                  <span className="sm:hidden">Maps</span>
                 </Button>
                 
                 <Button
                   onClick={addToCalendar}
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 h-8 sm:h-auto"
                 >
-                  <Calendar className="w-4 h-4" />
-                  Toevoegen aan Kalender
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Toevoegen aan Kalender</span>
+                  <span className="sm:hidden">Kalender</span>
                 </Button>
               </div>
             </div>
 
             {/* Available Dates */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                 Beschikbare data:
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2">
                 {invite.availableDates.map((date) => (
-                  <div key={date} className="bg-gray-100 p-2 rounded text-sm text-center">
+                  <div key={date} className="bg-gray-100 p-2 rounded text-xs sm:text-sm text-center">
                     {new Date(date).toLocaleDateString('nl-NL', { 
                       weekday: 'short', 
                       month: 'short', 
@@ -381,13 +387,13 @@ export default function InvitePage() {
 
             {/* Available Times */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+              <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                 Beschikbare tijden:
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {invite.availableTimes.map((time) => (
-                  <span key={time} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                  <span key={time} className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
                     {time}
                   </span>
                 ))}
@@ -395,14 +401,14 @@ export default function InvitePage() {
             </div>
 
             {/* Your Info */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Users className="w-4 h-4" />
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="font-semibold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
+                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                 Jouw gegevens:
               </h3>
               
               <div>
-                <Label htmlFor="name">Naam</Label>
+                <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
                 <Input
                   id="name"
                   value={inviteeName}
@@ -413,7 +419,7 @@ export default function InvitePage() {
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -428,16 +434,16 @@ export default function InvitePage() {
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-red-600 text-sm">{error}</p>
+                <p className="text-red-600 text-xs sm:text-sm">{error}</p>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
               <Button
                 onClick={handleAccept}
                 disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white h-10 sm:h-auto"
               >
                 {accepting ? 'Accepteren...' : '✅ Ja, ik ga mee!'}
               </Button>
@@ -446,7 +452,7 @@ export default function InvitePage() {
                 variant="outline"
                 onClick={() => setShowDeclineModal(true)}
                 disabled={accepting || declining || !inviteeName.trim() || !inviteeEmail.trim()}
-                className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-10 sm:h-auto"
               >
                 {declining ? 'Afwijzen...' : '❌ Nee, helaas'}
               </Button>

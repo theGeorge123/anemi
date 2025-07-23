@@ -36,13 +36,7 @@ const requiredEnvVars: EnvironmentConfig[] = [
     description: 'Supabase anonymous key',
     validation: (value) => value.length > 50
   },
-  {
-    name: 'RESEND_API_KEY',
-    value: process.env.RESEND_API_KEY,
-    required: true,
-    description: 'Resend API key for email sending',
-    validation: (value) => value.startsWith('re_')
-  },
+
   {
     name: 'EMAIL_FROM',
     value: process.env.EMAIL_FROM,

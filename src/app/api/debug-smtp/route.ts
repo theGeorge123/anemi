@@ -8,7 +8,6 @@ export async function GET(request: NextRequest) {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing',
       supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL ? '✅ Set' : '❌ Missing',
-      resendApiKey: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
       emailFrom: process.env.EMAIL_FROM ? '✅ Set' : '❌ Missing',
     }
 
@@ -43,7 +42,6 @@ export async function GET(request: NextRequest) {
         emailSent: !error || !error.message.includes('email'),
       },
       recommendations: {
-        smtpSetup: !process.env.RESEND_API_KEY ? 'Set up Resend SMTP in Supabase' : '✅ SMTP configured',
         emailTemplate: 'Check Supabase email template settings',
         siteUrl: !process.env.NEXT_PUBLIC_SITE_URL ? 'Set NEXT_PUBLIC_SITE_URL' : '✅ Site URL set',
       }

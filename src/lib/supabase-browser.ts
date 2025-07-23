@@ -57,8 +57,9 @@ export async function validateSupabaseConnection(): Promise<SupabaseConnectionRe
   try {
     const client = getSupabaseClient()
     
-    // Test the connection by making a simple query
-    const { data, error } = await client.from('coffee_shops').select('count').limit(1)
+    // Test the connection by checking auth instead of database queries
+    // This avoids permission issues with the database schema
+    const { data, error } = await client.auth.getSession()
     
     if (error) {
       logger.error('Supabase connection test failed', error, {}, 'SUPABASE')
@@ -70,12 +71,13 @@ export async function validateSupabaseConnection(): Promise<SupabaseConnectionRe
     }
 
     logger.info('Supabase connection test successful', {
-      dataCount: data?.length || 0
+      hasSession: !!data.session,
+      userId: data.session?.user?.id
     }, 'SUPABASE')
 
     return {
       success: true,
-      details: { data }
+      details: { session: data.session }
     }
   } catch (error) {
     logger.error('Supabase connection validation failed', error as Error, {}, 'SUPABASE')

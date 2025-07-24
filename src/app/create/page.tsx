@@ -1,7 +1,17 @@
-import dynamic from 'next/dynamic'
+import { redirect } from 'next/navigation'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import CreateClientPage from './client-page'
 
-const CreateClientPage = dynamic(() => import('./client-page'), { ssr: false })
-
-export default function CreatePage() {
+export default async function CreatePage() {
+  const cookieStore = await cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (!session) {
+    redirect('/auth/signin')
+  }
+  
   return <CreateClientPage />
 } 

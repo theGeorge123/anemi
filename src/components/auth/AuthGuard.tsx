@@ -1,29 +1,37 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { useSupabase } from '@/components/SupabaseProvider';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { session, loading } = useSupabase();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) {
-        router.push('/auth/signin');
-        return;
-      }
-      const { data } = await supabase.auth.getSession();
-      setIsAuthenticated(!!data.session);
+    if (!loading) {
+      setIsAuthenticated(!!session);
       setIsLoading(false);
-      if (!data.session) {
+      if (!session) {
         router.push('/auth/signin');
       }
-    };
-    checkAuth();
-  }, [router]);
+    }
+  }, [session, loading, router]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!isAuthenticated) return null;
+  if (loading || isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-background to-orange-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden... ☕</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect to signin
+  }
+
   return <>{children}</>;
 } 

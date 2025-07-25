@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { Session, User } from '@supabase/supabase-js'
 import { getSupabaseClient } from '@/lib/supabase-browser'
-import { logger } from '@/lib/logger'
 
 interface SupabaseContextType {
   supabase: ReturnType<typeof getSupabaseClient>
@@ -24,26 +23,26 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     let subscription: any = null
     
     try {
-      logger.info('Initializing Supabase provider', {}, 'SUPABASE')
-      
+      // Initialize client immediately
       const client = getSupabaseClient()
       setSupabase(client)
-      
-      logger.info('Supabase client set in provider', {}, 'SUPABASE')
 
-      // Get initial session
+      // Get initial session with timeout
       const getInitialSession = async () => {
         try {
-          const { data: { session: initialSession } } = await client.auth.getSession()
+          const result = await Promise.race([
+            client.auth.getSession(),
+            new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('Session timeout')), 2000)
+            )
+          ])
+          
+          const { data: { session: initialSession } } = result
           setSession(initialSession)
           setUser(initialSession?.user ?? null)
-          
-          logger.info('Initial session retrieved', { 
-            hasSession: !!initialSession,
-            userId: initialSession?.user?.id 
-          }, 'SUPABASE')
         } catch (error) {
-          logger.error('Error getting initial session', error as Error, {}, 'SUPABASE')
+          // If session check fails, continue without session
+          console.warn('Session check failed, continuing without session')
         } finally {
           setLoading(false)
         }
@@ -54,12 +53,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       // Listen for auth changes
       const { data: { subscription: authSubscription } } = client.auth.onAuthStateChange(
         async (event, session) => {
-          logger.info('Auth state changed', { 
-            event, 
-            hasSession: !!session,
-            userId: session?.user?.id 
-          }, 'SUPABASE')
-          
           setSession(session)
           setUser(session?.user ?? null)
           setLoading(false)
@@ -68,7 +61,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
       subscription = authSubscription
     } catch (error) {
-      logger.error('Error initializing Supabase provider', error as Error, {}, 'SUPABASE')
+      console.error('Error initializing Supabase provider:', error)
       setLoading(false)
     }
 

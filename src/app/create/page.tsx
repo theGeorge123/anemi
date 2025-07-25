@@ -1,17 +1,38 @@
-import { redirect } from 'next/navigation'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+"use client"
+
+import { useSupabase } from '@/components/SupabaseProvider'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import CreateClientPage from './client-page'
 
-export default async function CreatePage() {
-  const cookieStore = await cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-  
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  if (!session) {
-    redirect('/auth/signin')
+export default function CreatePage() {
+  const { session, loading } = useSupabase()
+  const router = useRouter()
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    if (!loading) {
+      if (!session) {
+        // Redirect to signin with current page as redirect parameter
+        router.push('/auth/signin?redirect=' + encodeURIComponent('/create'))
+      } else {
+        setIsChecking(false)
+      }
+    }
+  }, [session, loading, router])
+
+  // Show loading while checking authentication
+  if (loading || isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Even geduld...</p>
+        </div>
+      </div>
+    )
   }
-  
+
+  // If logged in, show create page
   return <CreateClientPage />
 } 

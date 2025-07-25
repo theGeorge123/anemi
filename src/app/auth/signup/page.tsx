@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { PasswordStrength } from '@/components/ui/password-strength'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAsyncOperation } from '@/lib/use-async-operation'
 import { ErrorService } from '@/lib/error-service'
 import { useFormValidation } from '@/lib/use-form-validation'
 import { Validators } from '@/lib/validators'
-import { Home } from 'lucide-react'
+import { Home, Coffee } from 'lucide-react'
 
 function SignUpPageContent() {
   const { supabase } = useSupabase()
@@ -20,6 +21,7 @@ function SignUpPageContent() {
   const searchParams = useSearchParams()
   const redirectUrl = searchParams.get('redirect')
   const [specificError, setSpecificError] = useState<string | null>(null)
+  const [generatedNickname, setGeneratedNickname] = useState<string | null>(null)
 
   const form = useFormValidation({
     email: '',
@@ -72,35 +74,69 @@ function SignUpPageContent() {
 
     if (!createUserResponse.ok) {
       const errorData = await createUserResponse.json()
-      const errorMessage = errorData.error || 'Failed to create account'
-      setSpecificError(`❌ ${errorMessage}`)
+      let errorMessage = errorData.error || 'Failed to create account'
+      
+      // Provide more specific and friendly error messages
+      if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
+        errorMessage = '📧 Dit email adres is al geregistreerd. Probeer in te loggen of gebruik een ander email adres.'
+      } else if (errorMessage.includes('Invalid email')) {
+        errorMessage = '📧 Voer een geldig email adres in.'
+      } else if (errorMessage.includes('password')) {
+        errorMessage = '🔒 Wachtwoord moet minimaal 8 karakters lang zijn.'
+      } else if (errorMessage.includes('SMTP') || errorMessage.includes('email configuration')) {
+        errorMessage = '📧 Account aangemaakt! Email verificatie is overgeslagen vanwege technische problemen. Je kunt nu direct inloggen.'
+        // This is actually a success case, not an error
+        const responseData = await createUserResponse.json()
+        if (responseData.nickname) {
+          setGeneratedNickname(responseData.nickname)
+        }
+        return responseData
+      } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
+        errorMessage = '🌐 Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
+      } else if (errorMessage.includes('rate limit') || errorMessage.includes('too many')) {
+        errorMessage = '⏰ Te veel pogingen. Wacht even en probeer opnieuw.'
+      } else {
+        errorMessage = `😅 ${errorMessage}`
+      }
+      
+      setSpecificError(errorMessage)
       throw new Error(errorMessage)
     }
 
+    const responseData = await createUserResponse.json()
     console.log('User created successfully')
+    
+    // Store the generated nickname
+    if (responseData.nickname) {
+      setGeneratedNickname(responseData.nickname)
+    }
     
     // The verification email is now sent automatically by the create-user API
     // No need to call a separate verify-email endpoint
     
     // The user profile will be created automatically by the SQL trigger
     // No need to call the API endpoint manually
+
+    return responseData
   }, {
     onSuccess: (data: any) => {
       // Check if email was skipped due to SMTP issues
       if (data?.emailSkipped) {
-        ErrorService.showToast('🎉 Account created! Email verification was skipped due to SMTP issues. You can now sign in directly.', 'success')
+        ErrorService.showToast(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`, 'success')
         // Redirect to signin with the original redirect URL
         const signinUrl = redirectUrl 
           ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
           : '/auth/signin?message=account_created'
         router.push(signinUrl)
       } else {
-        ErrorService.showToast('🎉 Account created! Please check your email to verify your account before signing in.', 'success')
         // Store redirect URL in sessionStorage for after verification
         if (redirectUrl) {
           sessionStorage.setItem('signup_redirect', redirectUrl)
         }
-        router.push('/auth/verify?email=' + encodeURIComponent(form.values.email))
+        
+        // Always redirect to verify page with email parameter
+        const verifyUrl = `/auth/verify?email=${encodeURIComponent(form.values.email)}`
+        router.push(verifyUrl)
       }
     },
     onError: (err) => {
@@ -117,6 +153,51 @@ function SignUpPageContent() {
     form.handleSubmit((values) => {
       signUpAsync()
     })(e)
+  }
+
+  // Show success state with nickname
+  if (generatedNickname) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coffee className="w-8 h-8 text-white" />
+            </div>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Welkom! 🎉</CardTitle>
+            <CardDescription className="text-base text-gray-500">
+              Je account is succesvol aangemaakt
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+              <p className="text-green-800 font-medium mb-2">Je bijnaam:</p>
+              <p className="text-green-600 text-lg font-bold">{generatedNickname}</p>
+              <p className="text-green-600 text-sm mt-2">
+                Je kunt deze later aanpassen in je profiel
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <Button 
+                onClick={() => router.push('/auth/signin')}
+                className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
+              >
+                Inloggen
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => router.push('/')}
+                className="w-full"
+              >
+                Terug naar Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   // Show error if Supabase client is not available
@@ -198,6 +279,9 @@ function SignUpPageContent() {
                 minLength={8}
               />
               {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
+              
+              {/* Password Strength Indicator */}
+              <PasswordStrength password={form.values.password} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>

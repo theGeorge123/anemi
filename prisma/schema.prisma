@@ -44,6 +44,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  nickname      String?   // Random nickname for users
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

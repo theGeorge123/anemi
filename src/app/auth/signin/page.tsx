@@ -26,7 +26,9 @@ function SignInPageContent() {
   // Show success message if user just verified their email
   useEffect(() => {
     if (message === 'verified') {
-      setSuccessMessage('🎉 Email verified successfully! You can now sign in to start your coffee adventure.')
+      setSuccessMessage('🎉 Email succesvol geverifieerd! Je kunt nu inloggen om je koffie avontuur te beginnen.')
+    } else if (message === 'account_created') {
+      setSuccessMessage('🎉 Account succesvol aangemaakt! Je kunt nu inloggen met je nieuwe account.')
     }
   }, [message])
 
@@ -39,34 +41,50 @@ function SignInPageContent() {
   })
 
   const getSpecificErrorMessage = (error: any) => {
-    if (!error) return 'Something went wrong'
+    if (!error) return 'Er ging iets mis'
     
     const message = error.message || ''
     const status = error.status || 0
     
-    // Check for specific error types
+    // Check for specific error types with friendly Dutch messages
     if (message.includes('Invalid login credentials') || status === 400) {
-      return '❌ Wrong email or password. Please check your credentials and try again.'
+      return '❌ Verkeerde email of wachtwoord. Controleer je gegevens en probeer opnieuw.'
     }
     
     if (message.includes('Email not confirmed') || status === 422) {
-      return '📧 Please check your email and click the verification link before signing in.'
+      return '📧 Controleer je email en klik op de verificatie link voordat je inlogt.'
     }
     
     if (message.includes('Too many requests') || status === 429) {
-      return '⏰ Too many login attempts. Please wait a few minutes and try again.'
+      return '⏰ Te veel inlog pogingen. Wacht even en probeer opnieuw.'
     }
     
     if (message.includes('User not found')) {
-      return '👤 Account not found. Please check your email or create a new account.'
+      return '👤 Account niet gevonden. Controleer je email of maak een nieuw account aan.'
     }
     
     if (message.includes('No API key found')) {
-      return '🔧 Technical issue. Please try again or contact support.'
+      return '🔧 Technisch probleem. Probeer opnieuw of neem contact op met support.'
+    }
+    
+    if (message.includes('Invalid email')) {
+      return '📧 Voer een geldig email adres in.'
+    }
+    
+    if (message.includes('network') || message.includes('connection')) {
+      return '🌐 Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
+    }
+    
+    if (message.includes('rate limit')) {
+      return '⏰ Te veel pogingen. Wacht even en probeer opnieuw.'
+    }
+    
+    if (message.includes('password')) {
+      return '🔒 Wachtwoord moet minimaal 8 karakters lang zijn.'
     }
     
     // Default error message
-    return `😅 ${message || 'Something went wrong. Please try again.'}`
+    return `😅 ${message || 'Er ging iets mis. Probeer opnieuw.'}`
   }
 
   const {
@@ -90,10 +108,17 @@ function SignInPageContent() {
     }
   }, {
     onSuccess: () => {
-      ErrorService.showToast('☕ Welcome back! Signing you in...', 'success')
-      // Redirect to the original URL if provided, otherwise to dashboard
-      const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard'
-      router.push(targetUrl)
+      ErrorService.showToast('☕ Welkom terug! Inloggen...', 'success')
+      
+      // Handle redirect after successful login
+      if (redirectUrl) {
+        // Decode the redirect URL and navigate to it
+        const decodedRedirect = decodeURIComponent(redirectUrl)
+        router.push(decodedRedirect)
+      } else {
+        // Default redirect to dashboard
+        router.push('/dashboard')
+      }
     },
     onError: (err) => {
       // Error is already handled with specific message above
@@ -194,7 +219,7 @@ function SignInPageContent() {
             
             <div className="mt-4 text-center text-xs text-gray-400">
               <Link href="/auth/verify" className="text-amber-600 hover:underline">
-                Need to verify your email?
+                Email nog niet geverifieerd?
               </Link>
             </div>
           </CardContent>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster, ToasterProvider } from '@/components/ui/toaster'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
@@ -82,13 +82,14 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <EnvironmentBanner />
-          <SupabaseProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
-            <Toaster />
-          </SupabaseProvider>
-
+          <ToasterProvider>
+            <SupabaseProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+              <Toaster />
+            </SupabaseProvider>
+          </ToasterProvider>
         </ErrorBoundary>
       </body>
     </html>

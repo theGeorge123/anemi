@@ -99,13 +99,14 @@ export async function sendEmail(options: EmailOptions) {
     });
 
     if (error) {
-      console.error('Email send error:', error);
+      console.error('Error sending email:', error);
       throw error;
     }
 
-    return { success: true, data };
+    console.log('Email sent successfully:', data);
+    return data;
   } catch (error) {
-    console.error('Email service error:', error);
+    console.error('Failed to send email:', error);
     throw error;
   }
 }
@@ -122,7 +123,7 @@ export async function sendMeetupConfirmation(emailData: MeetupConfirmationEmail)
   
   const calendarData = {
     eventTitle: emailData.meetupTitle,
-    eventDescription: `Coffee meetup at ${emailData.cafeName} with ${emailData.otherParticipantName}`,
+    eventDescription: `Koffie meetup bij ${emailData.cafeName} met ${emailData.otherParticipantName}`,
     eventLocation: `${emailData.cafeName}, ${emailData.cafeAddress}`,
     eventStartTime: eventStartTime.toISOString(),
     eventEndTime: eventEndTime.toISOString(),
@@ -132,26 +133,26 @@ export async function sendMeetupConfirmation(emailData: MeetupConfirmationEmail)
   const html = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Confirmed!</h1>
-        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Your coffee adventure is officially scheduled</p>
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Bevestigd!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je koffie avontuur is officieel gepland</p>
       </div>
       
       <div style="padding: 40px 20px; background-color: #ffffff;">
-        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hey ${emailData.participantName}! 👋</h2>
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé ${emailData.participantName}! 👋</h2>
         
         <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-          Great news! Your coffee meetup with <strong>${emailData.otherParticipantName}</strong> has been confirmed. 
-          Here are all the details you need:
+          Geweldig nieuws! Je koffie meetup met <strong>${emailData.otherParticipantName}</strong> is bevestigd. 
+          Hier zijn alle details die je nodig hebt:
         </p>
         
         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
           <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📅 Meetup Details</h3>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Event:</strong> ${emailData.meetupTitle}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Date:</strong> ${emailData.meetupDate}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Time:</strong> ${emailData.meetupTime}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Cafe:</strong> ${emailData.cafeName}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Address:</strong> ${emailData.cafeAddress}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Meeting:</strong> ${emailData.otherParticipantName} (${emailData.otherParticipantEmail})</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Evenement:</strong> ${emailData.meetupTitle}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Datum:</strong> ${emailData.meetupDate}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Tijd:</strong> ${emailData.meetupTime}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Café:</strong> ${emailData.cafeName}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Adres:</strong> ${emailData.cafeAddress}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Ontmoeting met:</strong> ${emailData.otherParticipantName} (${emailData.otherParticipantEmail})</p>
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
@@ -159,18 +160,19 @@ export async function sendMeetupConfirmation(emailData: MeetupConfirmationEmail)
              style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
                     text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
                     box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;"
-             download="coffee-meetup.ics">
-            📅 Add to Calendar
+             download="koffie-meetup.ics">
+            📅 Toevoegen aan Agenda
           </a>
         </div>
         
         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
-          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Pro Tips:</h3>
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Tips voor een Geweldige Meetup:</h3>
           <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>Arrive a few minutes early to find a good spot</li>
-            <li>Bring cash in case the cafe doesn't accept cards</li>
-            <li>Don't forget to exchange contact info if you haven't already</li>
-            <li>Share photos of your meetup with the community!</li>
+            <li>Kom een paar minuten eerder om een goede plek te vinden</li>
+            <li>Neem contant geld mee voor het geval het café geen kaarten accepteert</li>
+            <li>Vergeet niet contactgegevens uit te wisselen als je dat nog niet hebt gedaan</li>
+            <li>Deel foto's van je meetup met de community!</li>
+            <li>Ontdek samen nieuwe lokale spots in je stad</li>
           </ul>
         </div>
         
@@ -178,20 +180,20 @@ export async function sendMeetupConfirmation(emailData: MeetupConfirmationEmail)
           <a href="${siteUrl}/dashboard" 
              style="background-color: #10b981; color: white; padding: 12px 24px; 
                     text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-            📱 View in App
+            📱 Bekijk in App
           </a>
         </div>
       </div>
       
       <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
         <p style="color: #6b7280; font-size: 14px; margin: 0;">
-          Have a great coffee meetup! ☕<br>
-          <strong>The Anemi Meets Team</strong>
+          Veel plezier bij je koffie meetup! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
         </p>
         <div style="margin-top: 15px;">
           <a href="${siteUrl}" 
              style="color: #f59e0b; text-decoration: none; font-size: 14px;">
-            Visit Anemi Meets
+            Bezoek Anemi Meets
           </a>
         </div>
       </div>
@@ -200,7 +202,7 @@ export async function sendMeetupConfirmation(emailData: MeetupConfirmationEmail)
 
   return sendEmail({
     to: emailData.to,
-    subject: `☕ Confirmed: ${emailData.meetupTitle} - ${emailData.meetupDate} at ${emailData.meetupTime}`,
+    subject: `☕ Bevestigd: ${emailData.meetupTitle} - ${emailData.meetupDate} om ${emailData.meetupTime}`,
     html,
   });
 }
@@ -214,37 +216,37 @@ export async function sendMeetupConfirmationEmail(data: MeetupConfirmationEmailD
   const html = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Accepted!</h1>
-        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Your coffee meetup is now confirmed</p>
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Bevestigd!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je koffie meetup is nu bevestigd</p>
       </div>
       
       <div style="padding: 40px 20px; background-color: #ffffff;">
-        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Great news! 🎉</h2>
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Geweldig nieuws! 🎉</h2>
         
         <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-          Your coffee meetup has been accepted! Now it's time to coordinate the details.
+          Je koffie meetup is geaccepteerd! Nu is het tijd om de details te coördineren.
         </p>
         
         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
           <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Meetup Details</h3>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Organizer:</strong> ${data.organizerName}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Invitee:</strong> ${data.inviteeName}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Cafe:</strong> ${data.cafe.name}</p>
-          <p style="margin: 8px 0; color: #92400e;"><strong>Address:</strong> ${data.cafe.address}</p>
-          ${data.cafe.description ? `<p style="margin: 8px 0; color: #92400e;"><strong>Description:</strong> ${data.cafe.description}</p>` : ''}
+          <p style="margin: 8px 0; color: #92400e;"><strong>Organisator:</strong> ${data.organizerName}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Uitgenodigde:</strong> ${data.inviteeName}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Café:</strong> ${data.cafe.name}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>Adres:</strong> ${data.cafe.address}</p>
+          ${data.cafe.description ? `<p style="margin: 8px 0; color: #92400e;"><strong>Beschrijving:</strong> ${data.cafe.description}</p>` : ''}
         </div>
         
         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
           <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">📅 Meetup Details</h3>
           ${data.chosenDate && data.chosenTime ? `
             <div style="background-color: #dcfce7; padding: 15px; border-radius: 6px; margin: 10px 0; border-left: 4px solid #16a34a;">
-              <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px;">✅ Confirmed Date & Time</h4>
-              <p style="color: #166534; margin: 5px 0;"><strong>Date:</strong> ${new Date(data.chosenDate).toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p style="color: #166534; margin: 5px 0;"><strong>Time:</strong> ${data.chosenTime}</p>
+              <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px;">✅ Bevestigde Datum & Tijd</h4>
+              <p style="color: #166534; margin: 5px 0;"><strong>Datum:</strong> ${new Date(data.chosenDate).toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p style="color: #166534; margin: 5px 0;"><strong>Tijd:</strong> ${data.chosenTime}</p>
             </div>
           ` : `
-            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Available Dates:</strong> ${data.availableDates.map(date => new Date(date).toLocaleDateString('nl-NL')).join(', ')}</p>
-            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Available Times:</strong> ${data.availableTimes.join(', ')}</p>
+            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Beschikbare Datums:</strong> ${data.availableDates.map(date => new Date(date).toLocaleDateString('nl-NL')).join(', ')}</p>
+            <p style="color: #0c4a6e; margin: 8px 0;"><strong>Beschikbare Tijden:</strong> ${data.availableTimes.join(', ')}</p>
           `}
         </div>
         
@@ -253,20 +255,20 @@ export async function sendMeetupConfirmationEmail(data: MeetupConfirmationEmailD
              style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
                     text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
                     box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
-            📱 View in App
+            📱 Bekijk in App
           </a>
         </div>
       </div>
       
       <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
         <p style="color: #6b7280; font-size: 14px; margin: 0;">
-          Have a great coffee meetup! ☕<br>
-          <strong>The Anemi Meets Team</strong>
+          Veel plezier bij je koffie meetup! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
         </p>
         <div style="margin-top: 15px;">
           <a href="${siteUrl}" 
              style="color: #f59e0b; text-decoration: none; font-size: 14px;">
-            Visit Anemi Meets
+            Bezoek Anemi Meets
           </a>
         </div>
       </div>
@@ -276,14 +278,14 @@ export async function sendMeetupConfirmationEmail(data: MeetupConfirmationEmailD
   // Send email to organizer
   await sendEmail({
     to: data.organizerEmail,
-    subject: `☕ Meetup Accepted: ${data.inviteeName} has joined your coffee meetup!`,
+    subject: `☕ Meetup Bevestigd: ${data.inviteeName} heeft zich aangesloten bij je koffie meetup!`,
     html,
   });
 
   // Send email to invitee
   await sendEmail({
     to: data.inviteeEmail,
-    subject: `☕ Meetup Accepted: You've joined ${data.organizerName}'s coffee meetup!`,
+    subject: `☕ Meetup Bevestigd: Je hebt zich aangesloten bij ${data.organizerName}'s koffie meetup!`,
     html,
   });
 }
@@ -297,26 +299,26 @@ export async function sendWelcomeEmailAfterVerification(emailData: WelcomeEmail)
   const html = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🎉 Welcome to Anemi Meets!</h1>
-        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Your coffee adventure is officially underway</p>
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🎉 Welkom bij Anemi Meets!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je koffie avontuur is officieel gestart</p>
       </div>
       
       <div style="padding: 40px 20px; background-color: #ffffff;">
-        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hey ${emailData.userName}! 👋</h2>
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé ${emailData.userName}! 👋</h2>
         
         <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-          Congratulations! Your email has been verified and you're now part of the Anemi Meets community. 
-          Get ready to discover amazing coffee shops and connect with fellow coffee enthusiasts!
+          Gefeliciteerd! Je e-mail is geverifieerd en je bent nu een onderdeel van de Anemi Meets community. 
+          Klaar om wondervolle koffiewinkels te ontdekken en samen te verbinden met andere koffie liefhebbers!
         </p>
         
         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
-          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🚀 What you can do now:</h3>
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🚀 Wat je nu kunt doen:</h3>
           <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>Explore local coffee shops with ratings and reviews ☕</li>
-            <li>Join meetups or create your own coffee adventures 👥</li>
-            <li>Connect with coffee lovers in your area 💫</li>
-            <li>Get personalized coffee recommendations 🗺️</li>
-            <li>Share your coffee discoveries with the community 📸</li>
+            <li>Ontdek lokale koffiewinkels met beoordelingen en reviews ☕</li>
+            <li>Deel meetups of maak je eigen koffie avonturen 👥</li>
+            <li>Verbonden met koffie liefhebbers in je buurt 💫</li>
+            <li>Ontvang persoonlijke koffie aanbevelingen 🗺️</li>
+            <li>Deel je koffie ontdekkingen met de community 📸</li>
           </ul>
         </div>
         
@@ -325,30 +327,30 @@ export async function sendWelcomeEmailAfterVerification(emailData: WelcomeEmail)
              style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
                     text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
                     box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
-            🗺️ Start Exploring
+            🗺️ Start Explorando
           </a>
         </div>
         
         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
-          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Pro Tips:</h3>
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Tips voor een Geweldige Avontuur:</h3>
           <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>Complete your profile to get better recommendations</li>
-            <li>Follow coffee shops you love to stay updated</li>
-            <li>Join our community discussions about coffee</li>
-            <li>Share your favorite coffee spots with friends</li>
+            <li>Voltooi je profiel om betere aanbevelingen te krijgen</li>
+            <li>Volg koffiewinkels die je leuk vindt om op de hoogte te blijven</li>
+            <li>Doe mee aan onze community discussies over koffie</li>
+            <li>Deel je favoriete koffie spots met vrienden</li>
           </ul>
         </div>
       </div>
       
       <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
         <p style="color: #6b7280; font-size: 14px; margin: 0;">
-          Ready to start your coffee journey?<br>
-          <strong>The Anemi Meets Team</strong>
+          Klaar om je koffie avontuur te starten?<br>
+          <strong>Het Anemi Meets Team</strong>
         </p>
         <div style="margin-top: 15px;">
           <a href="${siteUrl}" 
              style="color: #f59e0b; text-decoration: none; font-size: 14px;">
-            Visit Anemi Meets
+            Bezoek Anemi Meets
           </a>
         </div>
       </div>
@@ -357,7 +359,7 @@ export async function sendWelcomeEmailAfterVerification(emailData: WelcomeEmail)
 
   return sendEmail({
     to: emailData.to,
-    subject: '🎉 Welcome to Anemi Meets! Your coffee adventure begins now',
+    subject: '🎉 Welkom bij Anemi Meets! Je koffie avontuur begint nu',
     html,
   });
 }
@@ -368,33 +370,33 @@ export async function sendWelcomeEmailAfterVerification(emailData: WelcomeEmail)
 export async function sendMeetupInvitation(emailData: MeetupInvitationEmail) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ You're invited to a coffee meetup!</h2>
+      <h2 style="color: #f59e0b;">☕ Je bent uitgenodigd voor een koffie meetup!</h2>
       
       <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0;">${emailData.meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${emailData.meetupDate}</p>
-        <p style="margin: 5px 0;"><strong>📍 Location:</strong> ${emailData.meetupLocation}</p>
-        <p style="margin: 5px 0;"><strong>👤 Organizer:</strong> ${emailData.organizerName}</p>
+        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${emailData.meetupDate}</p>
+        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${emailData.meetupLocation}</p>
+        <p style="margin: 5px 0;"><strong>👤 Organisator:</strong> ${emailData.organizerName}</p>
       </div>
       
       <div style="text-align: center; margin: 30px 0;">
         <a href="${emailData.invitationLink}" 
            style="background-color: #f59e0b; color: white; padding: 12px 24px; 
                   text-decoration: none; border-radius: 6px; display: inline-block;">
-          Join Meetup
+          Deel Meetup
         </a>
       </div>
       
       <p style="color: #6b7280; font-size: 14px;">
-        This invitation was sent from Anemi Meets. 
-        Connect with coffee lovers in your community!
+        Deze uitnodiging werd verzonden vanuit Anemi Meets. 
+        Verbind je met koffie liefhebbers in je gemeenschap!
       </p>
     </div>
   `;
 
   return sendEmail({
     to: emailData.to,
-    subject: `☕ You're invited: ${emailData.meetupTitle}`,
+    subject: `☕ Je bent uitgenodigd: ${emailData.meetupTitle}`,
     html,
   });
 }
@@ -405,20 +407,20 @@ export async function sendMeetupInvitation(emailData: MeetupInvitationEmail) {
 export async function sendWelcomeEmail(emailData: WelcomeEmail) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Welcome to Anemi Meets!</h2>
+      <h2 style="color: #f59e0b;">☕ Welkom bij Anemi Meets!</h2>
       
-      <p>Hi ${emailData.userName},</p>
+      <p>Hé ${emailData.userName},</p>
       
-      <p>Welcome to Anemi Meets! We're excited to help you discover amazing coffee shops 
-      and connect with like-minded people in your community.</p>
+      <p>Welkom bij Anemi Meets! We zijn enthousiast om je te helpen wondervolle koffiewinkels 
+      en mensen met dezelfde interesses in je buurt te verbinden.</p>
       
       <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 15px 0;">What you can do:</h3>
+        <h3 style="margin: 0 0 15px 0;">Wat je kunt doen:</h3>
         <ul style="margin: 0; padding-left: 20px;">
-          <li>Discover local coffee shops with ratings and reviews</li>
-          <li>Join meetups or create your own</li>
-          <li>Connect with coffee enthusiasts in your area</li>
-          <li>Get personalized coffee recommendations</li>
+          <li>Ontdek lokale koffiewinkels met beoordelingen en reviews</li>
+          <li>Deel meetups of maak je eigen</li>
+          <li>Verbonden met koffie liefhebbers in je buurt</li>
+          <li>Ontvang persoonlijke koffie aanbevelingen</li>
         </ul>
       </div>
       
@@ -426,20 +428,20 @@ export async function sendWelcomeEmail(emailData: WelcomeEmail) {
         <a href="${process.env.NEXT_PUBLIC_SUPABASE_URL}/explore" 
            style="background-color: #f59e0b; color: white; padding: 12px 24px; 
                   text-decoration: none; border-radius: 6px; display: inline-block;">
-          Start Exploring
+          Start Explorando
         </a>
       </div>
       
       <p style="color: #6b7280; font-size: 14px;">
-        Happy coffee adventures!<br>
-        The Anemi Meets Team
+        Veel plezier bij je koffie avonturen!<br>
+        Het Anemi Meets Team
       </p>
     </div>
   `;
 
   return sendEmail({
     to: emailData.to,
-    subject: '☕ Welcome to Anemi Meets!',
+    subject: '☕ Welkom bij Anemi Meets!',
     html,
   });
 }
@@ -455,25 +457,25 @@ export async function sendMeetupReminder(
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Meetup Reminder</h2>
+      <h2 style="color: #f59e0b;">☕ Meetup Herinnering</h2>
       
       <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0;">${meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${meetupDate}</p>
-        <p style="margin: 5px 0;"><strong>📍 Location:</strong> ${meetupLocation}</p>
+        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${meetupDate}</p>
+        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${meetupLocation}</p>
       </div>
       
-      <p>Don't forget about your upcoming coffee meetup! We're looking forward to seeing you there.</p>
+      <p>Vergeet je koffie meetup niet! We kijken ernaar uit om je daar te zien.</p>
       
       <p style="color: #6b7280; font-size: 14px;">
-        This reminder was sent from Anemi Meets.
+        Deze herinnering werd verzonden vanuit Anemi Meets.
       </p>
     </div>
   `;
 
   return sendEmail({
     to,
-    subject: `☕ Reminder: ${meetupTitle}`,
+    subject: `☕ Herinnering: ${meetupTitle}`,
     html,
   });
 }
@@ -491,18 +493,18 @@ export async function sendMeetupCancellation(
   
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #ef4444;">☕ Meetup Cancelled</h2>
+      <h2 style="color: #ef4444;">☕ Meetup Geannuleerd</h2>
       
       <div style="background-color: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0;">${meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${meetupDate}</p>
-        ${reason ? `<p style="margin: 5px 0;"><strong>Reason:</strong> ${reason}</p>` : ''}
+        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${meetupDate}</p>
+        ${reason ? `<p style="margin: 5px 0;"><strong>Reden:</strong> ${reason}</p>` : ''}
       </div>
       
-      <p>Unfortunately, this meetup has been cancelled. We'll notify you of any rescheduled events.</p>
+      <p>Helaas, deze meetup is geannuleerd. We zullen je op de hoogte brengen van eventuele herschoven evenementen.</p>
       
       <p style="color: #6b7280; font-size: 14px;">
-        This notification was sent from Anemi Meets.
+        Deze melding werd verzonden vanuit Anemi Meets.
       </p>
     </div>
   `;
@@ -510,7 +512,7 @@ export async function sendMeetupCancellation(
   try {
     const result = await sendEmail({
       to,
-      subject: `☕ Cancelled: ${meetupTitle}`,
+      subject: `☕ Geannuleerd: ${meetupTitle}`,
       html,
     })
     
@@ -538,35 +540,35 @@ function generateInviteEmailHTML(data: InviteEmailData): string {
 
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Coffee Meetup Invite</h2>
+      <h2 style="color: #f59e0b;">☕ Koffie Meetup Uitnodiging</h2>
       
-      <p>Hi there!</p>
+      <p>Hé!</p>
       
-      <p>You've been invited to join a coffee meetup at <strong>${data.cafe.name}</strong>!</p>
+      <p>Je bent uitgenodigd om deel te nemen aan een koffie meetup bij <strong>${data.cafe.name}</strong>!</p>
       
       <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0;">Meetup Details</h3>
-        <p style="margin: 5px 0;"><strong>📍 Cafe:</strong> ${data.cafe.name}</p>
-        <p style="margin: 5px 0;"><strong>🏠 Address:</strong> ${data.cafe.address}</p>
-        <p style="margin: 5px 0;"><strong>💰 Price Range:</strong> ${data.cafe.priceRange}</p>
-        <p style="margin: 5px 0;"><strong>⭐ Rating:</strong> ${data.cafe.rating}/5</p>
-        <p style="margin: 5px 0;"><strong>🕒 Hours:</strong> ${data.cafe.openHours}</p>
-        <p style="margin: 5px 0;"><strong>📅 Dates:</strong> ${datesList}</p>
-        ${data.times ? `<p style="margin: 5px 0;"><strong>⏰ Times:</strong> ${data.times.join(', ')}</p>` : ''}
-        <p style="margin: 5px 0;"><strong>👤 Organizer:</strong> ${data.organizerName}</p>
+        <p style="margin: 5px 0;"><strong>📍 Café:</strong> ${data.cafe.name}</p>
+        <p style="margin: 5px 0;"><strong>🏠 Adres:</strong> ${data.cafe.address}</p>
+        <p style="margin: 5px 0;"><strong>💰 Prijs Bereik:</strong> ${data.cafe.priceRange}</p>
+        <p style="margin: 5px 0;"><strong>⭐ Beoordeling:</strong> ${data.cafe.rating}/5</p>
+        <p style="margin: 5px 0;"><strong>🕒 Uren:</strong> ${data.cafe.openHours}</p>
+        <p style="margin: 5px 0;"><strong>📅 Datums:</strong> ${datesList}</p>
+        ${data.times ? `<p style="margin: 5px 0;"><strong>⏰ Tijden:</strong> ${data.times.join(', ')}</p>` : ''}
+        <p style="margin: 5px 0;"><strong>👤 Organisator:</strong> ${data.organizerName}</p>
       </div>
       
       <div style="text-align: center; margin: 30px 0;">
         <a href="${data.inviteLink || '#'}" 
            style="background-color: #f59e0b; color: white; padding: 12px 24px; 
                   text-decoration: none; border-radius: 6px; display: inline-block;">
-          Join Meetup
+          Deel Meetup
         </a>
       </div>
       
       <p style="color: #6b7280; font-size: 14px;">
-        This invitation was sent from Anemi Meets. 
-        Connect with coffee lovers in your community!
+        Deze uitnodiging werd verzonden vanuit Anemi Meets. 
+        Verbind je met koffie liefhebbers in je gemeenschap!
       </p>
     </div>
   `;
@@ -578,7 +580,7 @@ function generateInviteEmailHTML(data: InviteEmailData): string {
 export async function sendInviteEmail(data: InviteEmailData) {
   return sendEmail({
     to: data.to,
-    subject: `☕ You're invited: Coffee meetup at ${data.cafe.name}`,
+    subject: `☕ Je bent uitgenodigd: Koffie meetup bij ${data.cafe.name}`,
     html: generateInviteEmailHTML(data),
   });
 }
@@ -589,26 +591,26 @@ export async function sendInviteEmail(data: InviteEmailData) {
 export async function sendCalendarInvite(data: CalendarInviteData) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">📅 Calendar Invite</h2>
+      <h2 style="color: #f59e0b;">📅 Agenda Uitnodiging</h2>
       
       <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 10px 0;">${data.eventTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📝 Description:</strong> ${data.eventDescription}</p>
-        <p style="margin: 5px 0;"><strong>📍 Location:</strong> ${data.eventLocation}</p>
-        <p style="margin: 5px 0;"><strong>⏰ Start Time:</strong> ${data.eventStartTime}</p>
-        <p style="margin: 5px 0;"><strong>⏰ End Time:</strong> ${data.eventEndTime}</p>
-        <p style="margin: 5px 0;"><strong>👤 Attendee:</strong> ${data.attendeeName}</p>
+        <p style="margin: 5px 0;"><strong>📝 Beschrijving:</strong> ${data.eventDescription}</p>
+        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${data.eventLocation}</p>
+        <p style="margin: 5px 0;"><strong>⏰ Start Tijd:</strong> ${data.eventStartTime}</p>
+        <p style="margin: 5px 0;"><strong>⏰ Eind Tijd:</strong> ${data.eventEndTime}</p>
+        <p style="margin: 5px 0;"><strong>👤 Aanwezige:</strong> ${data.attendeeName}</p>
       </div>
       
       <p style="color: #6b7280; font-size: 14px;">
-        This calendar invite was sent from Anemi Meets.
+        Deze agenda uitnodiging werd verzonden vanuit Anemi Meets.
       </p>
     </div>
   `;
 
   return sendEmail({
     to: data.to,
-    subject: `📅 Calendar Invite: ${data.eventTitle}`,
+    subject: `📅 Agenda Uitnodiging: ${data.eventTitle}`,
     html,
   });
 } 

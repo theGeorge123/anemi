@@ -40,7 +40,7 @@ function VerifyPageContent() {
     if (!token || !email) {
       console.error('Missing token or email:', { token, email })
       setVerificationStatus('error')
-      ErrorService.showToast('Missing verification parameters. Please check your email link.', 'error')
+      ErrorService.showToast('Verificatie parameters ontbreken. Controleer je email link.', 'error')
       return
     }
 
@@ -57,13 +57,13 @@ function VerifyPageContent() {
       if (error) {
         console.error('Verification error:', error)
         setVerificationStatus('error')
-        ErrorService.showToast(`Verification failed: ${error.message}`, 'error')
+        ErrorService.showToast(`Verificatie mislukt: ${error.message}`, 'error')
         return
       }
 
       if (data.user) {
         setVerificationStatus('success')
-        ErrorService.showToast('🎉 Email verified successfully! Welcome to Anemi Meets!', 'success')
+        ErrorService.showToast('🎉 Email succesvol geverifieerd! Welkom bij Anemi Meets!', 'success')
         
         // Send welcome email after successful verification
         try {
@@ -100,12 +100,12 @@ function VerifyPageContent() {
         }, 3000)
       } else {
         setVerificationStatus('error')
-        ErrorService.showToast('Verification failed. Please try again.', 'error')
+        ErrorService.showToast('Verificatie mislukt. Probeer opnieuw.', 'error')
       }
     } catch (error) {
       console.error('Verification error:', error)
       setVerificationStatus('error')
-      ErrorService.showToast('Failed to verify email. Please try again.', 'error')
+      ErrorService.showToast('Email verifiëren mislukt. Probeer opnieuw.', 'error')
     } finally {
       setIsVerifying(false)
     }
@@ -138,13 +138,13 @@ function VerifyPageContent() {
 
       if (error) {
         console.error('Resend error:', error)
-        ErrorService.showToast('Failed to send verification email. Please try again.', 'error')
+        ErrorService.showToast('Verificatie email versturen mislukt. Probeer opnieuw.', 'error')
       } else {
-        ErrorService.showToast('📧 Verification email sent! Check your inbox.', 'success')
+        ErrorService.showToast('📧 Verificatie email verstuurd! Check je inbox.', 'success')
       }
     } catch (error) {
       console.error('Resend error:', error)
-      ErrorService.showToast('Failed to send verification email. Please try again.', 'error')
+      ErrorService.showToast('Verificatie email versturen mislukt. Probeer opnieuw.', 'error')
     }
   }
 
@@ -269,24 +269,24 @@ function VerifyPageContent() {
           <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
               <div className="text-6xl mb-4">📧</div>
-              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Check Your Email</CardTitle>
+              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Check Je Email</CardTitle>
               <CardDescription className="text-base text-gray-500">
-                We&apos;ve sent a verification link to <strong>{email}</strong>
+                We hebben een verificatie link gestuurd naar <strong>{email}</strong>
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <div className="space-y-4">
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-amber-800 mb-2">☕ Welcome to Anemi Meets!</h3>
+                  <h3 className="font-semibold text-amber-800 mb-2">☕ Welkom bij Anemi Meets!</h3>
                   <p className="text-amber-700 text-sm">
-                    To start your coffee adventure, please click the verification link in your email.
+                    Om je koffie avontuur te beginnen, klik op de verificatie link in je email.
                   </p>
                 </div>
                 
                 <div className="text-sm text-gray-600 space-y-2">
-                  <p>📧 Check your inbox (and spam folder)</p>
-                  <p>🔗 Click the verification link</p>
-                  <p>✅ Come back here to sign in</p>
+                  <p>📧 Check je inbox (en spam folder)</p>
+                  <p>🔗 Klik op de verificatie link</p>
+                  <p>✅ Kom hier terug om in te loggen</p>
                 </div>
                 
                 <div className="space-y-3">
@@ -294,12 +294,12 @@ function VerifyPageContent() {
                     onClick={resendVerification}
                     className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                   >
-                    📧 Resend Verification Email
+                    📧 Verificatie Email Opnieuw Versturen
                   </Button>
                   
                   <Link href="/auth/signin">
                     <Button variant="outline" className="w-full">
-                      ☕ Back to Sign In
+                      ☕ Terug naar Inloggen
                     </Button>
                   </Link>
                 </div>
@@ -329,9 +329,9 @@ function VerifyPageContent() {
       <Card className="w-full max-w-md">
           <CardHeader className="text-center pb-2">
             <div className="text-6xl mb-4">☕</div>
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Verifying Your Email</CardTitle>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Je Email Verifiëren</CardTitle>
             <CardDescription className="text-base text-gray-500">
-              {isVerifying ? 'Please wait while we verify your email...' : 'Check your email for the verification link'}
+              {isVerifying ? 'Even geduld terwijl we je email verifiëren...' : 'Check je email voor de verificatie link'}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -342,18 +342,18 @@ function VerifyPageContent() {
                 </div>
               )}
               <p className="text-gray-600">
-                Didn&apos;t receive the email? Check your spam folder or request a new one.
+                Geen email ontvangen? Check je spam folder of vraag een nieuwe aan.
               </p>
               <Button 
                 onClick={resendVerification}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
                 disabled={isVerifying}
               >
-                📧 Resend Verification Email
+                📧 Verificatie Email Opnieuw Versturen
               </Button>
               <Link href="/auth/signin">
                 <Button variant="outline" className="w-full">
-                  ☕ Back to Sign In
+                  ☕ Terug naar Inloggen
                 </Button>
               </Link>
             </div>

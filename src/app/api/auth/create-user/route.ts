@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { prisma } from '@/lib/prisma'
+import { generateNicknameFromEmail } from '@/lib/nickname-generator'
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +21,9 @@ export async function POST(request: NextRequest) {
         persistSession: false
       }
     })
+
+    // Generate nickname for the user
+    const nickname = generateNicknameFromEmail(email)
 
     // Try normal signup first
     const { data, error } = await supabase.auth.signUp({
@@ -51,10 +56,29 @@ export async function POST(request: NextRequest) {
             details: adminError.message 
           }, { status: 400 })
         }
+
+        // Save user to database with nickname
+        try {
+          await prisma.user.upsert({
+            where: { id: adminData.user!.id },
+            update: { nickname },
+            create: {
+              id: adminData.user!.id,
+              email: adminData.user!.email!,
+              nickname,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          })
+        } catch (dbError) {
+          console.error('Database error saving user with nickname:', dbError)
+          // Continue even if database save fails
+        }
         
         return NextResponse.json({ 
           success: true,
           user: adminData.user,
+          nickname,
           message: 'Account created successfully! Email verification was skipped due to SMTP issues.',
           userCreated: true,
           emailSkipped: true
@@ -64,9 +88,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
+    // Save user to database with nickname
+    try {
+      await prisma.user.upsert({
+        where: { id: data.user!.id },
+        update: { nickname },
+        create: {
+          id: data.user!.id,
+          email: data.user!.email!,
+          nickname,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      })
+    } catch (dbError) {
+      console.error('Database error saving user with nickname:', dbError)
+      // Continue even if database save fails
+    }
+
     return NextResponse.json({ 
       success: true, 
       user: data.user,
+      nickname,
       message: 'User created successfully. Please check your email to verify your account.' 
     })
 

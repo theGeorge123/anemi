@@ -153,37 +153,12 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
 
       <div className="space-y-3">
         <Button 
-          onClick={() => onCafeSelect(randomCafe?.id || '')}
-          className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+          onClick={onChooseOwn}
+          variant="outline"
+          className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
         >
-          ✅ Ja, deze cafe is perfect!
+          🔍 Zelf kiezen
         </Button>
-        
-        <div className="flex gap-2">
-          <Button 
-            onClick={() => fetchRandomCafe(true)}
-            variant="outline"
-            disabled={shuffling}
-            className="flex-1 border-blue-300 text-blue-700 hover:bg-blue-50"
-          >
-            {shuffling ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                Shufflen...
-              </>
-            ) : (
-              '🔄 Shuffle cafe'
-            )}
-          </Button>
-          
-          <Button 
-            onClick={onChooseOwn}
-            variant="outline"
-            className="flex-1 border-amber-300 text-amber-700 hover:bg-amber-50"
-          >
-            🔍 Zelf kiezen
-          </Button>
-        </div>
       </div>
 
 

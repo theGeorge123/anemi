@@ -37,9 +37,15 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
+  // Basic performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
   },
+  
   images: {
     domains: [
       'localhost',
@@ -51,6 +57,7 @@ const nextConfig = {
     ],
     formats: ['image/webp', 'image/avif'],
   },
+  
   async headers() {
     return [
       {
@@ -84,6 +91,7 @@ const nextConfig = {
       },
     ];
   },
+  
   async redirects() {
     return [
       {
@@ -93,6 +101,7 @@ const nextConfig = {
       },
     ];
   },
+  
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -103,18 +112,6 @@ const nextConfig = {
       };
     }
     return config;
-  },
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  },
-  compress: true,
-  poweredByHeader: false,
-  generateEtags: false,
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 2,
   },
 };
 

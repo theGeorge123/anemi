@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Poppins } from 'next/font/google'
 import '@/styles/globals.css'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { Toaster, ToasterProvider } from '@/components/ui/toaster'
@@ -8,12 +8,23 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { validateStartup } from '@/lib/startup'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const poppins = Poppins({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'Anemi Meets - Coffee Shop Meetups',
-  description: 'Plan coffee shop meetups with friends and discover great cafes together.',
-  keywords: 'coffee, meetups, cafes, friends, social',
+  title: 'Anemi Meets - Herverbind Over Koffie',
+  description: 'Plan koffie meetups met vrienden en ontdek geweldige cafés samen.',
+  keywords: 'koffie, meetups, cafés, vrienden, sociaal, herverbinden',
   authors: [{ name: 'Anemi Meets' }],
   creator: 'Anemi Meets',
   publisher: 'Anemi Meets',
@@ -27,8 +38,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'Anemi Meets - Coffee Shop Meetups',
-    description: 'Plan coffee shop meetups with friends and discover great cafes together.',
+    title: 'Anemi Meets - Herverbind Over Koffie',
+    description: 'Plan koffie meetups met vrienden en ontdek geweldige cafés samen.',
     url: '/',
     siteName: 'Anemi Meets',
     images: [
@@ -36,16 +47,16 @@ export const metadata: Metadata = {
         url: '/screenshot-desktop.png',
         width: 1200,
         height: 630,
-        alt: 'Anemi Meets - Coffee Shop Meetups',
+        alt: 'Anemi Meets - Herverbind Over Koffie',
       },
     ],
-    locale: 'en_US',
+    locale: 'nl_NL',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Anemi Meets - Coffee Shop Meetups',
-    description: 'Plan coffee shop meetups with friends and discover great cafes together.',
+    title: 'Anemi Meets - Herverbind Over Koffie',
+    description: 'Plan koffie meetups met vrienden en ontdek geweldige cafés samen.',
     images: ['/screenshot-desktop.png'],
   },
   robots: {
@@ -78,8 +89,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="nl">
+      <body className={`${inter.variable} ${poppins.variable} font-sans`}>
         <ErrorBoundary>
           <EnvironmentBanner />
           <ToasterProvider>

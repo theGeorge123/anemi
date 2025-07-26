@@ -63,6 +63,23 @@ module.exports = {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        // Warm coffee-inspired colors
+        cream: {
+          50: "#F5F5DC",
+          100: "#F0F0D0",
+          200: "#E8E8C0",
+        },
+        coffee: {
+          100: "#8B4513",
+          200: "#D2691E",
+          300: "#CD853F",
+          400: "#D2B48C",
+          500: "#DEB887",
+          600: "#F4A460",
+          700: "#DAA520",
+          800: "#B8860B",
+          900: "#2F1B14",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -142,6 +159,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-poppins)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
       },
       fontSize: {

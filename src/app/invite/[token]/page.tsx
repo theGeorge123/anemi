@@ -57,13 +57,17 @@ export default function InvitePage() {
     const fetchInvite = async () => {
       try {
         setLoading(true)
+        console.log('Fetching invite for token:', token)
         const response = await fetch(`/api/invite/${token}`)
+        console.log('Response status:', response.status)
         if (!response.ok) {
           throw new Error('Invite not found or expired')
         }
         const data = await response.json()
+        console.log('Invite data:', data)
         setInvite(data.invite)
       } catch (err) {
+        console.error('Error fetching invite:', err)
         setError(err instanceof Error ? err.message : 'Failed to load invite')
       } finally {
         setLoading(false)
@@ -76,6 +80,12 @@ export default function InvitePage() {
   }, [token])
 
   const handleAccept = async () => {
+    console.log('handleAccept called')
+    console.log('inviteeName:', inviteeName)
+    console.log('inviteeEmail:', inviteeEmail)
+    console.log('selectedDate:', selectedDate)
+    console.log('selectedTime:', selectedTime)
+    
     if (!inviteeName.trim() || !inviteeEmail.trim()) {
       setError('Vul je naam en email in')
       return
@@ -88,6 +98,7 @@ export default function InvitePage() {
 
     try {
       setAccepting(true)
+      console.log('Sending accept request...')
       const response = await fetch(`/api/invite/${token}/accept`, {
         method: 'POST',
         headers: {
@@ -102,15 +113,22 @@ export default function InvitePage() {
         }),
       })
 
+      console.log('Accept response status:', response.status)
       if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Accept error:', errorData)
         throw new Error('Failed to accept invite')
       }
+
+      const result = await response.json()
+      console.log('Accept success:', result)
 
       // Redirect to confirmed page
       if (typeof window !== 'undefined') {
         window.location.href = '/confirmed?status=accepted'
       }
     } catch (error) {
+      console.error('Error in handleAccept:', error)
       setError('Kon invite niet accepteren. Probeer het opnieuw.')
     } finally {
       setAccepting(false)
@@ -118,6 +136,10 @@ export default function InvitePage() {
   }
 
   const handleDecline = async (reason: string) => {
+    console.log('handleDecline called with reason:', reason)
+    console.log('inviteeName:', inviteeName)
+    console.log('inviteeEmail:', inviteeEmail)
+    
     if (!inviteeName.trim() || !inviteeEmail.trim()) {
       setError('Vul je naam en email in')
       return
@@ -125,6 +147,7 @@ export default function InvitePage() {
 
     try {
       setDeclining(true)
+      console.log('Sending decline request...')
       const response = await fetch(`/api/invite/${token}/decline`, {
         method: 'POST',
         headers: {
@@ -137,15 +160,22 @@ export default function InvitePage() {
         }),
       })
 
+      console.log('Decline response status:', response.status)
       if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Decline error:', errorData)
         throw new Error('Failed to decline invite')
       }
+
+      const result = await response.json()
+      console.log('Decline success:', result)
 
       // Redirect to confirmed page
       if (typeof window !== 'undefined') {
         window.location.href = '/confirmed?status=declined'
       }
     } catch (error) {
+      console.error('Error in handleDecline:', error)
       setError('Kon invite niet afwijzen. Probeer het opnieuw.')
     } finally {
       setDeclining(false)

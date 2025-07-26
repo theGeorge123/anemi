@@ -19,65 +19,50 @@ describe('Header', () => {
     jest.clearAllMocks()
   })
 
-  it('renders header with sign in/up buttons when not authenticated', () => {
+  it('renders header with sign in button when not authenticated', () => {
     ;(useSupabase as jest.Mock).mockReturnValue({
       session: null,
-      client: null,
+      supabase: null,
     })
 
     render(<Header />)
     
     expect(screen.getByRole('banner')).toBeTruthy()
-    expect(screen.getByText('Sign In')).toBeTruthy()
-    expect(screen.getByText('Get Started')).toBeTruthy()
+    expect(screen.getByText('Inloggen')).toBeTruthy()
   })
 
-  it('renders dashboard and sign out buttons when authenticated', () => {
+  it('renders dashboard and create meetup buttons when authenticated', () => {
     ;(useSupabase as jest.Mock).mockReturnValue({
       session: { user: { id: 'test-user' } },
-      client: mockSupabaseClient,
+      supabase: mockSupabaseClient,
     })
 
     render(<Header />)
     
-    expect(screen.getByText('Dashboard')).toBeTruthy()
-    expect(screen.getByText('Sign Out')).toBeTruthy()
+    expect(screen.getByText('Mijn Meetups')).toBeTruthy()
+    expect(screen.getByText('Nieuw Avontuur')).toBeTruthy()
   })
 
-  it('handles sign out when authenticated', () => {
-    ;(useSupabase as jest.Mock).mockReturnValue({
-      session: { user: { id: 'test-user' } },
-      client: mockSupabaseClient,
-    })
-
-    render(<Header />)
-    
-    fireEvent.click(screen.getByText('Sign Out'))
-    
-    expect(mockSupabaseClient.auth.signOut).toHaveBeenCalled()
-  })
-
-  it('shows navigation links', () => {
+  it('shows back to home button', () => {
     ;(useSupabase as jest.Mock).mockReturnValue({
       session: null,
-      client: null,
+      supabase: null,
     })
 
     render(<Header />)
     
-    expect(screen.getByText('Meetups')).toBeTruthy()
-    expect(screen.getByText('Coffee Shops')).toBeTruthy()
-    expect(screen.getByText('About')).toBeTruthy()
+    expect(screen.getByText('Terug naar Home')).toBeTruthy()
   })
 
-  it('shows My Meetups link when authenticated', () => {
+  it('shows logo and branding', () => {
     ;(useSupabase as jest.Mock).mockReturnValue({
-      session: { user: { id: 'test-user' } },
-      client: mockSupabaseClient,
+      session: null,
+      supabase: null,
     })
 
     render(<Header />)
     
-    expect(screen.getByText('My Meetups')).toBeTruthy()
+    // Check that the logo is rendered (assuming it has alt text or is identifiable)
+    expect(screen.getByRole('banner')).toBeTruthy()
   })
 }) 

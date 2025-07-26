@@ -14,7 +14,7 @@ interface UserNickname {
 }
 
 export function LoginStatus() {
-  const { session, loading } = useSupabase();
+  const { session, loading, supabase } = useSupabase();
   const [userNickname, setUserNickname] = useState<UserNickname | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editNickname, setEditNickname] = useState('');
@@ -98,24 +98,24 @@ export function LoginStatus() {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-        <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
+      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+        <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
           <Link href="/auth/signin?redirect=%2Fcreate">
-            <Users className="w-5 h-5 mr-2" />
+            <Users className="w-6 h-6 mr-3" />
             Start een Meetup
           </Link>
         </Button>
         
-        <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
           <Link href="/auth/signin">
-            <LogIn className="w-5 h-5 mr-2" />
+            <LogIn className="w-6 h-6 mr-3" />
             Inloggen
           </Link>
         </Button>
         
-        <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
           <Link href="/auth/signup">
-            <Calendar className="w-5 h-5 mr-2" />
+            <Calendar className="w-6 h-6 mr-3" />
             Lid worden
           </Link>
         </Button>
@@ -126,36 +126,36 @@ export function LoginStatus() {
   // Logged in user - show welcome and appropriate buttons
   if (session) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Welcome message with nickname - improved design */}
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-3xl p-8 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 text-lg">☕</span>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-200 to-emerald-200 rounded-full flex items-center justify-center shadow-md">
+                  <span className="text-green-600 text-2xl">☕</span>
                 </div>
-                <h3 className="text-xl font-bold text-green-800">
+                <h3 className="text-2xl font-display font-bold text-green-800">
                   Welkom terug!
                 </h3>
               </div>
               
               {userNickname?.nickname ? (
-                <div className="flex items-center gap-3">
-                  <p className="text-green-700 text-lg font-medium">
+                <div className="flex items-center gap-4">
+                  <p className="text-green-700 text-xl font-medium">
                     {userNickname.nickname}
                   </p>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsEditing(true)}
-                    className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-100"
+                    className="h-10 w-10 p-0 text-green-600 hover:text-green-800 hover:bg-green-100 rounded-full transition-all duration-200"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-5 h-5" />
                   </Button>
                 </div>
               ) : (
-                <p className="text-green-600 text-base">
+                <p className="text-green-600 text-lg">
                   {session.user.email}
                 </p>
               )}
@@ -164,29 +164,30 @@ export function LoginStatus() {
 
           {/* Edit nickname form - improved design */}
           {isEditing && (
-            <div className="mt-4 p-4 bg-white rounded-xl border border-green-200 shadow-sm">
-              <div className="flex flex-col sm:flex-row gap-3">
+            <div className="mt-6 p-6 bg-white rounded-2xl border-2 border-green-200 shadow-md">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input
                   value={editNickname}
                   onChange={(e) => setEditNickname(e.target.value)}
                   placeholder="Jouw bijnaam..."
-                  className="flex-1"
+                  className="flex-1 text-lg"
                   maxLength={50}
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button
-                    size="sm"
+                    size="lg"
                     onClick={saveNickname}
                     disabled={isLoading}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 shadow-md"
                   >
                     Opslaan
                   </Button>
                   <Button
-                    size="sm"
+                    size="lg"
                     variant="outline"
                     onClick={cancelEdit}
                     disabled={isLoading}
+                    className="border-green-300 text-green-700 hover:bg-green-50"
                   >
                     Annuleren
                   </Button>
@@ -197,17 +198,17 @@ export function LoginStatus() {
         </div>
 
         {/* Action buttons for logged-in users */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <Link href="/create">
-              <Users className="w-5 h-5 mr-2" />
+              <Users className="w-6 h-6 mr-3" />
               Start een Meetup
             </Link>
           </Button>
           
-          <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+          <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
             <Link href="/dashboard">
-              <Eye className="w-5 h-5 mr-2" />
+              <Eye className="w-6 h-6 mr-3" />
               Mijn Meetups
             </Link>
           </Button>
@@ -217,16 +218,15 @@ export function LoginStatus() {
         <div className="flex justify-center">
           <Button 
             variant="ghost" 
-            size="sm" 
+            size="lg" 
             onClick={async () => {
-              const { supabase } = await import('@/components/SupabaseProvider').then(module => module.useSupabase());
               if (supabase) {
                 await supabase.auth.signOut();
               }
             }}
-            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted px-6 py-3 rounded-full transition-all duration-200"
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-5 h-5 mr-2" />
             Uitloggen
           </Button>
         </div>
@@ -236,24 +236,24 @@ export function LoginStatus() {
 
   // Not logged in - show normal buttons
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-      <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
+    <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+      <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
         <Link href="/auth/signin?redirect=%2Fcreate">
-          <Users className="w-5 h-5 mr-2" />
+          <Users className="w-6 h-6 mr-3" />
           Start een Meetup
         </Link>
       </Button>
       
-      <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+      <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
         <Link href="/auth/signin">
-          <LogIn className="w-5 h-5 mr-2" />
+          <LogIn className="w-6 h-6 mr-3" />
           Inloggen
         </Link>
       </Button>
       
-      <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+      <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
         <Link href="/auth/signup">
-          <Calendar className="w-5 h-5 mr-2" />
+          <Calendar className="w-6 h-6 mr-3" />
           Lid worden
         </Link>
       </Button>

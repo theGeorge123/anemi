@@ -55,58 +55,58 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t bg-background">
-      <div className="container py-8 md:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Anemi Meets</h3>
-            <p className="text-sm text-muted-foreground">
+    <footer className="border-t-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="space-y-4">
+            <h3 className="text-xl font-display font-bold text-foreground">Anemi Meets</h3>
+            <p className="text-base text-muted-foreground leading-relaxed">
               Verbind met je community over koffie. Ontdek lokale meetups en koffie shops.
             </p>
           </div>
           
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Platform</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-4">
+            <h4 className="text-lg font-display font-semibold text-foreground">Platform</h4>
+            <ul className="space-y-3 text-base">
               <li>
-                <Link href="/create" className="text-muted-foreground hover:text-foreground">
+                <Link href="/create" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Meetup Maken
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground">
+                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Home
                 </Link>
               </li>
             </ul>
           </div>
           
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Ondersteuning</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-4">
+            <h4 className="text-lg font-display font-semibold text-foreground">Ondersteuning</h4>
+            <ul className="space-y-3 text-base">
               <li>
-                <a href="mailto:team@anemimeets.com" className="text-muted-foreground hover:text-foreground">
+                <a href="mailto:team@anemimeets.com" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Contact
                 </a>
               </li>
               <li>
-                <a href="/api/health" className="text-muted-foreground hover:text-foreground">
+                <a href="/api/health" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Systeem Status
                 </a>
               </li>
             </ul>
           </div>
           
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Rechtelijk</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-4">
+            <h4 className="text-lg font-display font-semibold text-foreground">Rechtelijk</h4>
+            <ul className="space-y-3 text-base">
               <li>
-                <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground">
+                <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Privacybeleid
                 </Link>
               </li>
               <li>
-                <Link href="/legal/terms" className="text-muted-foreground hover:text-foreground">
+                <Link href="/legal/terms" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Gebruiksvoorwaarden
                 </Link>
               </li>
@@ -114,7 +114,7 @@ export function Footer() {
                 <li>
                   <button
                     onClick={() => setShowConfirmation(true)}
-                    className="text-red-600 hover:text-red-700 text-left w-full flex items-center gap-2"
+                    className="text-red-600 hover:text-red-700 text-left w-full flex items-center gap-2 transition-colors duration-200"
                   >
                     <Trash2 className="w-4 h-4" />
                     Account Verwijderen
@@ -125,8 +125,8 @@ export function Footer() {
           </div>
         </div>
         
-        <div className="mt-8 pt-8 border-t">
-          <p className="text-center text-sm text-muted-foreground">
+        <div className="mt-12 pt-8 border-t-2 border-amber-200">
+          <p className="text-center text-base text-muted-foreground">
             © 2024 Anemi Meets. Alle rechten voorbehouden.
           </p>
         </div>

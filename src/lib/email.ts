@@ -511,9 +511,9 @@ export async function sendMeetupCancellation(
 
   try {
     const result = await sendEmail({
-      to,
+    to,
       subject: `☕ Geannuleerd: ${meetupTitle}`,
-      html,
+    html,
     })
     
     console.log('✅ sendMeetupCancellation email sent successfully to:', to)

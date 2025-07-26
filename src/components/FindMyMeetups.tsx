@@ -281,12 +281,6 @@ export function FindMyMeetups() {
             <p className="text-sm text-gray-600 mb-3">
               💡 Tip: Maak een account om al je meetups op één plek te beheren!
             </p>
-            <Link href="/auth/signup">
-              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
-                <Users className="w-4 h-4 mr-2" />
-                Account maken
-              </Button>
-            </Link>
           </div>
         </div>
       )}

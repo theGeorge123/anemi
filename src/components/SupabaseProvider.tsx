@@ -26,7 +26,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       // Initialize client immediately
       const client = getSupabaseClient()
       setSupabase(client)
-
+      
       // Get initial session with timeout
       const getInitialSession = async () => {
         try {

@@ -153,12 +153,12 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
 
       <div className="space-y-3">
         <Button 
-          onClick={onChooseOwn}
-          variant="outline"
+            onClick={onChooseOwn}
+            variant="outline"
           className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
-        >
-          🔍 Zelf kiezen
-        </Button>
+          >
+            🔍 Zelf kiezen
+          </Button>
       </div>
 
 

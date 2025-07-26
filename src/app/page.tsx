@@ -23,36 +23,32 @@ export default function HomePage() {
         {/* Login status and appropriate buttons */}
         <Suspense fallback={
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
-              <Link href="/create">
-                <Users className="w-5 h-5 mr-2" />
-                Start een Meetup
-              </Link>
-            </Button>
-            
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
-              <Link href="/auth/signin">
-                <LogIn className="w-5 h-5 mr-2" />
-                Inloggen
-              </Link>
-            </Button>
-            
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
-              <Link href="/auth/signup">
-                <Calendar className="w-5 h-5 mr-2" />
-                Lid worden
-              </Link>
-            </Button>
-          </div>
+          <Button asChild size="lg" className="text-lg px-8 py-6 bg-amber-600 hover:bg-amber-700">
+            <Link href="/create">
+              <Users className="w-5 h-5 mr-2" />
+              Start een Meetup
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Link href="/auth/signin">
+              <LogIn className="w-5 h-5 mr-2" />
+              Inloggen
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Link href="/auth/signup">
+              <Calendar className="w-5 h-5 mr-2" />
+              Lid worden
+            </Link>
+          </Button>
+        </div>
         }>
           <LoginStatus />
         </Suspense>
         
-        <p className="text-sm text-muted-foreground mb-8">
-          Heb je al meetups? <Link href="/auth/signin?redirect=%2Fdashboard" className="text-amber-600 hover:underline">Log in om ze te bekijken</Link>
-        </p>
-
-        {/* Simple static section */}
+        {/* Simple static section for non-logged in users */}
         <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -62,9 +58,9 @@ export default function HomePage() {
             <p className="text-gray-600 mb-4">
               Heb je een meetup geaccepteerd maar geen account? 
             </p>
-            <Link href="/auth/signin?redirect=%2Fdashboard" className="text-amber-600 hover:underline font-medium">
-              Log in om je meetups te bekijken →
-            </Link>
+            <p className="text-amber-600 font-medium">
+              Gebruik de zoekfunctie hieronder om je meetups te vinden →
+            </p>
           </div>
         </div>
       </div>

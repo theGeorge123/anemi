@@ -83,12 +83,12 @@ export default function RootLayout({
         <ErrorBoundary>
           <EnvironmentBanner />
           <ToasterProvider>
-            <SupabaseProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-              <Toaster />
-            </SupabaseProvider>
+          <SupabaseProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+            <Toaster />
+          </SupabaseProvider>
           </ToasterProvider>
         </ErrorBoundary>
       </body>

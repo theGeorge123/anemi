@@ -12,7 +12,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!loading) {
-      if (!session) {
+    if (!session) {
         // Redirect to signin with current page as redirect parameter
         router.push('/auth/signin?redirect=' + encodeURIComponent('/dashboard'))
       } else {
@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   // Show loading while checking authentication
   if (loading || isChecking) {
-    return (
+  return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>

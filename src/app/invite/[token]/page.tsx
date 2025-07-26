@@ -392,9 +392,9 @@ export default function InvitePage() {
                 {invite.availableDates.map((date) => {
                   const isSelected = selectedDate === date
                   const formattedDate = new Date(date).toLocaleDateString('nl-NL', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric' 
+                      weekday: 'short', 
+                      month: 'short', 
+                      day: 'numeric' 
                   })
                   return (
                     <button
@@ -432,7 +432,7 @@ export default function InvitePage() {
                           : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
                       }`}
                     >
-                      {time}
+                    {time}
                     </button>
                   )
                 })}
@@ -498,29 +498,29 @@ export default function InvitePage() {
                       </Button>
                     </div>
                   </div>
-                  
-                  <div>
+              
+              <div>
                     <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
-                    <Input
-                      id="name"
-                      value={inviteeName}
-                      onChange={(e) => setInviteeName(e.target.value)}
-                      placeholder="Jouw naam"
-                      className="mt-1"
-                    />
-                  </div>
+                <Input
+                  id="name"
+                  value={inviteeName}
+                  onChange={(e) => setInviteeName(e.target.value)}
+                  placeholder="Jouw naam"
+                  className="mt-1"
+                />
+              </div>
 
-                  <div>
+              <div>
                     <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={inviteeEmail}
-                      onChange={(e) => setInviteeEmail(e.target.value)}
-                      placeholder="jouw@email.com"
-                      className="mt-1"
-                    />
-                  </div>
+                <Input
+                  id="email"
+                  type="email"
+                  value={inviteeEmail}
+                  onChange={(e) => setInviteeEmail(e.target.value)}
+                  placeholder="jouw@email.com"
+                  className="mt-1"
+                />
+              </div>
                 </div>
               )}
             </div>

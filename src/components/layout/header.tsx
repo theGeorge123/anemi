@@ -51,25 +51,7 @@ export function Header() {
           )}
         </nav>
 
-        {supabase && session && (
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
-              Welkom, {session.user.email}
-            </div>
-            <Button
-              onClick={async () => {
-                if (supabase) {
-                  await supabase.auth.signOut()
-                }
-              }}
-              variant="outline"
-              size="sm"
-            >
-              Uitloggen
-            </Button>
-          </div>
-        )}
-
+        {/* Only show login button for non-logged in users */}
         {!supabase || !session ? (
           <Link href="/auth/signin">
             <Button variant="outline" size="sm">

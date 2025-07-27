@@ -227,7 +227,12 @@ export function StepContent({
           onCafeSelect={(cafeId) => {
             onFormDataChange({ cafeId })
             // If user accepts random cafe, go directly to summary
-            onNext()
+            // We need to go to the summary step, not just next
+            if (currentStep === totalSteps) {
+              onFinish()
+            } else {
+              onNext()
+            }
           }}
           onChooseOwn={() => {
             // Go directly to cafe selection without adding extra steps

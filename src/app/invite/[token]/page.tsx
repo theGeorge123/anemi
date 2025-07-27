@@ -60,15 +60,22 @@ export default function InvitePage() {
         console.log('Fetching invite for token:', token)
         const response = await fetch(`/api/invite/${token}`)
         console.log('Response status:', response.status)
-        if (!response.ok) {
-          throw new Error('Invite not found or expired')
+        
+        if (response.status === 404) {
+          throw new Error('❌ Deze uitnodiging bestaat niet of is verlopen')
+        } else if (response.status === 410) {
+          throw new Error('⏰ Deze uitnodiging is verlopen')
+        } else if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || '❌ Er ging iets mis bij het laden van de uitnodiging')
         }
+        
         const data = await response.json()
         console.log('Invite data:', data)
         setInvite(data.invite)
       } catch (err) {
         console.error('Error fetching invite:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load invite')
+        setError(err instanceof Error ? err.message : '❌ Er ging iets mis bij het laden van de uitnodiging')
       } finally {
         setLoading(false)
       }
@@ -279,18 +286,36 @@ export default function InvitePage() {
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <span className="text-2xl sm:text-3xl">😕</span>
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Oeps! Invite niet gevonden</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                {error.includes('verlopen') ? '⏰ Uitnodiging Verlopen' : '❌ Uitnodiging Niet Gevonden'}
+              </h2>
               <p className="text-sm sm:text-base text-gray-600 mb-4">{error}</p>
-              <Button 
-                onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.location.href = '/'
-                }
-                }}
-                className="h-10 sm:h-auto"
-              >
-                Terug naar home
-              </Button>
+              
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.location.href = '/'
+                    }
+                  }}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Terug naar Home
+                </Button>
+                
+                <Link href="/contact">
+                  <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50">
+                    Hulp Nodig?
+                  </Button>
+                </Link>
+              </div>
+              
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-xs text-amber-700">
+                  <strong>💡 Tip:</strong> Controleer of je de juiste link hebt gebruikt of neem contact op met de organisator
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -33,6 +33,8 @@ interface Meetup {
 
 export function FindMyMeetups() {
   const [email, setEmail] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
+  const [searchType, setSearchType] = useState<'email' | 'code'>('email')
   const [isLoading, setIsLoading] = useState(false)
   const [meetups, setMeetups] = useState<Meetup[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -40,20 +42,33 @@ export function FindMyMeetups() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    
+    if (searchType === 'email' && !email.trim()) return
+    if (searchType === 'code' && !inviteCode.trim()) return
 
     setIsLoading(true)
     setError(null)
     setMeetups([])
 
     try {
-      const response = await fetch('/api/meetups/find-by-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim() }),
-      })
+      let response
+      if (searchType === 'email') {
+        response = await fetch('/api/meetups/find-by-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email.trim() }),
+        })
+      } else {
+        response = await fetch('/api/meetups/find-by-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ inviteCode: inviteCode.trim() }),
+        })
+      }
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -64,7 +79,10 @@ export function FindMyMeetups() {
       setMeetups(data.meetups)
       
       if (data.meetups.length === 0) {
-        setError('Geen meetups gevonden voor dit email adres')
+        setError(searchType === 'email' 
+          ? 'Geen meetups gevonden voor dit email adres'
+          : 'Geen meetup gevonden voor deze uitnodigingscode'
+        )
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Er ging iets mis')
@@ -154,30 +172,84 @@ export function FindMyMeetups() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSearch} className="space-y-4">
-        <div>
-          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-            Email adres
-          </Label>
-          <div className="mt-1 flex gap-2">
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jouw@email.com"
-              className="flex-1"
-              required
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading || !email.trim()}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-            >
-              {isLoading ? 'Zoeken...' : 'Zoeken'}
-            </Button>
-          </div>
+      {/* Search Type Toggle */}
+      <div className="flex justify-center">
+        <div className="bg-gray-100 rounded-lg p-1">
+          <button
+            type="button"
+            onClick={() => setSearchType('email')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              searchType === 'email'
+                ? 'bg-white text-amber-700 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            📧 Email Zoeken
+          </button>
+          <button
+            type="button"
+            onClick={() => setSearchType('code')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              searchType === 'code'
+                ? 'bg-white text-amber-700 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            🔍 Code Zoeken
+          </button>
         </div>
+      </div>
+
+      <form onSubmit={handleSearch} className="space-y-4">
+        {searchType === 'email' ? (
+          <div>
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email adres
+            </Label>
+            <div className="mt-1 flex gap-2">
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="jouw@email.com"
+                className="flex-1"
+                required
+              />
+              <Button 
+                type="submit" 
+                disabled={isLoading || !email.trim()}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+              >
+                {isLoading ? 'Zoeken...' : 'Zoeken'}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <Label htmlFor="inviteCode" className="text-sm font-medium text-gray-700">
+              Uitnodigingscode
+            </Label>
+            <div className="mt-1 flex gap-2">
+              <Input
+                id="inviteCode"
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value)}
+                placeholder="Voer de uitnodigingscode in"
+                className="flex-1"
+                required
+              />
+              <Button 
+                type="submit" 
+                disabled={isLoading || !inviteCode.trim()}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+              >
+                {isLoading ? 'Zoeken...' : 'Zoeken'}
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
 
       {error && (

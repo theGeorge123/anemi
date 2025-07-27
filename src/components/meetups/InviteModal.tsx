@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, Share2, MessageCircle, Calendar } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Copy, Share2, MessageCircle, Calendar, Mail, Plus, X } from 'lucide-react'
 
 interface InviteModalProps {
   inviteCode: string
@@ -13,6 +15,10 @@ interface InviteModalProps {
 
 export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
   const [copied, setCopied] = useState(false)
+  const [showEmailSection, setShowEmailSection] = useState(false)
+  const [emails, setEmails] = useState<string[]>([''])
+  const [sendingEmails, setSendingEmails] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
   
   const inviteUrl = typeof window !== 'undefined' ? `${window.location.origin}/invite/${inviteCode}` : ''
   const whatsappMessage = `Hey! ☕ Ik heb een meetup gemaakt via Anemi. Wil je meedoen? Hier is de link: ${inviteUrl}`
@@ -31,6 +37,52 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
   const handleWhatsAppShare = () => {
     if (typeof window !== 'undefined') {
       window.open(whatsappUrl, '_blank')
+    }
+  }
+
+  const addEmailField = () => {
+    setEmails([...emails, ''])
+  }
+
+  const removeEmailField = (index: number) => {
+    if (emails.length > 1) {
+      setEmails(emails.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateEmail = (index: number, value: string) => {
+    const newEmails = [...emails]
+    newEmails[index] = value
+    setEmails(newEmails)
+  }
+
+  const sendInviteEmails = async () => {
+    const validEmails = emails.filter(email => email.trim() && email.includes('@'))
+    if (validEmails.length === 0) return
+
+    setSendingEmails(true)
+    try {
+      const response = await fetch('/api/send-invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inviteCode,
+          emails: validEmails,
+        }),
+      })
+
+      if (response.ok) {
+        setEmailSent(true)
+        setTimeout(() => setEmailSent(false), 3000)
+      } else {
+        throw new Error('Failed to send emails')
+      }
+    } catch (error) {
+      console.error('Error sending invite emails:', error)
+    } finally {
+      setSendingEmails(false)
     }
   }
 
@@ -99,6 +151,16 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
                 <span className="hidden sm:inline">Deel via WhatsApp</span>
                 <span className="sm:hidden">WhatsApp</span>
               </Button>
+
+              <Button
+                onClick={() => setShowEmailSection(!showEmailSection)}
+                variant="outline"
+                className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Verstuur via Email</span>
+                <span className="sm:hidden">Email</span>
+              </Button>
               
               <Button 
                 onClick={() => {
@@ -114,6 +176,59 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
                 <span className="sm:hidden">Bekijk</span>
               </Button>
             </div>
+
+            {/* Email Section */}
+            {showEmailSection && (
+              <div className="space-y-4 border-t border-gray-200 pt-4">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">📧 Email Adressen</Label>
+                  {emails.map((email, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        type="email"
+                        placeholder="vriend@email.com"
+                        value={email}
+                        onChange={(e) => updateEmail(index, e.target.value)}
+                        className="flex-1"
+                      />
+                      {emails.length > 1 && (
+                        <Button
+                          onClick={() => removeEmailField(index)}
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    onClick={addEmailField}
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Voeg Email Toe
+                  </Button>
+                </div>
+
+                <Button
+                  onClick={sendInviteEmails}
+                  disabled={sendingEmails || emails.every(email => !email.trim())}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                >
+                  {sendingEmails ? '📧 Versturen...' : '📧 Verstuur Uitnodigingen'}
+                </Button>
+
+                {emailSent && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-green-700 text-sm">✅ Uitnodigingen succesvol verzonden!</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
               <p className="text-xs sm:text-sm text-blue-800">

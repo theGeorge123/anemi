@@ -230,10 +230,17 @@ function SignInPageContent() {
               om een gratis account aan te maken!
             </div>
             
-            <div className="mt-4 text-center text-xs text-gray-400">
-              <Link href="/auth/verify" className="text-amber-600 hover:underline">
-                Email nog niet geverifieerd?
-              </Link>
+            <div className="mt-4 text-center text-xs text-gray-400 space-y-2">
+              <div>
+                <Link href="/auth/verify" className="text-amber-600 hover:underline">
+                  Email nog niet geverifieerd?
+                </Link>
+              </div>
+              <div>
+                <Link href="/auth/forgot-password" className="text-amber-600 hover:underline">
+                  Wachtwoord vergeten?
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

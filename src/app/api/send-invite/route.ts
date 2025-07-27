@@ -1,99 +1,100 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { randomUUID } from 'crypto'
-import { addDays } from 'date-fns'
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
+import { createClient } from '@supabase/supabase-js'
+import { sendInviteEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
-  // CSRF protection: double-submit cookie pattern
-  const csrfHeader = request.headers.get('x-csrf-token');
-  const csrfCookie = request.cookies.get('csrf_token')?.value;
-  if (!csrfHeader || !csrfCookie || csrfHeader !== csrfCookie) {
-    return NextResponse.json(
-      { error: 'Invalid CSRF token' },
-      { status: 403 }
-    );
-  }
   try {
-    const { rateLimit } = await import('@/lib/rate-limit')
-    const { sendInviteEmail } = await import('@/lib/email')
-    
-    // Apply rate limiting (5 requests per minute for email sending)
-    const rateLimitResult = await rateLimit(request, 5, 60000)
-    
-    if (!rateLimitResult.success) {
+    const { inviteCode, emails } = await request.json()
+
+    if (!inviteCode || !emails || !Array.isArray(emails) || emails.length === 0) {
       return NextResponse.json(
-        { error: 'Too many invite requests. Please try again later.' },
-        { status: 429 }
+        { error: 'Invalid request: inviteCode and emails array required' },
+        { status: 400 }
       )
     }
 
-    const { prisma } = await import('@/lib/prisma')
-    const { cafe, formData, dates, times, userId } = await request.json()
+    // Validate emails
+    const validEmails = emails.filter((email: string) => 
+      email && typeof email === 'string' && email.includes('@')
+    )
 
-    // Server-side validation
-    if (!formData || typeof formData.name !== 'string' || formData.name.length < 2 || formData.name.length > 50) {
-      return NextResponse.json({ error: 'Invalid name' }, { status: 400 })
-    }
-    if (!formData.email || !isValidEmail(formData.email)) {
-      return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
-    }
-    if (!Array.isArray(dates) || dates.length === 0) {
-      return NextResponse.json({ error: 'At least one date is required' }, { status: 400 })
-    }
-    if (times && !Array.isArray(times)) {
-      return NextResponse.json({ error: 'Times must be an array' }, { status: 400 })
+    if (validEmails.length === 0) {
+      return NextResponse.json(
+        { error: 'No valid email addresses provided' },
+        { status: 400 }
+      )
     }
 
-    // Generate a unique token for the invite
-    const token = randomUUID()
+    // Get invite details from database
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    
+    const { data: invite, error: inviteError } = await supabase
+      .from('invites')
+      .select(`
+        *,
+        meetups (
+          organizer_name,
+          organizer_email,
+          city,
+          available_dates,
+          available_times,
+          cafes (name, address)
+        )
+      `)
+      .eq('token', inviteCode)
+      .single()
 
-    // Create the invite record
-    const invite = await prisma.meetupInvite.create({
-      data: {
-        token: token,
-        organizerName: formData.name,
-        organizerEmail: formData.email,
-        cafeId: cafe.id,
-        availableDates: dates,
-        availableTimes: times || [],
-        status: 'pending',
-        expiresAt: addDays(new Date(), 7),
-        createdBy: userId || null,
+    if (inviteError || !invite) {
+      return NextResponse.json(
+        { error: 'Invite not found' },
+        { status: 404 }
+      )
+    }
+
+    // Send emails to all recipients
+    const emailPromises = validEmails.map(async (email: string) => {
+      try {
+        await sendInviteEmail({
+          to: email,
+          cafe: {
+            name: invite.meetups.cafes?.name || 'Gekozen café',
+            address: invite.meetups.cafes?.address || 'Adres volgt',
+            priceRange: '€€',
+            rating: 4.5,
+            openHours: '09:00-18:00',
+          },
+          dates: invite.meetups.available_dates || [],
+          times: invite.meetups.available_times || [],
+          token: inviteCode,
+          inviteLink: `${process.env.NEXT_PUBLIC_SITE_URL}/invite/${inviteCode}`,
+          organizerName: invite.meetups.organizer_name,
+        })
+        return { email, success: true }
+      } catch (error) {
+        console.error(`Failed to send email to ${email}:`, error)
+        return { email, success: false, error: error instanceof Error ? error.message : 'Unknown error' }
       }
     })
 
-    // Generate invite link
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const inviteLink = `${baseUrl}/invite/${token}`
+    const results = await Promise.all(emailPromises)
+    const successful = results.filter(r => r.success)
+    const failed = results.filter(r => !r.success)
 
-    // Send invite email with the link
-    try {
-      await sendInviteEmail({
-        to: formData.email, // For now, send to organizer as demo
-        cafe: cafe,
-        dates: dates,
-        times: times,
-        token: token,
-        inviteLink: inviteLink,
-        organizerName: formData.name
-      })
-    } catch (emailError) {
-      console.error('Failed to send email:', emailError)
-      // Don't fail the request if email fails
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      inviteId: invite.id,
-      token: token,
-      inviteLink: inviteLink,
-      message: `🎉 Your coffee meetup is brewing! Share this magic link with your friend: ${inviteLink} \nWhoever clicks it first gets to pick the date! ☕️✨`
+    return NextResponse.json({
+      message: `Emails sent successfully`,
+      results: {
+        total: results.length,
+        successful: successful.length,
+        failed: failed.length,
+        details: results
+      }
     })
+
   } catch (error) {
-    console.error('Error in send-invite:', error)
+    console.error('Error in send-invite API:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

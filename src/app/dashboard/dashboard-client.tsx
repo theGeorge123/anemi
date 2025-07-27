@@ -31,6 +31,15 @@ interface MeetupInvite {
   inviteeEmail?: string
   inviteeUserId?: string
   createdBy?: string
+  responses?: {
+    accepted: number
+    declined: number
+    pending: number
+  }
+  preferences?: {
+    preferredDates: { [date: string]: number }
+    preferredTimes: { [time: string]: number }
+  }
 }
 
 export default function DashboardClient() {
@@ -247,6 +256,115 @@ export default function DashboardClient() {
         <div className="mb-6">
           <BackgroundAgentStatus />
         </div>
+
+        {/* Statistics Section */}
+        {meetups.length > 0 && (
+          <div className="mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-green-600 font-medium">✅ Geaccepteerd</p>
+                      <p className="text-2xl font-bold text-green-700">
+                        {meetups.reduce((sum, meetup) => sum + (meetup.responses?.accepted || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="text-3xl">✅</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-red-50 to-rose-50 border-red-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-red-600 font-medium">❌ Afgewezen</p>
+                      <p className="text-2xl font-bold text-red-700">
+                        {meetups.reduce((sum, meetup) => sum + (meetup.responses?.declined || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="text-3xl">❌</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-amber-600 font-medium">⏳ In Afwachting</p>
+                      <p className="text-2xl font-bold text-amber-700">
+                        {meetups.reduce((sum, meetup) => sum + (meetup.responses?.pending || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="text-3xl">⏳</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Popular Preferences */}
+            {meetups.some(m => m.preferences) && (
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Populaire Voorkeuren</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Popular Dates */}
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-3">📅 Meest Gekozen Datums</h4>
+                      <div className="space-y-2">
+                        {Object.entries(
+                          meetups.reduce((acc, meetup) => {
+                            if (meetup.preferences?.preferredDates) {
+                              Object.entries(meetup.preferences.preferredDates).forEach(([date, count]) => {
+                                acc[date] = (acc[date] || 0) + count
+                              })
+                            }
+                            return acc
+                          }, {} as { [date: string]: number })
+                        )
+                          .sort(([,a], [,b]) => b - a)
+                          .slice(0, 3)
+                          .map(([date, count]) => (
+                            <div key={date} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <span className="text-sm text-gray-600">{date}</span>
+                              <Badge variant="secondary">{count} stemmen</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Popular Times */}
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-3">🕐 Meest Gekozen Tijden</h4>
+                      <div className="space-y-2">
+                        {Object.entries(
+                          meetups.reduce((acc, meetup) => {
+                            if (meetup.preferences?.preferredTimes) {
+                              Object.entries(meetup.preferences.preferredTimes).forEach(([time, count]) => {
+                                acc[time] = (acc[time] || 0) + count
+                              })
+                            }
+                            return acc
+                          }, {} as { [time: string]: number })
+                        )
+                          .sort(([,a], [,b]) => b - a)
+                          .slice(0, 3)
+                          .map(([time, count]) => (
+                            <div key={time} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <span className="text-sm text-gray-600">{time}</span>
+                              <Badge variant="secondary">{count} stemmen</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Loading State */}
         {isLoading && (

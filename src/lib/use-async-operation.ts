@@ -22,7 +22,7 @@ export function useAsyncOperation<T>(
     } catch (err) {
       setError(err);
       options.onError?.(err);
-      ErrorService.handleError(err);
+      console.error('Async operation error:', err);
       throw err;
     } finally {
       setIsLoading(false);

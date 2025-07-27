@@ -108,7 +108,8 @@ function SignInPageContent() {
     }
   }, {
     onSuccess: () => {
-      ErrorService.showToast('☕ Welkom terug! Inloggen...', 'success')
+      // Show success message
+      console.log('☕ Welkom terug! Inloggen...')
       
       // Handle redirect after successful login
       if (redirectUrl) {

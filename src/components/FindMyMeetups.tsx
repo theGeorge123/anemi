@@ -161,6 +161,8 @@ export function FindMyMeetups() {
         return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">⏳ Wachten op reactie</Badge>
       case 'confirmed':
         return <Badge className="bg-green-100 text-green-800 border-green-200">✅ Bevestigd!</Badge>
+      case 'accepted':
+        return <Badge className="bg-green-100 text-green-800 border-green-200">✅ Geaccepteerd!</Badge>
       case 'declined':
         return <Badge className="bg-red-100 text-red-800 border-red-200">❌ Afgewezen</Badge>
       case 'expired':
@@ -269,8 +271,27 @@ export function FindMyMeetups() {
             </p>
           </div>
 
+          {/* Show pending meetups first */}
+          {meetups.filter(m => m.status === 'pending').length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <h5 className="font-semibold text-yellow-800 mb-2">
+                ⏳ {meetups.filter(m => m.status === 'pending').length} Uitnodiging{meetups.filter(m => m.status === 'pending').length !== 1 ? 'en' : ''} in Afwachting
+              </h5>
+              <p className="text-yellow-700 text-sm">
+                Je hebt nog uitnodigingen die wachten op je reactie. Klik op &quot;Bekijk&quot; om te reageren!
+              </p>
+            </div>
+          )}
+
           <div className="grid gap-4">
-            {meetups.map((meetup) => (
+            {meetups
+              .sort((a, b) => {
+                // Sort pending first, then by creation date (newest first)
+                if (a.status === 'pending' && b.status !== 'pending') return -1
+                if (a.status !== 'pending' && b.status === 'pending') return 1
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              })
+              .map((meetup) => (
               <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">

@@ -40,6 +40,16 @@ interface MeetupInvite {
     preferredDates: { [date: string]: number }
     preferredTimes: { [time: string]: number }
   }
+  // New fields for enhanced metrics
+  totalInvites?: number
+  participants?: {
+    name: string
+    email: string
+    status: string
+    responseDate?: string
+    chosenDate?: string
+    chosenTime?: string
+  }[]
 }
 
 export default function DashboardClient() {
@@ -260,7 +270,21 @@ export default function DashboardClient() {
         {/* Statistics Section */}
         {meetups.length > 0 && (
           <div className="mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-blue-600 font-medium">📧 Uitnodigingen Verzonden</p>
+                      <p className="text-2xl font-bold text-blue-700">
+                        {meetups.reduce((sum, meetup) => sum + (meetup.totalInvites || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="text-3xl">📧</div>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
@@ -368,7 +392,7 @@ export default function DashboardClient() {
             <Card className="mb-6">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">📈 Extra Inzichten</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Response Rate */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
@@ -394,6 +418,19 @@ export default function DashboardClient() {
                         </p>
                       </div>
                       <div className="text-2xl">⏱️</div>
+                    </div>
+                  </div>
+
+                  {/* Total Participants */}
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-indigo-600 font-medium">👥 Totaal Deelnemers</p>
+                        <p className="text-2xl font-bold text-indigo-700">
+                          {meetups.reduce((sum, m) => sum + (m.participants?.length || 0), 0)}
+                        </p>
+                      </div>
+                      <div className="text-2xl">👥</div>
                     </div>
                   </div>
 
@@ -484,6 +521,20 @@ export default function DashboardClient() {
                           ✅ Gekozen: {formatDate(meetup.chosenDate)}
                         </p>
                       )}
+
+                      {/* Quick Stats */}
+                      {meetup.totalInvites && (
+                        <div className="flex gap-4 mt-3 text-sm">
+                          <span className="text-blue-600">📧 {meetup.totalInvites} uitnodigingen</span>
+                          {meetup.responses && (
+                            <>
+                              <span className="text-green-600">✅ {meetup.responses.accepted} geaccepteerd</span>
+                              <span className="text-red-600">❌ {meetup.responses.declined} afgewezen</span>
+                              <span className="text-amber-600">⏳ {meetup.responses.pending} in afwachting</span>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -516,6 +567,44 @@ export default function DashboardClient() {
                       )}
                     </div>
                   </div>
+
+                  {/* Participants List */}
+                  {meetup.participants && meetup.participants.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <h4 className="font-medium text-gray-900 mb-3">👥 Deelnemers ({meetup.participants.length})</h4>
+                      <div className="grid gap-2">
+                        {meetup.participants.map((participant, index) => (
+                          <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-gray-900">{participant.name}</span>
+                                <span className="text-sm text-gray-500">({participant.email})</span>
+                                {participant.status === 'accepted' && (
+                                  <Badge className="bg-green-100 text-green-800 border-green-200">✅ Geaccepteerd</Badge>
+                                )}
+                                {participant.status === 'declined' && (
+                                  <Badge className="bg-red-100 text-red-800 border-red-200">❌ Afgewezen</Badge>
+                                )}
+                                {participant.status === 'pending' && (
+                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">⏳ Wachten</Badge>
+                                )}
+                              </div>
+                              {participant.chosenDate && participant.chosenTime && (
+                                <p className="text-sm text-green-600 mt-1">
+                                  📅 Gekozen: {formatDate(participant.chosenDate)} om {participant.chosenTime}
+                                </p>
+                              )}
+                              {participant.responseDate && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Reageerde op: {formatDate(participant.responseDate)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}

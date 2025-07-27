@@ -5,24 +5,25 @@ import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle, Home, Lock } from 'lucide-react'
+import { CheckCircle, XCircle, RefreshCw, Mail, AlertTriangle, Home } from 'lucide-react'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import Link from 'next/link'
 
-function VerifyPageContent() {
+function VerifyEmailPageContent() {
   const { supabase } = useSupabase()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
   const [email, setEmail] = useState<string>('')
+  const [countdown, setCountdown] = useState(3)
 
   const token = searchParams.get('token_hash') || searchParams.get('token')
   const emailParam = searchParams.get('email')
   const type = searchParams.get('type')
 
   // Debug: Log all parameters
-  console.log('Password reset verification parameters:', {
+  console.log('Email verification parameters:', {
     token,
     emailParam,
     type,
@@ -39,13 +40,13 @@ function VerifyPageContent() {
     if (!token || !email) {
       console.error('Missing token or email:', { token, email })
       setVerificationStatus('error')
-      console.error('Password reset verificatie parameters ontbreken. Controleer je email link.')
+      console.error('Email verificatie parameters ontbreken. Controleer je email link.')
       return
     }
 
     setIsVerifying(true)
     try {
-      console.log('Attempting password reset verification with:', { token, email, type })
+      console.log('Attempting email verification with:', { token, email, type })
       
       // Verify the token with Supabase
       const { data, error } = await supabase.auth.verifyOtp({
@@ -54,26 +55,61 @@ function VerifyPageContent() {
       })
 
       if (error) {
-        console.error('Password reset verification error:', error)
+        console.error('Email verification error:', error)
         setVerificationStatus('error')
-        console.error(`Password reset verificatie mislukt: ${error.message}`)
+        console.error(`Email verificatie mislukt: ${error.message}`)
         return
       }
 
       if (data.user) {
         setVerificationStatus('success')
-        console.log('🎉 Password reset verificatie succesvol!')
+        console.log('🎉 Email succesvol geverifieerd! Welkom bij Anemi Meets!')
         
-        // Redirect to password reset page
-        setTimeout(() => {
-          const resetUrl = `/auth/reset-password?access_token=${data.session?.access_token}&refresh_token=${data.session?.refresh_token}`
-          router.push(resetUrl)
-        }, 2000)
+        // Send welcome email after successful verification
+        try {
+          const response = await fetch('/api/auth/welcome-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              email,
+              userName: email.split('@')[0] // Use email prefix as username
+            }),
+          })
+
+          if (response.ok) {
+            console.log('Welcome email sent successfully')
+          } else {
+            console.error('Failed to send welcome email')
+          }
+        } catch (error) {
+          console.error('Error sending welcome email:', error)
+        }
+        
+        // Start countdown for redirect
+        setCountdown(3)
+        const countdownInterval = setInterval(() => {
+          setCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(countdownInterval)
+              // Check if there's a stored redirect URL from signup
+              const storedRedirect = sessionStorage.getItem('signup_redirect')
+              sessionStorage.removeItem('signup_redirect') // Clean up
+              
+              const signinUrl = storedRedirect 
+                ? `/auth/signin?redirect=${storedRedirect}&message=verified`
+                : '/auth/signin?message=verified'
+              router.push(signinUrl)
+            }
+            return prev - 1
+          })
+        }, 1000)
       }
     } catch (error) {
-      console.error('Password reset verification error:', error)
+      console.error('Email verification error:', error)
       setVerificationStatus('error')
-      console.error('Password reset verifiëren mislukt. Probeer opnieuw.')
+      console.error('Email verifiëren mislukt. Probeer opnieuw.')
     } finally {
       setIsVerifying(false)
     }
@@ -86,7 +122,7 @@ function VerifyPageContent() {
     }
   }, [token, email, verificationStatus, handleVerification])
 
-  const resendPasswordReset = async () => {
+  const resendVerification = async () => {
     if (!email) {
       console.error('No email available for resend')
       return
@@ -100,13 +136,13 @@ function VerifyPageContent() {
 
       if (error) {
         console.error('Resend error:', error)
-        console.error('Password reset email versturen mislukt. Probeer opnieuw.')
+        console.error('Verificatie email versturen mislukt. Probeer opnieuw.')
       } else {
-        console.log('📧 Password reset email verstuurd! Check je inbox.')
+        console.log('📧 Verificatie email verstuurd! Check je inbox.')
       }
     } catch (error) {
       console.error('Resend error:', error)
-      console.error('Password reset email versturen mislukt. Probeer opnieuw.')
+      console.error('Verificatie email versturen mislukt. Probeer opnieuw.')
     }
   }
 
@@ -119,16 +155,19 @@ function VerifyPageContent() {
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-              🔐 Verificatie Succesvol!
+              🎉 Email Geverifieerd!
             </CardTitle>
             <CardDescription className="text-lg text-gray-600">
-              Je password reset link is geverifieerd. Je wordt doorgestuurd naar de wachtwoord reset pagina.
+              Je email is succesvol geverifieerd. Je wordt over {countdown} seconde{countdown !== 1 ? 'n' : ''} doorgestuurd naar de inlogpagina.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-            </div>
+            <Link href="/auth/signin">
+              <Button className="w-full bg-amber-600 hover:bg-amber-700">
+                <Home className="w-4 h-4 mr-2" />
+                Nu Inloggen
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -144,27 +183,27 @@ function VerifyPageContent() {
               <XCircle className="w-10 h-10 text-red-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-              ❌ Password Reset Mislukt
+              ❌ Verificatie Mislukt
             </CardTitle>
             <CardDescription className="text-lg text-gray-600">
-              Er is een probleem met de password reset verificatie. Controleer je email link of probeer opnieuw.
+              Er is een probleem met de email verificatie. Controleer je email link of probeer opnieuw.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <Button 
-                onClick={resendPasswordReset}
+                onClick={resendVerification}
                 variant="outline" 
                 className="w-full"
               >
                 <Mail className="w-4 h-4 mr-2" />
-                Nieuwe Password Reset Email Versturen
+                Nieuwe Verificatie Email Versturen
               </Button>
               
-              <Link href="/auth/forgot-password">
+              <Link href="/auth/signin">
                 <Button variant="outline" className="w-full">
-                  <Lock className="w-4 h-4 mr-2" />
-                  Terug naar Wachtwoord Vergeten
+                  <Home className="w-4 h-4 mr-2" />
+                  Terug naar Inloggen
                 </Button>
               </Link>
             </div>
@@ -175,7 +214,7 @@ function VerifyPageContent() {
                 <li>• Controleer je spam/junk folder</li>
                 <li>• Zorg dat je de juiste email gebruikt</li>
                 <li>• Klik op de link in de email</li>
-                <li>• Probeer een nieuwe password reset email</li>
+                <li>• Probeer een nieuwe verificatie email</li>
               </ul>
             </div>
           </CardContent>
@@ -192,10 +231,10 @@ function VerifyPageContent() {
             <RefreshCw className={`w-10 h-10 text-amber-600 ${isVerifying ? 'animate-spin' : ''}`} />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-            🔐 Password Reset Verifiëren
+            🔐 Email Verifiëren
           </CardTitle>
           <CardDescription className="text-lg text-gray-600">
-            {isVerifying ? 'Je password reset link wordt geverifieerd...' : 'Password reset verificatie wordt voorbereid...'}
+            {isVerifying ? 'Je email wordt geverifieerd...' : 'Email verificatie wordt voorbereid...'}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -208,7 +247,7 @@ function VerifyPageContent() {
   )
 }
 
-export default function VerifyPage() {
+export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
@@ -224,7 +263,7 @@ export default function VerifyPage() {
         </Card>
       </div>
     }>
-      <VerifyPageContent />
+      <VerifyEmailPageContent />
     </Suspense>
   )
 } 

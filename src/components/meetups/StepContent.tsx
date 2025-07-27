@@ -88,7 +88,22 @@ export function StepContent({
       case 2: return formData.city.trim()
       case 3: return formData.dates.length > 0 && formData.times.length > 0
       case 'dateTimePreferences': 
-        return Object.keys(formData.dateTimePreferences).length > 0
+        // Enhanced validation: check if each selected date has at least one time selected
+        const hasValidDateTimePreferences = () => {
+          // If no dates are selected, validation fails
+          if (formData.dates.length === 0) return false
+          
+          // Check if each selected date has at least one time preference
+          const dateTimeKeys = Object.keys(formData.dateTimePreferences)
+          const selectedDates = formData.dates
+          
+          // All selected dates must have time preferences
+          return selectedDates.every(date => {
+            const timesForDate = formData.dateTimePreferences[date] || []
+            return timesForDate.length > 0
+          })
+        }
+        return hasValidDateTimePreferences()
       case 'cafeChoice': 
         // Always require cafeId regardless of selection method (random or manual)
         return !!formData.cafeId
@@ -225,14 +240,17 @@ export function StepContent({
         <CafeChoiceStep
           selectedCity={formData.city}
           onCafeSelect={(cafeId) => {
+            console.log('🎯 Random cafe selected:', cafeId)
+            console.log('🎯 Current step:', currentStep)
+            console.log('🎯 Should show date/time preferences:', shouldShowDateTimePreferences())
             onFormDataChange({ cafeId })
-            // If user accepts random cafe, go directly to summary
-            // Check if we're at the final step based on actual step type
-            const actualStep = getActualStep()
-            if (actualStep === 'cafeChoice' && !shouldShowDateTimePreferences()) {
-              // We're at cafe choice and no date/time preferences, so this is the final step
+            // If user accepts random cafe, check if we should finish or continue
+            // If we're at step 5 (final step) or if no date/time preferences, finish
+            if (currentStep >= 5 || !shouldShowDateTimePreferences()) {
+              console.log('🎯 Calling onFinish()')
               onFinish()
             } else {
+              console.log('🎯 Calling onNext()')
               onNext()
             }
           }}
@@ -382,6 +400,51 @@ export function StepContent({
     }
   }
 
+  // Get validation message for current step
+  const getValidationMessage = () => {
+    const actualStep = getActualStep()
+    
+    switch (actualStep) {
+      case 1:
+        if (!formData.name.trim()) return 'Voer je naam in'
+        if (!formData.email.trim()) return 'Email is vereist'
+        return '✅ Stap 1 compleet!'
+        
+      case 2:
+        if (!formData.city.trim()) return 'Selecteer een stad'
+        return '✅ Stad geselecteerd!'
+        
+      case 3:
+        if (formData.dates.length === 0) return 'Selecteer minimaal 1 datum'
+        if (formData.times.length === 0) return 'Selecteer minimaal 1 tijd'
+        return '✅ Data en tijden geselecteerd!'
+        
+      case 'dateTimePreferences':
+        const incompleteDates = formData.dates.filter(date => {
+          const timesForDate = formData.dateTimePreferences[date] || []
+          return timesForDate.length === 0
+        })
+        
+        if (incompleteDates.length > 0) {
+          const dateLabels = incompleteDates.map(date => 
+            new Date(date).toLocaleDateString('nl-NL', { weekday: 'short', month: 'short', day: 'numeric' })
+          )
+          return `⚠️ Selecteer tijden voor: ${dateLabels.join(', ')}`
+        }
+        return '✅ Alle datums hebben tijden geselecteerd!'
+        
+      case 'cafeChoice':
+        if (!formData.cafeId) return 'Selecteer een cafe of kies voor willekeurig'
+        return '✅ Cafe geselecteerd!'
+        
+      case 'summary':
+        return '✅ Alles compleet! Klaar om invite code te genereren'
+        
+      default:
+        return ''
+    }
+  }
+
   return (
     <div className="px-2 sm:px-0">
       {renderStep()}
@@ -392,6 +455,8 @@ export function StepContent({
         onBack={onBack}
         isNextDisabled={!isStepValid()}
         nextLabel={currentStep === totalSteps ? 'Genereer Invite Code! 🎫' : 'Volgende'}
+        validationMessage={getValidationMessage()}
+        isValid={isStepValid() === true}
       />
     </div>
   )

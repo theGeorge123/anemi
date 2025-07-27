@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get all meetups for the user
     const meetups = await prisma.meetupInvite.findMany({
       where: {
         OR: [
@@ -54,24 +55,72 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    // For each meetup, get additional metrics
+    const meetupsWithMetrics = await Promise.all(
+      meetups.map(async (meetup) => {
+        // Get all invites for this meetup (same token)
+        const allInvites = await prisma.meetupInvite.findMany({
+          where: {
+            token: meetup.token,
+            deletedAt: null
+          },
+          select: {
+            id: true,
+            inviteeName: true,
+            inviteeEmail: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+            chosenDate: true,
+            chosenTime: true
+          }
+        })
+
+        // Calculate response metrics
+        const responses = {
+          accepted: allInvites.filter(invite => invite.status === 'confirmed' || invite.status === 'accepted').length,
+          declined: allInvites.filter(invite => invite.status === 'declined').length,
+          pending: allInvites.filter(invite => invite.status === 'pending').length
+        }
+
+        // Get participants list (excluding the organizer)
+        const participants = allInvites
+          .filter(invite => invite.inviteeEmail !== meetup.organizerEmail)
+          .map(invite => ({
+            name: invite.inviteeName || 'Onbekend',
+            email: invite.inviteeEmail || '',
+            status: invite.status,
+            responseDate: invite.updatedAt,
+            chosenDate: invite.chosenDate,
+            chosenTime: invite.chosenTime
+          }))
+
+        return {
+          id: meetup.id,
+          token: meetup.token,
+          organizerName: meetup.organizerName,
+          organizerEmail: meetup.organizerEmail,
+          status: meetup.status,
+          createdAt: meetup.createdAt,
+          expiresAt: meetup.expiresAt,
+          cafe: meetup.cafe,
+          availableDates: meetup.availableDates,
+          availableTimes: meetup.availableTimes,
+          chosenDate: meetup.chosenDate,
+          inviteeName: meetup.inviteeName,
+          inviteeEmail: meetup.inviteeEmail,
+          inviteeUserId: meetup.inviteeUserId,
+          createdBy: meetup.createdBy,
+          // New metrics
+          totalInvites: allInvites.length,
+          responses,
+          participants
+        }
+      })
+    )
+
     return NextResponse.json({
-      meetups: meetups.map(meetup => ({
-        id: meetup.id,
-        token: meetup.token,
-        organizerName: meetup.organizerName,
-        organizerEmail: meetup.organizerEmail,
-        status: meetup.status,
-        createdAt: meetup.createdAt,
-        expiresAt: meetup.expiresAt,
-        cafe: meetup.cafe,
-        availableDates: meetup.availableDates,
-        availableTimes: meetup.availableTimes,
-        chosenDate: meetup.chosenDate,
-        inviteeName: meetup.inviteeName,
-        inviteeEmail: meetup.inviteeEmail,
-        inviteeUserId: meetup.inviteeUserId,
-        createdBy: meetup.createdBy
-      }))
+      meetups: meetupsWithMetrics
     })
   } catch (error) {
     console.error('❌ Error fetching meetups:', error)

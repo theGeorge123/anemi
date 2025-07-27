@@ -122,7 +122,7 @@ function SignUpPageContent() {
     onSuccess: (data: any) => {
       // Check if email was skipped due to SMTP issues
       if (data?.emailSkipped) {
-        ErrorService.showToast(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`, 'success')
+        console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
         // Redirect to signin with the original redirect URL
         const signinUrl = redirectUrl 
           ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
@@ -134,8 +134,8 @@ function SignUpPageContent() {
           sessionStorage.setItem('signup_redirect', redirectUrl)
         }
         
-        // Always redirect to verify page with email parameter
-        const verifyUrl = `/auth/verify?email=${encodeURIComponent(form.values.email)}`
+        // Always redirect to verify-email page with email parameter
+        const verifyUrl = `/auth/verify-email?email=${encodeURIComponent(form.values.email)}`
         router.push(verifyUrl)
       }
     },
@@ -143,7 +143,7 @@ function SignUpPageContent() {
       console.error('Signup error:', err)
       // Don't show toast if we already set a specific error
       if (!specificError) {
-        ErrorService.showToast(ErrorService.handleError(err), 'error')
+        console.error('Registration error:', err)
       }
     },
   })

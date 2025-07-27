@@ -33,7 +33,7 @@ function ForgotPasswordPageContent() {
     if (!supabase) throw new Error('No Supabase client')
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/auth/verify`,
     })
     
     if (error) {

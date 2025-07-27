@@ -5,6 +5,7 @@ import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { Toaster, ToasterProvider } from '@/components/ui/toaster'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { GlobalErrorHandler } from '@/components/GlobalErrorHandler'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { validateStartup } from '@/lib/startup'
@@ -93,17 +94,19 @@ export default function RootLayout({
     <html lang="nl">
       <body className={`${inter.variable} ${poppins.variable} font-sans`}>
         <ErrorBoundary>
-          <EnvironmentBanner />
-          <ToasterProvider>
-          <SupabaseProvider>
-            <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-            </BackgroundAgentProvider>
-            <Toaster />
-          </SupabaseProvider>
-          </ToasterProvider>
+          <GlobalErrorHandler>
+            <EnvironmentBanner />
+            <ToasterProvider>
+            <SupabaseProvider>
+              <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+              </BackgroundAgentProvider>
+              <Toaster />
+            </SupabaseProvider>
+            </ToasterProvider>
+          </GlobalErrorHandler>
         </ErrorBoundary>
       </body>
     </html>

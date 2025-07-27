@@ -153,8 +153,9 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn }: Cafe
 
       <div className="space-y-3">
         <Button 
-          onClick={() => onCafeSelect(randomCafe.id)}
+          onClick={() => randomCafe && onCafeSelect(randomCafe.id)}
           className="w-full bg-amber-500 hover:bg-amber-600 text-white"
+          disabled={!randomCafe}
         >
           ✅ Kies dit cafe
         </Button>

@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react';
 import { CitySelector } from './CitySelector';
 import { Button } from '@/components/ui/button';

@@ -107,7 +107,7 @@ export default function ContactPage() {
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">🔐 Problemen met inloggen?</h4>
                 <p className="text-sm text-gray-600 mb-2">
-                  Controleer je email en wachtwoord. Als je je wachtwoord bent vergeten, gebruik de "Wachtwoord vergeten" link op de inlogpagina.
+                  Controleer je email en wachtwoord. Als je je wachtwoord bent vergeten, gebruik de &quot;Wachtwoord vergeten&quot; link op de inlogpagina.
                 </p>
               </div>
 

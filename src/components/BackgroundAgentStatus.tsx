@@ -1,7 +1,9 @@
+"use client"
+
 // Background Agent Status Component
 // Shows background agent status and allows user interaction
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useBackgroundAgentContext } from './BackgroundAgentProvider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +29,7 @@ export function BackgroundAgentStatus() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Check push subscription status
-  const checkPushStatus = async () => {
+  const checkPushStatus = useCallback(async () => {
     setIsLoading(true);
     try {
       const status = await getPushSubscriptionStatus();
@@ -37,7 +39,7 @@ export function BackgroundAgentStatus() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getPushSubscriptionStatus]);
 
   // Request notification permission
   const handleRequestPermission = async () => {
@@ -90,7 +92,7 @@ export function BackgroundAgentStatus() {
     if (isInitialized) {
       checkPushStatus();
     }
-  }, [isInitialized]);
+  }, [isInitialized, checkPushStatus]);
 
   if (!isSupported) {
     return (

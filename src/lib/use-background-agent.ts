@@ -1,3 +1,5 @@
+"use client"
+
 // React Hook for Background Agent
 // Provides easy access to background agent functionality
 

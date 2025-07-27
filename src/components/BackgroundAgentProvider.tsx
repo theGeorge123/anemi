@@ -1,3 +1,5 @@
+"use client"
+
 // Background Agent Provider
 // Manages background agent lifecycle and provides it to the app
 
@@ -71,13 +73,10 @@ export function BackgroundAgentProvider({
     }
   }, [
     autoRegister,
-    backgroundAgent.isSupported,
+    backgroundAgent,
     isInitialized,
-    backgroundAgent.register,
     enableNotifications,
     enablePushNotifications,
-    backgroundAgent.requestNotificationPermission,
-    backgroundAgent.subscribeToPushNotifications,
   ]);
 
   // Listen for background agent events
@@ -109,7 +108,7 @@ export function BackgroundAgentProvider({
       backgroundAgent.offMessage('background-agent:notification-sent');
       backgroundAgent.offMessage('background-agent:notification-error');
     };
-  }, [backgroundAgent.isActive, backgroundAgent.onMessage, backgroundAgent.offMessage]);
+  }, [backgroundAgent]);
 
   const contextValue: BackgroundAgentContextType = {
     ...backgroundAgent,

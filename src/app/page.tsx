@@ -3,6 +3,7 @@ import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin } from 'lucide-re
 import Link from 'next/link';
 import { Suspense, lazy } from 'react';
 import { LoginStatus } from '@/components/LoginStatus';
+import { PublicMeetupExamples } from '@/components/PublicMeetupExamples';
 
 // Lazy load the FindMyMeetups component
 const FindMyMeetups = lazy(() => import('@/components/FindMyMeetups').then(module => ({ default: module.FindMyMeetups })));
@@ -85,6 +86,11 @@ export default function HomePage() {
           }>
             <FindMyMeetups />
           </Suspense>
+        </div>
+
+        {/* Public Meetup Examples */}
+        <div className="mt-16">
+          <PublicMeetupExamples />
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus, Search } from 'lucide-react'
 import Link from 'next/link'
 
 interface Meetup {
@@ -32,27 +32,65 @@ interface Meetup {
 }
 
 export function FindMyMeetups() {
-  const [email, setEmail] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [meetups, setMeetups] = useState<Meetup[]>([])
   const [error, setError] = useState<string | null>(null)
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
 
+  // Function to detect if input is email or invitation code
+  const detectInputType = (input: string): 'email' | 'token' | 'invalid' => {
+    const trimmedInput = input.trim()
+    
+    // Email validation (basic)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (emailRegex.test(trimmedInput)) {
+      return 'email'
+    }
+    
+    // Token validation (assuming tokens are alphanumeric strings of certain length)
+    // Based on Prisma schema, tokens are generated with @default(cuid())
+    const tokenRegex = /^[a-zA-Z0-9]{20,30}$/
+    if (tokenRegex.test(trimmedInput)) {
+      return 'token'
+    }
+    
+    return 'invalid'
+  }
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!searchInput.trim()) return
+
+    const inputType = detectInputType(searchInput)
+    
+    if (inputType === 'invalid') {
+      setError('Voer een geldig email adres of uitnodigingscode in')
+      return
+    }
 
     setIsLoading(true)
     setError(null)
     setMeetups([])
 
     try {
-      const response = await fetch('/api/meetups/find-by-email', {
+      let endpoint = ''
+      let requestBody = {}
+
+      if (inputType === 'email') {
+        endpoint = '/api/meetups/find-by-email'
+        requestBody = { email: searchInput.trim() }
+      } else {
+        endpoint = '/api/meetups/find-by-token'
+        requestBody = { token: searchInput.trim() }
+      }
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
@@ -64,7 +102,11 @@ export function FindMyMeetups() {
       setMeetups(data.meetups)
       
       if (data.meetups.length === 0) {
-        setError('Geen meetups gevonden voor dit email adres')
+        if (inputType === 'email') {
+          setError('Geen meetups gevonden voor dit email adres')
+        } else {
+          setError('Geen meetup gevonden met deze uitnodigingscode')
+        }
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Er ging iets mis')
@@ -156,27 +198,33 @@ export function FindMyMeetups() {
     <div className="space-y-6">
       <form onSubmit={handleSearch} className="space-y-4">
         <div>
-          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-            Email adres
-          </Label>
-          <div className="mt-1 flex gap-2">
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jouw@email.com"
-              className="flex-1"
-              required
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading || !email.trim()}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-            >
-              {isLoading ? 'Zoeken...' : 'Zoeken'}
-            </Button>
-          </div>
+                      <Label htmlFor="searchInput" className="text-sm font-medium text-gray-700">
+              Email adres of uitnodigingscode
+            </Label>
+            <div className="mt-1 flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  id="searchInput"
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="jouw@email.com of uitnodigingscode"
+                  className="pl-10"
+                  required
+                />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={isLoading || !searchInput.trim()}
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+              >
+                {isLoading ? 'Zoeken...' : 'Zoeken'}
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              💡 Tip: Voer je email adres in om al je meetups te zien, of een specifieke uitnodigingscode voor één meetup
+            </p>
         </div>
       </form>
 

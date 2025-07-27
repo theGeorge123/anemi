@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
-import { Home } from 'lucide-react'
+import { InvitationDashboard } from '@/components/dashboard/InvitationDashboard'
+import { Home, Calendar, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MeetupInvite {
@@ -39,6 +40,7 @@ export default function DashboardClient() {
   const [error, setError] = useState<string | null>(null)
   const [editingMeetup, setEditingMeetup] = useState<MeetupInvite | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'meetups' | 'invitations'>('meetups')
 
   useEffect(() => {
     if (!session) {
@@ -238,106 +240,142 @@ export default function DashboardClient() {
               ← Terug naar Home
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">📊 Mijn Meetups</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">📊 Dashboard</h1>
           <p className="text-gray-600 mt-2">Beheer je koffie meetups en uitnodigingen</p>
+          
+          {/* Tabs */}
+          <div className="flex gap-1 mt-6 bg-amber-50 p-1 rounded-lg border border-amber-200 max-w-md">
+            <button
+              onClick={() => setActiveTab('meetups')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+                activeTab === 'meetups'
+                  ? 'bg-white text-amber-900 shadow-sm border border-amber-200'
+                  : 'text-amber-700 hover:text-amber-900 hover:bg-amber-100'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              Mijn Meetups
+            </button>
+            <button
+              onClick={() => setActiveTab('invitations')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${
+                activeTab === 'invitations'
+                  ? 'bg-white text-amber-900 shadow-sm border border-amber-200'
+                  : 'text-amber-700 hover:text-amber-900 hover:bg-amber-100'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Uitnodigingen
+            </button>
+          </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Laden van je meetups... ☕</p>
-          </div>
-        )}
+        {/* Tab Content */}
+        {activeTab === 'meetups' && (
+          <>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Laden van je meetups... ☕</p>
+              </div>
+            )}
 
-        {/* Meetups List */}
-        {!isLoading && meetups.length === 0 && (
-          <div className="text-center py-12">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-amber-200 max-w-md mx-auto">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">☕ Nog geen meetups</h3>
-              <p className="text-gray-600 mb-6">
-                Je hebt nog geen meetups gemaakt. Start je eerste koffie avontuur!
-              </p>
-              <Button asChild className="bg-amber-600 hover:bg-amber-700">
-                <Link href="/create">
-                  🚀 Maak je eerste Meetup
-                </Link>
-              </Button>
-            </div>
-          </div>
-        )}
+            {/* Meetups List */}
+            {!isLoading && meetups.length === 0 && (
+              <div className="text-center py-12">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-amber-200 max-w-md mx-auto">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">☕ Nog geen meetups</h3>
+                  <p className="text-gray-600 mb-6">
+                    Je hebt nog geen meetups gemaakt. Start je eerste koffie avontuur!
+                  </p>
+                  <Button asChild className="bg-amber-600 hover:bg-amber-700">
+                    <Link href="/create">
+                      🚀 Maak je eerste Meetup
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
 
-        {/* Meetups Grid */}
-        {!isLoading && meetups.length > 0 && (
-          <div className="grid gap-6">
-            {meetups.map((meetup) => (
-              <Card key={meetup.id} className="bg-white/80 backdrop-blur-sm border-amber-200">
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        {getStatusBadge(meetup.status)}
-                        {meetup.createdBy === session?.user?.email && (
-                          <Badge variant="outline">👤 Organisator</Badge>
-                        )}
-                        {meetup.inviteeEmail === session?.user?.email && (
-                          <Badge variant="outline">👥 Deelnemer</Badge>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        ☕ {meetup.cafe.name}
-                      </h3>
-                      
-                      <p className="text-gray-600 mb-2">
-                        📍 {meetup.cafe.address}
-                      </p>
-                      
-                      <p className="text-sm text-gray-500 mb-3">
-                        🗓️ {formatDate(meetup.createdAt)}
-                      </p>
+            {/* Meetups Grid */}
+            {!isLoading && meetups.length > 0 && (
+              <div className="grid gap-6">
+                {meetups.map((meetup) => (
+                  <Card key={meetup.id} className="bg-white/80 backdrop-blur-sm border-amber-200">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {getStatusBadge(meetup.status)}
+                            {meetup.createdBy === session?.user?.email && (
+                              <Badge variant="outline">👤 Organisator</Badge>
+                            )}
+                            {meetup.inviteeEmail === session?.user?.email && (
+                              <Badge variant="outline">👥 Deelnemer</Badge>
+                            )}
+                          </div>
+                          
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            ☕ {meetup.cafe.name}
+                          </h3>
+                          
+                          <p className="text-gray-600 mb-2">
+                            📍 {meetup.cafe.address}
+                          </p>
+                          
+                          <p className="text-sm text-gray-500 mb-3">
+                            🗓️ {formatDate(meetup.createdAt)}
+                          </p>
 
-                      {meetup.chosenDate && (
-                        <p className="text-sm text-green-600 font-medium">
-                          ✅ Gekozen: {formatDate(meetup.chosenDate)}
-                        </p>
-                      )}
-                    </div>
+                          {meetup.chosenDate && (
+                            <p className="text-sm text-green-600 font-medium">
+                              ✅ Gekozen: {formatDate(meetup.chosenDate)}
+                            </p>
+                          )}
+                        </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(getInviteLink(meetup.token))}
-                      >
-                        📋 Kopieer Link
-                      </Button>
-                      
-                      {meetup.createdBy === session?.user?.email && (
-                        <>
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleEditMeetup(meetup)}
+                            onClick={() => copyToClipboard(getInviteLink(meetup.token))}
                           >
-                            ✏️ Bewerken
+                            📋 Kopieer Link
                           </Button>
                           
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteMeetup(meetup.id)}
-                          >
-                            🗑️ Verwijderen
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                          {meetup.createdBy === session?.user?.email && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditMeetup(meetup)}
+                              >
+                                ✏️ Bewerken
+                              </Button>
+                              
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteMeetup(meetup.id)}
+                              >
+                                🗑️ Verwijderen
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Invitations Tab */}
+        {activeTab === 'invitations' && (
+          <InvitationDashboard />
         )}
 
         {/* Edit Modal */}

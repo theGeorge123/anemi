@@ -85,14 +85,14 @@ export function Footer() {
             <h4 className="text-lg font-display font-semibold text-foreground">Ondersteuning</h4>
             <ul className="space-y-3 text-base">
               <li>
-                <a href="mailto:team@anemimeets.com" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Contact
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/api/health" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
+                <Link href="/system-status" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Systeem Status
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

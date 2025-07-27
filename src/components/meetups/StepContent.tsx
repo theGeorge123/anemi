@@ -90,10 +90,8 @@ export function StepContent({
       case 'dateTimePreferences': 
         return Object.keys(formData.dateTimePreferences).length > 0
       case 'cafeChoice': 
-        if (showCafeSelection) {
-          return formData.cafeId // Cafe selection step requires cafeId
-        }
-        return true // Cafe choice step is always valid
+        // Always require cafeId regardless of selection method (random or manual)
+        return !!formData.cafeId
       case 'summary': return true // Summary step is always valid
       default: return true
     }

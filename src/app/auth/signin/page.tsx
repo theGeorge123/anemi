@@ -201,20 +201,33 @@ function SignInPageContent() {
                 </div>
               )}
               
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg font-semibold" 
-                disabled={signInLoading}
-              >
-                {signInLoading ? '🔄 Inloggen...' : '☕ Log In'}
-              </Button>
+              <div className="flex gap-3">
+                <Button 
+                  type="submit" 
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg font-semibold" 
+                  disabled={signInLoading}
+                >
+                  {signInLoading ? '🔄 Inloggen...' : '☕ Log In'}
+                </Button>
+                <Link 
+                  href={`/auth/signup${redirectUrl ? `?redirect=${redirectUrl}` : ''}`}
+                  className="flex-1"
+                >
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    className="w-full border-2 border-amber-500 text-amber-700 hover:bg-amber-50 hover:border-amber-600 text-lg font-semibold"
+                  >
+                    ✨ Registreer
+                  </Button>
+                </Link>
+              </div>
             </form>
             
             <div className="mt-6 text-center text-sm text-gray-600">
-              Heb je nog geen account?{' '}
-              <Link href="/auth/signup" className="text-amber-700 hover:underline font-medium">
-                Registreer hier
-              </Link>
+              Nieuw bij Anemi Meets? Klik hierboven op{' '}
+              <span className="font-semibold text-amber-700">Registreer</span>{' '}
+              om een gratis account aan te maken!
             </div>
             
             <div className="mt-4 text-center text-xs text-gray-400">

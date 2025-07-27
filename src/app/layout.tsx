@@ -6,6 +6,7 @@ import { Toaster, ToasterProvider } from '@/components/ui/toaster'
 import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
+import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { validateStartup } from '@/lib/startup'
 
 const inter = Inter({ 
@@ -95,9 +96,11 @@ export default function RootLayout({
           <EnvironmentBanner />
           <ToasterProvider>
           <SupabaseProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+            <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </BackgroundAgentProvider>
             <Toaster />
           </SupabaseProvider>
           </ToasterProvider>

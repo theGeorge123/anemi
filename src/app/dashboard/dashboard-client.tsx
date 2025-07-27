@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
+import { BackgroundAgentStatus } from '@/components/BackgroundAgentStatus'
 import { Home } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
@@ -240,6 +241,11 @@ export default function DashboardClient() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-4">📊 Mijn Meetups</h1>
           <p className="text-gray-600 mt-2">Beheer je koffie meetups en uitnodigingen</p>
+        </div>
+
+        {/* Background Agent Status */}
+        <div className="mb-6">
+          <BackgroundAgentStatus />
         </div>
 
         {/* Loading State */}

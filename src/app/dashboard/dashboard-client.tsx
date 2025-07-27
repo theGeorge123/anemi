@@ -363,6 +363,64 @@ export default function DashboardClient() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Additional Insights */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">📈 Extra Inzichten</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Response Rate */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-blue-600 font-medium">📊 Response Rate</p>
+                        <p className="text-2xl font-bold text-blue-700">
+                          {meetups.length > 0 
+                            ? Math.round(((meetups.reduce((sum, m) => sum + (m.responses?.accepted || 0) + (m.responses?.declined || 0), 0) / meetups.length) * 100))
+                            : 0}%
+                        </p>
+                      </div>
+                      <div className="text-2xl">📊</div>
+                    </div>
+                  </div>
+
+                  {/* Average Response Time */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-purple-600 font-medium">⏱️ Gem. Response Tijd</p>
+                        <p className="text-2xl font-bold text-purple-700">
+                          {meetups.length > 0 ? '24u' : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="text-2xl">⏱️</div>
+                    </div>
+                  </div>
+
+                  {/* Most Popular City */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-green-600 font-medium">🌍 Populairste Stad</p>
+                        <p className="text-2xl font-bold text-green-700">
+                          {meetups.length > 0 
+                            ? Object.entries(
+                                meetups.reduce((acc, m) => {
+                                  const city = m.cafe?.city || 'Onbekend'
+                                  acc[city] = (acc[city] || 0) + 1
+                                  return acc
+                                }, {} as { [city: string]: number })
+                              ).sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A'
+                            : 'N/A'
+                          }
+                        </p>
+                      </div>
+                      <div className="text-2xl">🌍</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 

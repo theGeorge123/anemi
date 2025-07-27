@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Find meetup by invite code
+    // Find meetup by invite code - include all statuses
     const { data: meetups, error } = await supabase
       .from('invites')
       .select(`
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         )
       `)
       .eq('token', inviteCode)
-      .eq('status', 'pending')
+      .in('status', ['pending', 'accepted', 'declined'])
 
     if (error) {
       console.error('Database error:', error)

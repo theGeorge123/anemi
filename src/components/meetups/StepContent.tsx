@@ -227,8 +227,10 @@ export function StepContent({
           onCafeSelect={(cafeId) => {
             onFormDataChange({ cafeId })
             // If user accepts random cafe, go directly to summary
-            // We need to go to the summary step, not just next
-            if (currentStep === totalSteps) {
+            // Check if we're at the final step based on actual step type
+            const actualStep = getActualStep()
+            if (actualStep === 'cafeChoice' && !shouldShowDateTimePreferences()) {
+              // We're at cafe choice and no date/time preferences, so this is the final step
               onFinish()
             } else {
               onNext()

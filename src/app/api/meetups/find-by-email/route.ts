@@ -12,11 +12,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find meetups where the user is the invitee (by email)
+    // Find meetups where the user is the invitee (by email) - include all statuses
     const meetups = await prisma.meetupInvite.findMany({
       where: {
         inviteeEmail: email.toLowerCase().trim(),
-        deletedAt: null
+        deletedAt: null,
+        // Include all statuses: pending, accepted, declined
+        status: {
+          in: ['pending', 'accepted', 'declined']
+        }
       },
       include: {
         cafe: true

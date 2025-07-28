@@ -7,7 +7,7 @@ import { ErrorInfo } from '@/lib/error-service'
 
 interface ErrorDisplayProps {
   error: ErrorInfo
-  onRetry?: () => void | Promise<void>
+  onRetry?: (() => void | Promise<void>) | undefined
   onDismiss?: () => void
   showDismiss?: boolean
   className?: string

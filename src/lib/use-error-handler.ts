@@ -16,7 +16,7 @@ export function useErrorHandler() {
         return null
       }
     },
-    [handleError]
+    []
   )
 
   const handleFetchError = useCallback(

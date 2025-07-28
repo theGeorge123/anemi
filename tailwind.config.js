@@ -189,6 +189,12 @@ module.exports = {
         "3xl": "1600px",
         "4xl": "1920px",
       },
+      minHeight: {
+        'touch': '44px',
+      },
+      minWidth: {
+        'touch': '44px',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

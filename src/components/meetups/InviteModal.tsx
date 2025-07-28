@@ -16,8 +16,8 @@ interface InviteModalProps {
 export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
   const [copied, setCopied] = useState(false)
   const [showEmailSection, setShowEmailSection] = useState(false)
-  const [emails, setEmails] = useState<string[]>([''])
-  const [sendingEmails, setSendingEmails] = useState(false)
+  const [email, setEmail] = useState<string>('')
+  const [sendingEmail, setSendingEmail] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   
   const inviteUrl = typeof window !== 'undefined' ? `${window.location.origin}/invite/${inviteCode}` : ''
@@ -40,27 +40,10 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
     }
   }
 
-  const addEmailField = () => {
-    setEmails([...emails, ''])
-  }
+  const sendInviteEmail = async () => {
+    if (!email.trim() || !email.includes('@')) return
 
-  const removeEmailField = (index: number) => {
-    if (emails.length > 1) {
-      setEmails(emails.filter((_, i) => i !== index))
-    }
-  }
-
-  const updateEmail = (index: number, value: string) => {
-    const newEmails = [...emails]
-    newEmails[index] = value
-    setEmails(newEmails)
-  }
-
-  const sendInviteEmails = async () => {
-    const validEmails = emails.filter(email => email.trim() && email.includes('@'))
-    if (validEmails.length === 0) return
-
-    setSendingEmails(true)
+    setSendingEmail(true)
     try {
       const response = await fetch('/api/send-invite', {
         method: 'POST',
@@ -69,20 +52,27 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
         },
         body: JSON.stringify({
           inviteCode,
-          emails: validEmails,
+          email: email.trim(),
         }),
       })
 
+      const responseData = await response.json()
+
       if (response.ok) {
         setEmailSent(true)
+        setEmail('') // Clear the email input
         setTimeout(() => setEmailSent(false), 3000)
       } else {
-        throw new Error('Failed to send emails')
+        // Show specific error message
+        console.error('Failed to send email:', responseData)
+        throw new Error(responseData.message || responseData.error || 'Failed to send email')
       }
     } catch (error) {
-      console.error('Error sending invite emails:', error)
+      console.error('Error sending invite email:', error)
+      // You could add a proper error state here if needed
+      alert(`Fout bij het versturen van email: ${error instanceof Error ? error.message : 'Onbekende fout'}`)
     } finally {
-      setSendingEmails(false)
+      setSendingEmail(false)
     }
   }
 
@@ -111,7 +101,7 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
                   onClick={copyToClipboard}
                   size="sm"
                   variant="outline"
-                  className="shrink-0 h-8 sm:h-auto"
+                  className="shrink-0 min-h-[44px] min-w-[44px] touch-target"
                 >
                   <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   <span className="hidden sm:inline">{copied ? 'Gekopieerd!' : 'Kopieer'}</span>
@@ -127,13 +117,13 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
                   type="text"
                   value={inviteUrl}
                   readOnly
-                  className="flex-1 bg-white px-2 sm:px-3 py-2 rounded border text-xs sm:text-sm"
+                  className="flex-1 bg-white px-2 sm:px-3 py-2 rounded border text-xs sm:text-sm min-h-[44px]"
                 />
                 <Button
                   onClick={copyToClipboard}
                   size="sm"
                   variant="outline"
-                  className="shrink-0 h-8 sm:h-auto"
+                  className="shrink-0 min-h-[44px] min-w-[44px] touch-target"
                 >
                   <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   <span className="hidden sm:inline">{copied ? 'Gekopieerd!' : 'Kopieer'}</span>
@@ -180,51 +170,46 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
             {/* Email Section */}
             {showEmailSection && (
               <div className="space-y-4 border-t border-gray-200 pt-4">
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">📧 Email Adressen</Label>
-                  {emails.map((email, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        type="email"
-                        placeholder="vriend@email.com"
-                        value={email}
-                        onChange={(e) => updateEmail(index, e.target.value)}
-                        className="flex-1"
-                      />
-                      {emails.length > 1 && (
-                        <Button
-                          onClick={() => removeEmailField(index)}
-                          variant="outline"
-                          size="sm"
-                          className="shrink-0"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    onClick={addEmailField}
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Voeg Email Toe
-                  </Button>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-xs sm:text-sm text-blue-800 mb-2">
+                    <strong>📧 Nieuwe single email functie</strong>
+                  </p>
+                  <p className="text-xs text-blue-700">
+                    Je kunt nu <strong>één email</strong> per keer versturen. Dit zorgt voor betere deliverability en eenvoudiger beheer.
+                  </p>
                 </div>
-
-                <Button
-                  onClick={sendInviteEmails}
-                  disabled={sendingEmails || emails.every(email => !email.trim())}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                >
-                  {sendingEmails ? '📧 Versturen...' : '📧 Verstuur Uitnodigingen'}
-                </Button>
+                
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">📧 Email Adres</Label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      type="email"
+                      placeholder="vriend@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="flex-1"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && email.trim() && email.includes('@')) {
+                          sendInviteEmail()
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={sendInviteEmail}
+                      disabled={sendingEmail || !email.trim() || !email.includes('@')}
+                      className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+                    >
+                      {sendingEmail ? '📧 Versturen...' : '📧 Verstuur'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Druk op Enter of klik op verstuur om de uitnodiging te verzenden
+                  </p>
+                </div>
 
                 {emailSent && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                    <p className="text-green-700 text-sm">✅ Uitnodigingen succesvol verzonden!</p>
+                    <p className="text-green-700 text-sm">✅ Uitnodiging succesvol verzonden!</p>
                   </div>
                 )}
               </div>

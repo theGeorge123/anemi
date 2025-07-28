@@ -45,6 +45,7 @@ model User {
   image         String?
   password      String?
   nickname      String?   // Random nickname for users
+  onboardingCompleted Boolean @default(false) // Track if user completed onboarding
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -165,6 +166,7 @@ model MeetupInvite {
   cafeId          String
   availableDates  String[]  // Array of ISO date strings
   availableTimes  String[]  // Array of time preferences
+  dateTimePreferences Json? // Store date-time mapping as JSON: {"2024-01-15": ["10:00", "14:00"], "2024-01-16": ["11:00"]}
   chosenDate      String?   // ISO date string
   chosenTime      String?   // Selected time
   status          String    @default("pending") // pending, confirmed, declined, expired
@@ -191,7 +193,7 @@ model CoffeeShop {
   id          String   @id @default(cuid())
   name        String
   description String?  @db.Text
-  city        String   // Amsterdam or Rotterdam
+  city        String   // Amsterdam, Rotterdam, Utrecht, Den Haag, Rhoon, etc.
   address     String
   latitude    Float
   longitude   Float

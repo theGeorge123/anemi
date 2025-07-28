@@ -10,6 +10,8 @@ import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { SessionManager } from '@/components/SessionManager'
 import { validateStartup } from '@/lib/startup'
+import { AccountLinkingProvider } from '@/components/AccountLinkingProvider'
+import { OnboardingProvider } from '@/components/OnboardingProvider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -31,6 +33,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Anemi Meets' }],
   creator: 'Anemi Meets',
   publisher: 'Anemi Meets',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -100,11 +107,15 @@ export default function RootLayout({
             <ToasterProvider>
             <SupabaseProvider>
               <SessionManager>
-                <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-                  <LayoutWrapper>
-                    {children}
-                  </LayoutWrapper>
-                </BackgroundAgentProvider>
+                <AccountLinkingProvider>
+                  <OnboardingProvider>
+                    <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+                      <LayoutWrapper>
+                        {children}
+                      </LayoutWrapper>
+                    </BackgroundAgentProvider>
+                  </OnboardingProvider>
+                </AccountLinkingProvider>
               </SessionManager>
               <Toaster />
             </SupabaseProvider>

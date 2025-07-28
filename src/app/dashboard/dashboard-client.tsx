@@ -513,17 +513,48 @@ export default function DashboardClient() {
   }
 
   if (error) {
+    const isAuthError = error.includes('token') || error.includes('authorization') || error.includes('Invalid') || error.includes('expired')
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-background to-orange-50 flex items-center justify-center px-4">
         <div className="max-w-md mx-auto text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">❌ Error</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <Button asChild className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/auth/signin">
-                🔐 Inloggen
-              </Link>
-            </Button>
+            {isAuthError ? (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">🔐 Inloggen Vereist</h2>
+                <p className="text-gray-600 mb-6">
+                  Je moet ingelogd zijn om je meetups te bekijken. Log in om door te gaan.
+                </p>
+                <Button asChild className="bg-amber-600 hover:bg-amber-700 w-full mb-3">
+                  <Link href="/auth/signin">
+                    🔐 Inloggen
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    ← Terug naar Home
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">⚠️ Er ging iets mis</h2>
+                <p className="text-gray-600 mb-6">
+                  We konden je meetups niet laden. Probeer het later opnieuw.
+                </p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="bg-amber-600 hover:bg-amber-700 w-full mb-3"
+                >
+                  🔄 Opnieuw Proberen
+                </Button>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    ← Terug naar Home
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -532,20 +563,21 @@ export default function DashboardClient() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-background to-orange-50">
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-3 sm:p-4">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <Link href="/">
             <Button 
               variant="ghost" 
-              className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+              className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-sm sm:text-base px-2 sm:px-4"
             >
-              <Home className="w-4 h-4" />
-              ← Terug naar Home
+              <Home className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">← Terug naar Home</span>
+              <span className="sm:hidden">← Home</span>
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">📊 Mijn Meetups</h1>
-          <p className="text-gray-600 mt-2">Beheer je koffie meetups en uitnodigingen</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-3 sm:mt-4">📊 Mijn Meetups</h1>
+          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Beheer je koffie meetups en uitnodigingen</p>
         </div>
 
         {/* Background Agent Status */}
@@ -555,8 +587,8 @@ export default function DashboardClient() {
 
         {/* Statistics Section */}
         {meetups.length > 0 && (
-          <div className="mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="mb-4 sm:mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">

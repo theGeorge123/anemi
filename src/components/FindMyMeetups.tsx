@@ -44,9 +44,7 @@ interface StatusGroup {
 }
 
 export function FindMyMeetups() {
-  const [email, setEmail] = useState('')
   const [inviteCode, setInviteCode] = useState('')
-  const [searchType, setSearchType] = useState<'email' | 'code'>('email')
   const [isLoading, setIsLoading] = useState(false)
   const [meetups, setMeetups] = useState<Meetup[]>([])
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
@@ -57,32 +55,20 @@ export function FindMyMeetups() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (searchType === 'email' && !email.trim()) return
-    if (searchType === 'code' && !inviteCode.trim()) return
+    if (!inviteCode.trim()) return
 
     setIsLoading(true)
     clearError()
     setMeetups([])
 
     try {
-      let response
-      if (searchType === 'email') {
-        response = await fetch('/api/meetups/find-by-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: email.trim() }),
-        })
-      } else {
-        response = await fetch('/api/meetups/find-by-code', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ inviteCode: inviteCode.trim() }),
-        })
-      }
+      const response = await fetch('/api/meetups/find-by-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ inviteCode: inviteCode.trim() }),
+      })
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -93,10 +79,7 @@ export function FindMyMeetups() {
       setMeetups(data.meetups)
       
       if (data.meetups.length === 0) {
-        const noResultsError = new Error(searchType === 'email' 
-          ? 'Geen meetups gevonden voor dit email adres'
-          : 'Geen meetup gevonden voor deze uitnodigingscode'
-        )
+        const noResultsError = new Error('Geen meetup gevonden met deze uitnodigingscode')
         handleError(noResultsError)
       }
     } catch (error) {
@@ -330,84 +313,35 @@ export function FindMyMeetups() {
 
   return (
     <div className="space-y-6">
-      {/* Search Type Toggle */}
-      <div className="flex justify-center">
-        <div className="bg-gray-100 rounded-lg p-1">
-          <button
-            type="button"
-            onClick={() => setSearchType('email')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              searchType === 'email'
-                ? 'bg-white text-amber-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            📧 Email Zoeken
-          </button>
-          <button
-            type="button"
-            onClick={() => setSearchType('code')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              searchType === 'code'
-                ? 'bg-white text-amber-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            🔍 Code Zoeken
-          </button>
-        </div>
-      </div>
 
-      <form onSubmit={handleSearch} className="space-y-4">
-        {searchType === 'email' ? (
-          <div>
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email adres
-            </Label>
-            <div className="mt-1 flex gap-2">
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jouw@email.com"
-                className="flex-1"
-                required
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !email.trim()}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-              >
-                {isLoading ? 'Zoeken...' : 'Zoeken'}
-              </Button>
-            </div>
+      <form onSubmit={handleSearch} className="space-y-4 px-4">
+        <div className="space-y-3">
+          <Label htmlFor="inviteCode" className="text-sm sm:text-base font-medium text-gray-700">
+            🔑 Vind je meetup met invite token
+          </Label>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+            <Input
+              id="inviteCode"
+              type="text"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              placeholder="Voer de invite token in (bijv. abc123def)"
+              className="flex-1 text-base"
+              required
+            />
+            <Button 
+              type="submit" 
+              disabled={isLoading || !inviteCode.trim()}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 text-base sm:whitespace-nowrap touch-target"
+            >
+              {isLoading ? 'Zoeken...' : 'Zoeken'}
+            </Button>
           </div>
-        ) : (
-          <div>
-            <Label htmlFor="inviteCode" className="text-sm font-medium text-gray-700">
-              Uitnodigingscode
-            </Label>
-            <div className="mt-1 flex gap-2">
-              <Input
-                id="inviteCode"
-                type="text"
-                value={inviteCode}
-                onChange={(e) => setInviteCode(e.target.value)}
-                placeholder="Voer de uitnodigingscode in"
-                className="flex-1"
-                required
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !inviteCode.trim()}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-              >
-                {isLoading ? 'Zoeken...' : 'Zoeken'}
-              </Button>
-            </div>
+          <div className="text-xs sm:text-sm text-gray-500 text-center space-y-1">
+            <p>🔑 De invite token vind je in je uitnodiging (email of WhatsApp)</p>
+            <p>💡 Geen account nodig - gewoon je token invoeren!</p>
           </div>
-        )}
+        </div>
       </form>
 
       {/* Error Display */}
@@ -449,10 +383,30 @@ export function FindMyMeetups() {
             </div>
           ))}
 
-          <div className="text-center pt-4 border-t border-amber-200">
-            <p className="text-sm text-gray-600 mb-3">
-              💡 Tip: Maak een account om al je meetups op één plek te beheren!
-            </p>
+          <div className="text-center pt-6 border-t border-amber-200 mt-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <h4 className="font-semibold text-blue-800 mb-2">💡 Account aanmaken?</h4>
+              <p className="text-sm text-blue-700 mb-3">
+                Je kunt meetups bekijken en accepteren zonder account. Maar met een account kun je:
+              </p>
+              <ul className="text-sm text-blue-700 text-left space-y-1 mb-3">
+                <li>• Al je meetups op één plek beheren</li>
+                <li>• Meetup details aanpassen</li>
+                <li>• Automatisch koppelen van nieuwe uitnodigingen</li>
+              </ul>
+              <div className="flex flex-col xs:flex-row gap-2 justify-center">
+                <Link href="/auth/signup">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    Account Aanmaken
+                  </Button>
+                </Link>
+                <Link href="/auth/signin">
+                  <Button variant="outline" className="border-blue-300 text-blue-700">
+                    Inloggen
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       )}

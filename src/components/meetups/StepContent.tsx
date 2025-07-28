@@ -123,15 +123,31 @@ export function StepContent({
         value={formData.name}
         onChange={(name) => onFormDataChange({ name })}
       />
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <p className="text-sm text-amber-800">
-          <span className="font-medium">📧 Email:</span> {formData.email || 'Laden...'}
-        </p>
-        <p className="text-xs text-amber-600 mt-1">
-          We gebruiken je account email voor notificaties
+      
+      {/* Show email input if no email is preset (guest users) */}
+      {!formData.email || formData.email === '' ? (
+        <EmailInput 
+          value={formData.email}
+          onChange={(email) => onFormDataChange({ email })}
+        />
+      ) : (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p className="text-sm text-amber-800">
+            <span className="font-medium">📧 Email:</span> {formData.email}
+          </p>
+          <p className="text-xs text-amber-600 mt-1">
+            We gebruiken je account email voor uitnodigingen
+          </p>
+        </div>
+      )}
+      
+      <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <p className="font-medium text-blue-800 mb-1">📧 Nieuwe single email uitnodiging</p>
+        <p className="text-blue-700">
+          Je kunt nu <strong>één email</strong> opgeven om je meetup uitnodiging te versturen. 
+          Dit maakt het eenvoudiger en directer!
         </p>
       </div>
-      <p className="text-gray-600">Geen zorgen, je kunt dit later nog aanpassen.</p>
     </div>
   )
 

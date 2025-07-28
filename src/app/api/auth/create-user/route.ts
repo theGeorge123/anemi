@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { prisma } from '@/lib/prisma'
 import { generateNicknameFromEmail } from '@/lib/nickname-generator'
+import { sendEmailVerificationEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,24 +26,33 @@ export async function POST(request: NextRequest) {
     // Generate nickname for the user
     const nickname = generateNicknameFromEmail(email)
 
-    // Try normal signup first
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify`
+    // Create user with admin API to have full control over the process
+    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
     })
 
-    if (error) {
-      console.error('User creation error:', error)
+    // Generate email verification link using admin API
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'signup',
+      email: email,
+      password: password,
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/verify-email?type=signup`
+      }
+    })
+
+    if (linkError) {
+      console.error('Email verification link generation error:', linkError)
       
       // If it's an email/SMTP error, try creating user without email confirmation
-      if (error.message.includes('email') || error.message.includes('confirmation') || error.message.includes('smtp')) {
+      if (linkError.message.includes('email') || linkError.message.includes('confirmation') || linkError.message.includes('smtp')) {
         console.warn('Email sending failed, trying to create user without email confirmation')
         
         // Try creating user with email_confirm: true to bypass email
-        const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
+        const { data: adminData, error: adminError } = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
           email_confirm: true,
@@ -85,17 +95,34 @@ export async function POST(request: NextRequest) {
         })
       }
       
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json({ error: linkError.message }, { status: 400 })
+    }
+
+    // Send custom email verification email
+    try {
+      await sendEmailVerificationEmail({
+        to: email,
+        verificationLink: linkData.properties?.action_link || '',
+        userName: email.split('@')[0] // Use email prefix as username
+      })
+      
+      console.log('Custom email verification email sent successfully to:', email)
+    } catch (emailError) {
+      console.error('Failed to send custom email verification email:', emailError)
+      return NextResponse.json(
+        { error: 'Failed to send email verification email' },
+        { status: 500 }
+      )
     }
 
     // Save user to database with nickname
     try {
       await prisma.user.upsert({
-        where: { id: data.user!.id },
+        where: { id: linkData.user!.id },
         update: { nickname },
         create: {
-          id: data.user!.id,
-          email: data.user!.email!,
+          id: linkData.user!.id,
+          email: linkData.user!.email!,
           nickname,
           createdAt: new Date(),
           updatedAt: new Date()
@@ -108,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      user: data.user,
+      user: linkData.user,
       nickname,
       message: 'User created successfully. Please check your email to verify your account.' 
     })

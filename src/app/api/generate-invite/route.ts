@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         cafeId: cafeId || '', // Use empty string if no cafe selected
         availableDates: dates,
         availableTimes: times,
+        dateTimePreferences: dateTimePreferences || null, // Store the date-time mapping
         status: 'pending',
         expiresAt,
         createdBy: userEmail

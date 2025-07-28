@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendPasswordResetEmail } from '@/lib/email'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -33,13 +34,13 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         )
       }
-      
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
       )
     }
 
+    // Password reset email sent successfully by Supabase
     console.log('Password reset email sent successfully to:', email)
     
     return NextResponse.json({

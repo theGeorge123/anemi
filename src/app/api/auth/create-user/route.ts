@@ -88,21 +88,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: linkError.message }, { status: 400 })
     }
 
-    // Send custom email verification email
-    try {
-      await sendEmailVerificationEmail({
-        to: email,
-        verificationLink: linkData.properties?.action_link || '',
-        userName: email.split('@')[0] // Use email prefix as username
-      })
-      
-      console.log('Custom email verification email sent successfully to:', email)
-    } catch (emailError) {
-      console.error('Failed to send custom email verification email:', emailError)
-      return NextResponse.json(
-        { error: 'Failed to send email verification email' },
-        { status: 500 }
-      )
+    // Send custom email verification email (only if emails are enabled)
+    if (process.env.DISABLE_EMAILS !== 'true') {
+      try {
+        await sendEmailVerificationEmail({
+          to: email,
+          verificationLink: linkData.properties?.action_link || '',
+          userName: email.split('@')[0] // Use email prefix as username
+        })
+        
+        console.log('Custom email verification email sent successfully to:', email)
+      } catch (emailError) {
+        console.error('Failed to send custom email verification email:', emailError)
+        return NextResponse.json(
+          { error: 'Failed to send email verification email' },
+          { status: 500 }
+        )
+      }
+    } else {
+      console.log('📧 Email verification skipped (DISABLE_EMAILS=true)')
     }
 
     // Save user to database with nickname

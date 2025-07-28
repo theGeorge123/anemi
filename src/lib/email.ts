@@ -102,6 +102,12 @@ export interface EmailVerificationEmail {
  */
 export async function sendEmail(options: EmailOptions) {
   try {
+    // Check if emails are disabled
+    if (process.env.DISABLE_EMAILS === 'true') {
+      console.log('📧 Email disabled (DISABLE_EMAILS=true), skipping email to:', options.to);
+      return { id: 'disabled', to: options.to };
+    }
+
     // Validate required environment variables
     if (!process.env.RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY is not configured. Please set this environment variable.');

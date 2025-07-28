@@ -193,7 +193,7 @@ model CoffeeShop {
   id          String   @id @default(cuid())
   name        String
   description String?  @db.Text
-  city        String   // Amsterdam or Rotterdam
+  city        String   // Amsterdam, Rotterdam, Utrecht, Den Haag, Rhoon, etc.
   address     String
   latitude    Float
   longitude   Float

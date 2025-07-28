@@ -85,6 +85,18 @@ export interface CalendarInviteData {
   attendeeName: string;
 }
 
+export interface PasswordResetEmail {
+  to: string;
+  resetLink: string;
+  userName?: string;
+}
+
+export interface EmailVerificationEmail {
+  to: string;
+  verificationLink: string;
+  userName?: string;
+}
+
 /**
  * Send a generic email using Resend
  */
@@ -582,6 +594,184 @@ export async function sendInviteEmail(data: InviteEmailData) {
     to: data.to,
     subject: `☕ Je bent uitgenodigd: Koffie meetup bij ${data.cafe.name}`,
     html: generateInviteEmailHTML(data),
+  });
+}
+
+/**
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(data: PasswordResetEmail) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🔐 Wachtwoord Reset</h1>
+        <p style="color: #fecaca; margin: 10px 0 0 0; font-size: 16px;">Herstel toegang tot je account</p>
+      </div>
+      
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hallo${data.userName ? ` ${data.userName}` : ''}! 👋</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          We hebben een verzoek ontvangen om het wachtwoord voor je Anemi Meets account te resetten. 
+          Klik op de onderstaande knop om een nieuw wachtwoord in te stellen.
+        </p>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+          <h3 style="color: #991b1b; margin: 0 0 15px 0; font-size: 18px;">🔒 Wachtwoord Reset Link</h3>
+          <p style="margin: 8px 0; color: #991b1b;">Deze link is <strong>24 uur geldig</strong> en kan maar één keer gebruikt worden.</p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${data.resetLink}" 
+             style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.3); transition: all 0.3s ease;">
+            🔓 Reset Mijn Wachtwoord
+          </a>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">🛡️ Veiligheid Tips:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Kies een sterk wachtwoord van minimaal 8 karakters</li>
+            <li>Gebruik een combinatie van letters, cijfers en symbolen</li>
+            <li>Deel je wachtwoord nooit met anderen</li>
+            <li>Overweeg het gebruik van een wachtwoord manager</li>
+          </ul>
+        </div>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">⚠️ Heb je dit niet aangevraagd?</h3>
+          <p style="color: #92400e; margin: 0;">
+            Als je geen wachtwoord reset hebt aangevraagd, kun je deze email veilig negeren. 
+            Je account blijft beveiligd en er worden geen wijzigingen aangebracht.
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/contact" 
+             style="background-color: #6b7280; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
+            📞 Contact Ondersteuning
+          </a>
+        </div>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          Je account veiligheid is onze prioriteit.<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #dc2626; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: data.to,
+    subject: '🔐 Wachtwoord Reset - Anemi Meets',
+    html,
+  });
+}
+
+/**
+ * Send email verification email
+ */
+export async function sendEmailVerificationEmail(data: EmailVerificationEmail) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">📧 Email Verificatie</h1>
+        <p style="color: #bbf7d0; margin: 10px 0 0 0; font-size: 16px;">Bevestig je email adres</p>
+      </div>
+      
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Welkom${data.userName ? ` ${data.userName}` : ''}! 🎉</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Bedankt voor het aanmelden bij Anemi Meets! We zijn enthousiast om je te verwelkomen in onze community van koffieliefhebbers. 
+          Om je account te activeren, klik je op de onderstaande knop om je email adres te verifiëren.
+        </p>
+        
+        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
+          <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 18px;">✅ Email Verificatie</h3>
+          <p style="margin: 8px 0; color: #166534;">Deze link is <strong>24 uur geldig</strong>. Klik op de knop hieronder om je account te activeren.</p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${data.verificationLink}" 
+             style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.3); transition: all 0.3s ease;">
+            ✅ Verifieer Mijn Email
+          </a>
+        </div>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🚀 Wat kun je doen na verificatie:</h3>
+          <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Koffie meetups plannen met vrienden</li>
+            <li>Ontdek geweldige cafés in je stad</li>
+            <li>Deel je koffie ervaringen met de community</li>
+            <li>Ontvang persoonlijke aanbevelingen</li>
+          </ul>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">🔒 Account Veiligheid:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>We slaan je persoonlijke gegevens veilig op</li>
+            <li>Je email wordt nooit gedeeld met derden</li>
+            <li>Je kunt je account altijd verwijderen</li>
+            <li>We sturen alleen relevante updates</li>
+          </ul>
+        </div>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+          <h3 style="color: #991b1b; margin: 0 0 15px 0; font-size: 18px;">❓ Problemen met de link?</h3>
+          <p style="color: #991b1b; margin: 0;">
+            Als de knop niet werkt, kopieer dan deze link naar je browser:<br>
+            <span style="word-break: break-all; font-family: monospace; background: #fff; padding: 4px; border-radius: 4px;">${data.verificationLink}</span>
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/contact" 
+             style="background-color: #6b7280; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
+            📞 Hulp Nodig?
+          </a>
+        </div>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          Welkom bij de koffie community! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #16a34a; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: data.to,
+    subject: '📧 Verifieer je email - Welkom bij Anemi Meets!',
+    html,
   });
 }
 

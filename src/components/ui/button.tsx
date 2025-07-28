@@ -22,11 +22,11 @@ const buttonVariants = cva(
         warmOutline: 'border-2 border-amber-300 bg-background hover:bg-amber-50 hover:border-amber-400 text-foreground transition-all duration-300',
       },
       size: {
-        default: 'h-12 px-6 py-3',
-        sm: 'h-10 rounded-lg px-4 py-2',
-        lg: 'h-16 rounded-xl px-10 py-4 text-lg',
-        xl: 'h-20 rounded-2xl px-12 py-6 text-xl',
-        icon: 'h-12 w-12 rounded-xl',
+        default: 'h-12 px-6 py-3 min-h-[44px]',
+        sm: 'h-10 rounded-lg px-4 py-2 min-h-[40px]',
+        lg: 'h-16 rounded-xl px-8 py-4 text-lg min-h-[44px] sm:px-10',
+        xl: 'h-20 rounded-2xl px-10 py-6 text-xl min-h-[44px] sm:px-12',
+        icon: 'h-12 w-12 rounded-xl min-h-[44px] min-w-[44px]',
       },
     },
     defaultVariants: {

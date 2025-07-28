@@ -45,6 +45,7 @@ model User {
   image         String?
   password      String?
   nickname      String?   // Random nickname for users
+  onboardingCompleted Boolean @default(false) // Track if user completed onboarding
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

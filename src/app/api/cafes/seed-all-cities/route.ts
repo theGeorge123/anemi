@@ -364,7 +364,7 @@ export async function POST(request: NextRequest) {
         if (!cityStats[cafe.city]) {
           cityStats[cafe.city] = 0;
         }
-        cityStats[cafe.city]++;
+        cityStats[cafe.city] = (cityStats[cafe.city] || 0) + 1;
 
       } catch (error) {
         const errorMsg = `Failed to add ${cafe.name} (${cafe.city}): ${error}`;
@@ -420,13 +420,16 @@ export async function GET(request: NextRequest) {
       if (!acc[cafe.city]) {
         acc[cafe.city] = [];
       }
-      acc[cafe.city].push({
-        name: cafe.name,
-        address: cafe.address,
-        rating: cafe.rating,
-        priceRange: cafe.priceRange,
-        features: cafe.features
-      });
+      const cityArray = acc[cafe.city];
+      if (cityArray) {
+        cityArray.push({
+          name: cafe.name,
+          address: cafe.address,
+          rating: cafe.rating,
+          priceRange: cafe.priceRange,
+          features: cafe.features
+        });
+      }
       return acc;
     }, {} as Record<string, any[]>);
 

@@ -37,10 +37,12 @@ function VerifyEmailPageContent() {
   }, [emailParam])
 
   const handleVerification = useCallback(async () => {
-    if (!token || !email) {
-      console.error('Missing token or email:', { token, email })
-      setVerificationStatus('error')
-      console.error('Email verificatie parameters ontbreken. Controleer je email link.')
+    if (!token || !email || isVerifying) {
+      console.error('Missing token or email, or already verifying:', { token, email, isVerifying })
+      if (!token || !email) {
+        setVerificationStatus('error')
+        console.error('Email verificatie parameters ontbreken. Controleer je email link.')
+      }
       return
     }
 
@@ -105,6 +107,9 @@ function VerifyEmailPageContent() {
             return prev - 1
           })
         }, 1000)
+      } else {
+        console.error('No user data returned from verification')
+        setVerificationStatus('error')
       }
     } catch (error) {
       console.error('Email verification error:', error)
@@ -113,14 +118,24 @@ function VerifyEmailPageContent() {
     } finally {
       setIsVerifying(false)
     }
-  }, [token, email, type, supabase, router])
+  }, [token, email, type, supabase, router, isVerifying])
 
   // Auto-verify when component mounts
   useEffect(() => {
-    if (token && email && verificationStatus === 'pending') {
+    if (token && email && verificationStatus === 'pending' && !isVerifying) {
+      // Add timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        if (verificationStatus === 'pending') {
+          console.error('Email verification timeout')
+          setVerificationStatus('error')
+        }
+      }, 10000) // 10 second timeout
+
       handleVerification()
+
+      return () => clearTimeout(timeoutId)
     }
-  }, [token, email, verificationStatus, handleVerification])
+  }, [token, email, verificationStatus, isVerifying])
 
   const resendVerification = async () => {
     if (!email) {

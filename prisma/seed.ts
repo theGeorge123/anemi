@@ -306,6 +306,86 @@ const cafes = [
 
   // ROTTERDAM (EXISTING - Updated)
   {
+    name: "Man Met Bril Koffie",
+    description: "Contemporary cafe known for on-site roasted coffee and all-day breakfast options in a cozy, plant-filled space.",
+    address: "Vijverhofstraat 70, 3032 SN Rotterdam",
+    latitude: 51.930474,
+    longitude: 4.474231,
+    phone: "+31 10 307 2855",
+    website: "http://www.manmetbrilkoffie.nl",
+    rating: 4.5,
+    reviewCount: 726,
+    priceRange: PriceRange.MODERATE,
+    features: ["Wi-Fi", "Outdoor seating", "Pet friendly"],
+    hours: {
+      "Mon-Fri": "7:00-17:00",
+      "Sat-Sun": "8:00-18:00"
+    },
+    photos: [],
+    isVerified: true,
+    city: "Rotterdam"
+  },
+  {
+    name: "Hopper Coffee Rotterdam",
+    description: "Modern cafe and bakery known for on-site coffee roasting, fresh sourdough breads, and a popular breakfast menu.",
+    address: "Schiedamse Vest 146, 3011 EV Rotterdam",
+    latitude: 51.916514,
+    longitude: 4.480304,
+    phone: "+31 10 413 0638",
+    website: "https://www.hopper-coffee.nl",
+    rating: 4.3,
+    reviewCount: 698,
+    priceRange: PriceRange.MODERATE,
+    features: ["Wi-Fi", "Outdoor seating", "Pet friendly"],
+    hours: {
+      "Mon-Fri": "8:30-17:30",
+      "Sat-Sun": "9:30-17:30"
+    },
+    photos: [],
+    isVerified: true,
+    city: "Rotterdam"
+  },
+  {
+    name: "Urban Espresso Bar (UEB West)",
+    description: "Hip espresso bar with an Italian-style vibe, known for its own coffee blend, tasty pastries, and a cozy work-friendly atmosphere.",
+    address: "Nieuwe Binnenweg 263, 3021 GD Rotterdam",
+    latitude: 51.9157,
+    longitude: 4.4527,
+    phone: "+31 6 22814505",
+    website: "http://www.urbanespressobar.nl",
+    rating: 4.3,
+    reviewCount: 432,
+    priceRange: PriceRange.MODERATE,
+    features: ["Wi-Fi", "Outdoor seating", "Pet friendly"],
+    hours: {
+      "Mon-Fri": "8:30-18:00",
+      "Sat-Sun": "8:30-18:00"
+    },
+    photos: [],
+    isVerified: true,
+    city: "Rotterdam"
+  },
+  {
+    name: "Lebkov & Sons",
+    description: "Cafe at Rotterdam Centraal offering specialty coffee, fresh juices, and homemade sandwiches and pastries in a laptop-friendly space.",
+    address: "Stationsplein 50, 3013 AK Rotterdam",
+    latitude: 51.9244,
+    longitude: 4.4699,
+    phone: "+31 10 240 0617",
+    website: "https://www.lebkov.nl",
+    rating: 3.9,
+    reviewCount: 1107,
+    priceRange: PriceRange.MODERATE,
+    features: ["Wi-Fi", "Indoor seating", "Pet friendly"],
+    hours: {
+      "Mon-Fri": "7:00-18:00",
+      "Sat-Sun": "9:00-17:00"
+    },
+    photos: [],
+    isVerified: true,
+    city: "Rotterdam"
+  },
+  {
     name: "Wakuli Specialty Coffee Bar",
     description: "Subscription-based specialty coffee roaster with a focus on direct-trade and sustainable beans. Features a cozy bar for tastings.",
     address: "Witte de Withstraat 44, Rotterdam",

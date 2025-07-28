@@ -577,10 +577,20 @@ export default function InvitePage() {
               </div>
             </div>
 
+            {/* Account Requirements Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4">
+              <h4 className="font-semibold text-blue-800 mb-2 text-sm sm:text-base">ℹ️ Account vereisten</h4>
+              <div className="text-xs sm:text-sm text-blue-700 space-y-1">
+                <p>• ✅ <strong>Bekijken en accepteren:</strong> Geen account nodig</p>
+                <p>• 🔐 <strong>Wijzigen van details:</strong> Account vereist</p>
+                <p>• 📱 <strong>Alle meetups beheren:</strong> Account vereist</p>
+              </div>
+            </div>
+
             {/* Account Status & Info */}
             <div className="space-y-3 sm:space-y-4">
               <h3 className="font-semibold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
-                <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                 Jouw gegevens:
               </h3>
 
@@ -596,13 +606,13 @@ export default function InvitePage() {
                   </p>
                   
                   <div className="mt-3">
-                    <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
+                    <Label htmlFor="name" className="text-sm sm:text-base font-medium">Naam</Label>
                     <Input
                       id="name"
                       value={inviteeName}
                       onChange={(e) => setInviteeName(e.target.value)}
                       placeholder="Jouw naam"
-                      className="mt-1"
+                      className="mt-2"
                     />
                   </div>
                 </div>
@@ -637,27 +647,32 @@ export default function InvitePage() {
                     </div>
                   </div>
               
-              <div>
-                    <Label htmlFor="name" className="text-sm sm:text-base">Naam</Label>
-                <Input
-                  id="name"
-                  value={inviteeName}
-                  onChange={(e) => setInviteeName(e.target.value)}
-                  placeholder="Jouw naam"
-                  className="mt-1"
-                />
-              </div>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="guestName" className="text-sm sm:text-base font-medium">Naam</Label>
+                  <Input
+                    id="guestName"
+                    value={inviteeName}
+                    onChange={(e) => setInviteeName(e.target.value)}
+                    placeholder="Jouw naam"
+                    className="mt-2"
+                  />
+                </div>
 
-              <div>
-                    <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={inviteeEmail}
-                  onChange={(e) => setInviteeEmail(e.target.value)}
-                  placeholder="jouw@email.com"
-                  className="mt-1"
-                />
+                <div>
+                  <Label htmlFor="guestEmail" className="text-sm sm:text-base font-medium">Email</Label>
+                  <Input
+                    id="guestEmail"
+                    type="email"
+                    value={inviteeEmail}
+                    onChange={(e) => setInviteeEmail(e.target.value)}
+                    placeholder="jouw@email.com"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Je email wordt alleen gebruikt voor bevestiging en updates
+                  </p>
+                </div>
               </div>
                 </div>
               )}

@@ -10,6 +10,7 @@ import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { SessionManager } from '@/components/SessionManager'
 import { validateStartup } from '@/lib/startup'
+import { AccountLinkingProvider } from '@/components/AccountLinkingProvider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -105,11 +106,13 @@ export default function RootLayout({
             <ToasterProvider>
             <SupabaseProvider>
               <SessionManager>
-                <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-                  <LayoutWrapper>
-                    {children}
-                  </LayoutWrapper>
-                </BackgroundAgentProvider>
+                <AccountLinkingProvider>
+                  <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+                    <LayoutWrapper>
+                      {children}
+                    </LayoutWrapper>
+                  </BackgroundAgentProvider>
+                </AccountLinkingProvider>
               </SessionManager>
               <Toaster />
             </SupabaseProvider>

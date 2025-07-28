@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 import { prisma } from '@/lib/prisma'
 import { generateNicknameFromEmail } from '@/lib/nickname-generator'
 import { sendEmailVerificationEmail } from '@/lib/email'
@@ -12,27 +12,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
-    // Create Supabase client with anon key for normal signup
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
-
     // Generate nickname for the user
     const nickname = generateNicknameFromEmail(email)
 
-    // Create user with admin API to have full control over the process
-    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    })
+    // Check if supabaseAdmin is available
+    if (!supabaseAdmin) {
+      console.error('❌ Create user API: Supabase admin client not configured')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
 
     // Generate email verification link using admin API
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({

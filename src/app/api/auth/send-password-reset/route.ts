@@ -18,17 +18,22 @@ export async function POST(request: NextRequest) {
     // Create Supabase client with service role key for admin operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Send password reset email with correct redirect URL
-    const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`
-      }
+    // Send password reset email using the correct method
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`
     })
 
     if (error) {
       console.error('Password reset email error:', error)
+      
+      // Check if user doesn't exist
+      if (error.message.includes('User not found') || error.message.includes('No user found')) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        )
+      }
+      
       return NextResponse.json(
         { error: error.message },
         { status: 400 }

@@ -20,6 +20,7 @@ function ResetPasswordPageContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordReset, setPasswordReset] = useState(false)
+  const [isValidResetLink, setIsValidResetLink] = useState(false)
 
   const form = useFormValidation({
     password: '',
@@ -76,39 +77,25 @@ function ResetPasswordPageContent() {
     })(e)
   }
 
-  // Check if we have the necessary tokens from the reset email
+  // Check if we have a valid reset link
   useEffect(() => {
-    // Supabase admin.generateLink sends these parameters
-    const accessToken = searchParams.get('access_token')
-    const refreshToken = searchParams.get('refresh_token')
-    const type = searchParams.get('type')
-    
-    console.log('Reset password parameters:', {
-      accessToken: accessToken ? 'Present' : 'Missing',
-      refreshToken: refreshToken ? 'Present' : 'Missing',
-      type,
-      allParams: Object.fromEntries(searchParams.entries())
-    })
-    
-    if (!accessToken || !refreshToken) {
-      console.error('Missing reset tokens')
-      console.error('Ongeldige of ontbrekende reset link. Vraag een nieuwe reset link aan.')
-      return
+    // For password reset, we need to check if the user is authenticated
+    // The resetPasswordForEmail method should have set up the session
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      if (session && !error) {
+        console.log('Valid session found for password reset')
+        setIsValidResetLink(true)
+      } else {
+        console.error('No valid session found for password reset')
+        console.error('Ongeldige of ontbrekende reset link. Vraag een nieuwe reset link aan.')
+        setIsValidResetLink(false)
+      }
     }
 
-    // Set the session with the tokens from the reset email
-    supabase?.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    }).then(({ data, error }) => {
-      if (error) {
-        console.error('Error setting session:', error)
-        console.error('Er is een probleem met de reset link. Probeer opnieuw.')
-      } else {
-        console.log('Session set successfully for password reset')
-      }
-    })
-  }, [searchParams, supabase])
+    checkSession()
+  }, [supabase])
 
   if (passwordReset) {
     return (
@@ -148,6 +135,44 @@ function ResetPasswordPageContent() {
     )
   }
 
+  // Show error if reset link is invalid
+  if (!isValidResetLink) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-red-600" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-red-700 mb-1">❌ Ongeldige Reset Link</CardTitle>
+            <CardDescription className="text-base text-gray-500">
+              Deze reset link is ongeldig of verlopen
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 text-sm">
+                Vraag een nieuwe wachtwoord reset link aan.
+              </p>
+            </div>
+            
+            <Link href="/auth/forgot-password">
+              <Button className="w-full bg-amber-500 hover:bg-amber-600">
+                Nieuwe Reset Link Aanvragen
+              </Button>
+            </Link>
+            
+            <Link href="/auth/signin">
+              <Button variant="outline" className="w-full">
+                Terug naar Inloggen
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
       {/* Back to Home Button */}
@@ -167,7 +192,7 @@ function ResetPasswordPageContent() {
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-3xl font-bold text-amber-700 mb-1">🔐 Nieuw Wachtwoord</CardTitle>
           <CardDescription className="text-base text-gray-500">
-            Kies een nieuw wachtwoord voor je account
+            Kies een sterk nieuw wachtwoord voor je account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -195,14 +220,14 @@ function ResetPasswordPageContent() {
               </div>
               {form.errors.password && <p className="text-red-500 text-sm">{form.errors.password}</p>}
             </div>
-
+            
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>
+              <Label htmlFor="confirmPassword">Bevestig Nieuw Wachtwoord</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Bevestig je nieuwe wachtwoord"
+                  placeholder="Voer je nieuwe wachtwoord opnieuw in"
                   value={form.values.confirmPassword}
                   onChange={(e) => form.handleChange('confirmPassword')(e)}
                   onBlur={form.handleBlur('confirmPassword')}
@@ -217,16 +242,14 @@ function ResetPasswordPageContent() {
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {(form.errors.confirmPassword || confirmPasswordError) && (
-                <p className="text-red-500 text-sm">{form.errors.confirmPassword || confirmPasswordError}</p>
-              )}
+              {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
             </div>
             
             {/* Error message */}
             {resetError && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-700 text-sm">
-                  ❌ {resetError.message || 'Er ging iets mis bij het resetten van je wachtwoord. Probeer opnieuw.'}
+                  ❌ {resetError.message || 'Er ging iets mis bij het wijzigen van je wachtwoord. Probeer opnieuw.'}
                 </p>
               </div>
             )}

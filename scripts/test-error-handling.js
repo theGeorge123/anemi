@@ -1,242 +1,230 @@
-// Test script for error handling functionality
-// Run this in the browser console
+// Test script voor error handling functionaliteit
+// Run dit script in de browser console
 
-console.log('🧪 Testing Error Handling Functionality...')
+console.log('🚨 Error Handling Test Script')
+console.log('=============================')
 
-// Function to test network error simulation
-function testNetworkError() {
-  console.log('🎯 Testing Network Error Simulation...')
+// Function to test error service integration
+function testErrorServiceIntegration() {
+  console.log('🎯 Testing Error Service Integration...')
   
-  // Simulate a network error
-  const networkError = new Error('Failed to fetch: NetworkError when attempting to fetch resource.')
-  
-  // Import and use the error service
-  if (typeof window !== 'undefined' && window.errorService) {
-    const errorInfo = window.errorService.handleError(networkError)
-    console.log('✅ Network error handled:', errorInfo)
-    return errorInfo
+  // Check if ErrorService is available
+  if (typeof window !== 'undefined' && window.ErrorService) {
+    console.log('✅ ErrorService is available globally')
   } else {
-    console.log('❌ Error service not available globally')
-    console.log('💡 Error should be handled by GlobalErrorHandler component')
-    return null
+    console.log('❌ ErrorService not found globally')
   }
-}
-
-// Function to test server error simulation
-function testServerError() {
-  console.log('🎯 Testing Server Error Simulation...')
   
-  // Simulate a server error
-  const serverError = new Error('500 Internal Server Error')
-  
-  if (typeof window !== 'undefined' && window.errorService) {
-    const errorInfo = window.errorService.handleError(serverError)
-    console.log('✅ Server error handled:', errorInfo)
-    return errorInfo
-  } else {
-    console.log('❌ Error service not available globally')
-    console.log('💡 Error should be handled by GlobalErrorHandler component')
-    return null
-  }
-}
-
-// Function to test auth error simulation
-function testAuthError() {
-  console.log('🎯 Testing Auth Error Simulation...')
-  
-  // Simulate an auth error
-  const authError = new Error('401 Unauthorized: Invalid token')
-  
-  if (typeof window !== 'undefined' && window.errorService) {
-    const errorInfo = window.errorService.handleError(authError)
-    console.log('✅ Auth error handled:', errorInfo)
-    return errorInfo
-  } else {
-    console.log('❌ Error service not available globally')
-    console.log('💡 Error should be handled by GlobalErrorHandler component')
-    return null
-  }
-}
-
-// Function to test validation error simulation
-function testValidationError() {
-  console.log('🎯 Testing Validation Error Simulation...')
-  
-  // Simulate a validation error
-  const validationError = new Error('400 Bad Request: Validation failed')
-  
-  if (typeof window !== 'undefined' && window.errorService) {
-    const errorInfo = window.errorService.handleError(validationError)
-    console.log('✅ Validation error handled:', errorInfo)
-    return errorInfo
-  } else {
-    console.log('❌ Error service not available globally')
-    console.log('💡 Error should be handled by GlobalErrorHandler component')
-    return null
-  }
-}
-
-// Function to test error boundary
-function testErrorBoundary() {
-  console.log('🎯 Testing Error Boundary...')
-  
-  // Look for error boundary component
-  const errorBoundary = document.querySelector('[class*="error-boundary"]') ||
-                       document.querySelector('[data-testid="error-boundary"]')
-  
-  if (errorBoundary) {
-    console.log('✅ Error boundary component found')
-  } else {
-    console.log('⚠️ Error boundary component not found')
-    console.log('💡 Error boundary should be wrapping the app')
-  }
-}
-
-// Function to test global error handler
-function testGlobalErrorHandler() {
-  console.log('🎯 Testing Global Error Handler...')
-  
-  // Look for global error handler component
-  const globalErrorHandler = document.querySelector('[class*="global-error-handler"]') ||
-                            document.querySelector('[data-testid="global-error-handler"]')
-  
-  if (globalErrorHandler) {
-    console.log('✅ Global error handler component found')
-  } else {
-    console.log('⚠️ Global error handler component not found')
-    console.log('💡 Global error handler should be wrapping the app')
-  }
-}
-
-// Function to test error modal
-function testErrorModal() {
-  console.log('🎯 Testing Error Modal...')
-  
-  // Look for error modal
-  const errorModal = document.querySelector('[class*="fixed inset-0"]') ||
-                    document.querySelector('[class*="bg-black/50"]')
-  
-  if (errorModal) {
-    console.log('✅ Error modal found')
+  // Check for error display components
+  const errorDisplays = document.querySelectorAll('[class*="bg-red-50"], [class*="bg-yellow-50"], [class*="bg-blue-50"], [class*="bg-orange-50"]')
+  if (errorDisplays.length > 0) {
+    console.log(`✅ Found ${errorDisplays.length} error display(s)`)
     
-    // Check for modal content
-    const modalContent = errorModal.querySelector('[class*="card"]')
-    if (modalContent) {
-      console.log('✅ Modal content found')
+    errorDisplays.forEach((display, index) => {
+      const text = display.textContent || ''
+      const hasIcon = display.querySelector('[class*="text-lg"]') || display.textContent?.includes('🌐') || display.textContent?.includes('🖥️')
+      const hasRetryButton = display.querySelector('button')?.textContent?.includes('Opnieuw')
       
-      // Check for specific elements
-      const title = modalContent.querySelector('h1, h2, h3')
-      const buttons = modalContent.querySelectorAll('button')
-      const closeButton = modalContent.querySelector('[class*="absolute"]')
-      
-      console.log(`📋 Modal elements: Title=${!!title}, Buttons=${buttons.length}, Close=${!!closeButton}`)
-    }
-  } else {
-    console.log('⚠️ Error modal not found (this is normal if no error occurred)')
-  }
-}
-
-// Function to simulate API error
-function simulateApiError() {
-  console.log('🎯 Simulating API Error...')
-  
-  // Create a fake fetch that throws an error
-  const originalFetch = window.fetch
-  window.fetch = function() {
-    return Promise.reject(new Error('Failed to fetch: NetworkError when attempting to fetch resource.'))
-  }
-  
-  // Try to fetch something to trigger the error
-  fetch('/api/health')
-    .catch(error => {
-      console.log('✅ API error caught:', error.message)
-      
-      // Restore original fetch
-      window.fetch = originalFetch
-      
-      // The error should be handled by the GlobalErrorHandler
-      console.log('💡 Error should trigger the global error handler')
+      console.log(`📋 Error Display ${index + 1}:`)
+      console.log(`   Text: ${text.substring(0, 100)}...`)
+      console.log(`   Has Icon: ${hasIcon ? '✅' : '❌'}`)
+      console.log(`   Has Retry Button: ${hasRetryButton ? '✅' : '❌'}`)
     })
-}
-
-// Function to test 404 page
-function test404Page() {
-  console.log('🎯 Testing 404 Page...')
-  
-  // Check if we're on a 404 page
-  const is404Page = document.querySelector('h1')?.textContent.includes('404') ||
-                   window.location.pathname === '/404' ||
-                   document.title.includes('404')
-  
-  if (is404Page) {
-    console.log('✅ 404 page detected')
-    
-    // Check for 404 page elements
-    const searchSection = document.querySelector('input[placeholder*="zoek"]')
-    const popularLinks = document.querySelectorAll('a[href="/"], a[href="/create"], a[href="/contact"]')
-    const quickActions = document.querySelectorAll('button')
-    
-    console.log(`📋 404 page elements: Search=${!!searchSection}, Popular links=${popularLinks.length}, Quick actions=${quickActions.length}`)
-    
-    if (searchSection && popularLinks.length > 0 && quickActions.length > 0) {
-      console.log('🎉 SUCCESS: 404 page has all expected elements!')
-    } else {
-      console.log('⚠️ WARNING: Some 404 page elements might be missing')
-    }
   } else {
-    console.log('💡 Navigate to a non-existent page to test 404 functionality')
+    console.log('⚠️ No error displays found (this might be normal if no errors)')
   }
 }
 
-// Function to simulate complete error flow
-function simulateErrorFlow() {
-  console.log('🎯 Simulating Complete Error Flow...')
+// Function to test error types
+function testErrorTypes() {
+  console.log('🎯 Testing Error Types...')
   
-  console.log('📝 Step 1: Error occurs (network, server, auth, validation)')
-  console.log('📝 Step 2: Error service detects error type')
-  console.log('📝 Step 3: Global error handler shows modal')
-  console.log('📝 Step 4: User sees user-friendly message')
-  console.log('📝 Step 5: User can retry, go home, or contact support')
+  console.log('📝 Expected Error Types:')
+  console.log('   - Network errors (Yellow)')
+  console.log('   - Server errors (Red)')
+  console.log('   - Auth errors (Blue)')
+  console.log('   - Validation errors (Orange)')
+  console.log('   - Unknown errors (Gray)')
   
-  console.log('💡 Expected Results:')
-  console.log('   - Error type detection (network/server/auth/validation)')
-  console.log('   - User-friendly error messages')
-  console.log('   - Troubleshooting tips')
-  console.log('   - Quick action buttons')
-  console.log('   - Help links (contact, system status)')
-  console.log('   - Error details (type, code, timestamp)')
+  console.log('📝 Expected Features:')
+  console.log('   - Consistent error styling')
+  console.log('   - Clear error messages')
+  console.log('   - Retry buttons for retryable errors')
+  console.log('   - Dismiss buttons')
+  console.log('   - Error icons and colors')
+  
+  console.log('💡 To test:')
+  console.log('   1. Trigger different types of errors')
+  console.log('   2. Check if error styling is consistent')
+  console.log('   3. Verify retry functionality works')
+  console.log('   4. Test dismiss functionality')
 }
 
-// Export functions for manual testing
-window.testNetworkError = testNetworkError
-window.testServerError = testServerError
-window.testAuthError = testAuthError
-window.testValidationError = testValidationError
-window.testErrorBoundary = testErrorBoundary
-window.testGlobalErrorHandler = testGlobalErrorHandler
-window.testErrorModal = testErrorModal
-window.simulateApiError = simulateApiError
-window.test404Page = test404Page
-window.simulateErrorFlow = simulateErrorFlow
+// Function to test error boundaries
+function testErrorBoundaries() {
+  console.log('🎯 Testing Error Boundaries...')
+  
+  // Check if error boundary is active
+  const hasErrorBoundary = document.querySelector('[class*="error-boundary"]') || 
+                          document.querySelector('[data-error-boundary]')
+  
+  if (hasErrorBoundary) {
+    console.log('✅ Error boundary detected')
+  } else {
+    console.log('⚠️ No error boundary detected (might be normal)')
+  }
+  
+  console.log('📝 Expected Error Boundary Features:')
+  console.log('   - Catches JavaScript errors')
+  console.log('   - Shows user-friendly error page')
+  console.log('   - Provides retry functionality')
+  console.log('   - Shows error details in development')
+  console.log('   - Logs errors for debugging')
+}
 
-console.log('🧪 Error Handling Test Functions Loaded:')
-console.log('- testNetworkError() - Test network error handling')
-console.log('- testServerError() - Test server error handling')
-console.log('- testAuthError() - Test auth error handling')
-console.log('- testValidationError() - Test validation error handling')
-console.log('- testErrorBoundary() - Test error boundary component')
-console.log('- testGlobalErrorHandler() - Test global error handler')
-console.log('- testErrorModal() - Test error modal display')
-console.log('- simulateApiError() - Simulate API error')
-console.log('- test404Page() - Test 404 page functionality')
-console.log('- simulateErrorFlow() - Show complete error flow steps')
+// Function to test form validation errors
+function testFormValidationErrors() {
+  console.log('🎯 Testing Form Validation Errors...')
+  
+  // Look for forms
+  const forms = document.querySelectorAll('form')
+  if (forms.length > 0) {
+    console.log(`✅ Found ${forms.length} form(s)`)
+    
+    forms.forEach((form, index) => {
+      const inputs = form.querySelectorAll('input, textarea, select')
+      const errorMessages = form.querySelectorAll('[class*="error"], [class*="red-"], [class*="invalid"]')
+      
+      console.log(`📋 Form ${index + 1}:`)
+      console.log(`   Inputs: ${inputs.length}`)
+      console.log(`   Error Messages: ${errorMessages.length}`)
+      
+      if (errorMessages.length > 0) {
+        console.log('✅ Form has error handling')
+      } else {
+        console.log('⚠️ Form might not have error handling')
+      }
+    })
+  } else {
+    console.log('❌ No forms found')
+  }
+}
 
-// Auto-detect and show relevant tests
-const is404Page = document.querySelector('h1')?.textContent.includes('404')
-if (is404Page) {
-  console.log('🎯 Auto-detected 404 page')
-  console.log('💡 Run test404Page() to test 404 functionality')
+// Function to test network error handling
+function testNetworkErrorHandling() {
+  console.log('🎯 Testing Network Error Handling...')
+  
+  console.log('📝 Expected Network Error Features:')
+  console.log('   - Detects network connectivity issues')
+  console.log('   - Shows user-friendly network error message')
+  console.log('   - Provides retry functionality')
+  console.log('   - Suggests checking internet connection')
+  
+  console.log('💡 To test network errors:')
+  console.log('   1. Disconnect internet')
+  console.log('   2. Try to submit forms or load data')
+  console.log('   3. Check if network error is shown')
+  console.log('   4. Verify retry button works')
+}
+
+// Function to test server error handling
+function testServerErrorHandling() {
+  console.log('🎯 Testing Server Error Handling...')
+  
+  console.log('📝 Expected Server Error Features:')
+  console.log('   - Detects 500-level server errors')
+  console.log('   - Shows user-friendly server error message')
+  console.log('   - Provides retry functionality')
+  console.log('   - Suggests trying again later')
+  
+  console.log('💡 To test server errors:')
+  console.log('   1. Try to access non-existent endpoints')
+  console.log('   2. Check if server error is shown')
+  console.log('   3. Verify error message is helpful')
+  console.log('   4. Test retry functionality')
+}
+
+// Function to test auth error handling
+function testAuthErrorHandling() {
+  console.log('🎯 Testing Auth Error Handling...')
+  
+  console.log('📝 Expected Auth Error Features:')
+  console.log('   - Detects 401/403 authentication errors')
+  console.log('   - Shows user-friendly auth error message')
+  console.log('   - Redirects to login if needed')
+  console.log('   - Suggests logging in again')
+  
+  console.log('💡 To test auth errors:')
+  console.log('   1. Try to access protected routes')
+  console.log('   2. Check if auth error is shown')
+  console.log('   3. Verify redirect to login works')
+  console.log('   4. Test login flow after error')
+}
+
+// Function to test validation error handling
+function testValidationErrorHandling() {
+  console.log('🎯 Testing Validation Error Handling...')
+  
+  console.log('📝 Expected Validation Error Features:')
+  console.log('   - Detects form validation errors')
+  console.log('   - Shows specific field error messages')
+  console.log('   - Highlights invalid fields')
+  console.log('   - Provides clear guidance on how to fix')
+  
+  console.log('💡 To test validation errors:')
+  console.log('   1. Submit forms with invalid data')
+  console.log('   2. Check if validation errors are shown')
+  console.log('   3. Verify error messages are helpful')
+  console.log('   4. Test that errors clear when fixed')
+}
+
+// Function to simulate error scenarios
+function simulateErrorScenarios() {
+  console.log('🎯 Simulating Error Scenarios...')
+  
+  console.log('📝 Error Scenarios to Test:')
+  console.log('   1. Network connectivity issues')
+  console.log('   2. Server errors (500, 502, 503)')
+  console.log('   3. Authentication failures (401, 403)')
+  console.log('   4. Validation errors (400)')
+  console.log('   5. Timeout errors')
+  console.log('   6. JavaScript runtime errors')
+  
+  console.log('💡 Manual Testing Steps:')
+  console.log('   1. Disconnect internet and try actions')
+  console.log('   2. Submit invalid form data')
+  console.log('   3. Try to access protected content')
+  console.log('   4. Check error messages are consistent')
+  console.log('   5. Verify retry functionality works')
+}
+
+// Auto-detect current page and show relevant tests
+const currentPath = window.location.pathname
+if (currentPath === '/') {
+  console.log('🎯 Auto-detected homepage')
+  console.log('💡 Run testErrorServiceIntegration() to test error service')
+  console.log('💡 Run testErrorTypes() to see expected error types')
+  console.log('💡 Run testErrorBoundaries() to test error boundaries')
+  console.log('💡 Run testFormValidationErrors() to test form errors')
+} else if (currentPath.includes('/auth')) {
+  console.log('🎯 Auto-detected auth page')
+  console.log('💡 Run testAuthErrorHandling() to test auth errors')
+  console.log('💡 Run testFormValidationErrors() to test form validation')
 } else {
-  console.log('💡 Run simulateApiError() to test error handling')
-  console.log('💡 Navigate to a non-existent page to test 404')
-} 
+  console.log('💡 Navigate to different pages to test error handling')
+  console.log('💡 Run testErrorServiceIntegration() to test error service')
+}
+
+// Make functions globally available
+window.testErrorServiceIntegration = testErrorServiceIntegration
+window.testErrorTypes = testErrorTypes
+window.testErrorBoundaries = testErrorBoundaries
+window.testFormValidationErrors = testFormValidationErrors
+window.testNetworkErrorHandling = testNetworkErrorHandling
+window.testServerErrorHandling = testServerErrorHandling
+window.testAuthErrorHandling = testAuthErrorHandling
+window.testValidationErrorHandling = testValidationErrorHandling
+window.simulateErrorScenarios = simulateErrorScenarios
+
+console.log('✅ All error handling test functions are now available globally')
+console.log('💡 Use the functions above to test error handling functionality') 

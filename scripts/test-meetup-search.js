@@ -1,11 +1,12 @@
-// Test script for meetup search functionality
-// Run this in the browser console
+// Test script voor verbeterde meetup zoekfunctie
+// Run dit script in de browser console op de homepage
 
-console.log('🧪 Testing Meetup Search Functionality...')
+console.log('🔍 Verbeterde Meetup Zoekfunctie Test Script')
+console.log('============================================')
 
-// Function to test email search
-function testEmailSearch() {
-  console.log('🎯 Testing Email Search...')
+// Function to test email search with status grouping
+function testEmailSearchWithStatusGrouping() {
+  console.log('🎯 Testing Email Search with Status Grouping...')
   
   // Check if we're on the homepage or a page with FindMyMeetups
   const findMyMeetups = document.querySelector('[data-testid="find-my-meetups"]') ||
@@ -46,30 +47,83 @@ function testEmailSearch() {
     form.onsubmit = function(e) {
       console.log('🎯 Search form submitted!')
       console.log('🎯 Email:', emailInput.value)
-      console.log('🎯 Checking if meetups are found...')
+      console.log('🎯 Checking for status groups...')
       
       // Check if results appear within 3 seconds
       setTimeout(() => {
         const meetupCards = document.querySelectorAll('[class*="card"]')
-        const pendingSection = document.querySelector('[class*="yellow-50"]')
+        const statusGroups = document.querySelectorAll('[class*="bg-yellow-50"], [class*="bg-green-50"], [class*="bg-red-50"], [class*="bg-gray-50"]')
         const errorMessage = document.querySelector('[class*="red-50"]')
         
         if (meetupCards.length > 0) {
           console.log('✅ SUCCESS: Meetups found!')
           console.log(`📊 Found ${meetupCards.length} meetup(s)`)
           
-          if (pendingSection) {
-            console.log('✅ Pending meetups section found')
-            console.log('✅ Search is showing ALL statuses including pending')
+          if (statusGroups.length > 0) {
+            console.log('✅ SUCCESS: Status groups found!')
+            console.log(`📊 Found ${statusGroups.length} status group(s)`)
+            
+            // Check each status group
+            statusGroups.forEach((group, index) => {
+              const title = group.querySelector('h5')?.textContent || 'Unknown'
+              const description = group.querySelector('p')?.textContent || 'No description'
+              const meetupsInGroup = group.querySelectorAll('[class*="card"]').length
+              
+              console.log(`📋 Group ${index + 1}: ${title}`)
+              console.log(`   Description: ${description}`)
+              console.log(`   Meetups in group: ${meetupsInGroup}`)
+            })
+            
+            // Check for specific status groups
+            const pendingGroup = document.querySelector('[class*="bg-yellow-50"]')
+            const confirmedGroup = document.querySelector('[class*="bg-green-50"]')
+            const declinedGroup = document.querySelector('[class*="bg-red-50"]')
+            const expiredGroup = document.querySelector('[class*="bg-gray-50"]')
+            
+            if (pendingGroup) {
+              console.log('✅ Pending meetups group found')
+              console.log('✅ "In afwachting" status feedback working')
+            }
+            
+            if (confirmedGroup) {
+              console.log('✅ Confirmed meetups group found')
+              console.log('✅ "Bevestigd" status feedback working')
+            }
+            
+            if (declinedGroup) {
+              console.log('✅ Declined meetups group found')
+              console.log('✅ "Afgewezen" status feedback working')
+            }
+            
+            if (expiredGroup) {
+              console.log('✅ Expired meetups group found')
+              console.log('✅ "Verlopen" status feedback working')
+            }
+            
           } else {
-            console.log('⚠️ No pending meetups section found')
-            console.log('💡 This might mean no pending meetups exist for this email')
+            console.log('⚠️ No status groups found')
+            console.log('💡 This might mean all meetups have the same status')
           }
           
-          // Check for different status badges
+          // Check for status badges
           const badges = document.querySelectorAll('[class*="badge"]')
           const statuses = Array.from(badges).map(badge => badge.textContent)
           console.log('📋 Status badges found:', statuses)
+          
+          // Check for improved status text
+          const hasImprovedStatus = statuses.some(status => 
+            status.includes('In afwachting') || 
+            status.includes('Bevestigd') || 
+            status.includes('Afgewezen') || 
+            status.includes('Verlopen')
+          )
+          
+          if (hasImprovedStatus) {
+            console.log('✅ SUCCESS: Improved status text found')
+            console.log('✅ Status feedback is working correctly')
+          } else {
+            console.log('⚠️ No improved status text found')
+          }
           
         } else if (errorMessage) {
           console.log('❌ FAILED: Error message found')
@@ -87,113 +141,109 @@ function testEmailSearch() {
   }
 }
 
-// Function to test invite code search
-function testInviteCodeSearch() {
-  console.log('🎯 Testing Invite Code Search...')
+// Function to test status grouping functionality
+function testStatusGrouping() {
+  console.log('🎯 Testing Status Grouping Functionality...')
   
-  // Look for search type toggle
-  const toggleButtons = document.querySelectorAll('button[class*="bg-gray-100"]')
-  if (toggleButtons.length >= 2) {
-    console.log('✅ Search type toggle found')
-    
-    // Click on invite code search
-    const codeButton = Array.from(toggleButtons).find(btn => 
-      btn.textContent.includes('Code') || btn.textContent.includes('code')
-    )
-    
-    if (codeButton) {
-      console.log('✅ Invite code search button found')
-      codeButton.click()
-      console.log('🎯 Switched to invite code search')
-      
-      // Look for invite code input
-      setTimeout(() => {
-        const codeInput = document.querySelector('input[placeholder*="uitnodigingscode"]') ||
-                         document.querySelector('input[placeholder*="code"]')
-        
-        if (codeInput) {
-          console.log('✅ Invite code input found')
-          console.log('🎯 Ready to test! Enter an invite code and click search')
-        } else {
-          console.log('❌ Invite code input not found')
-        }
-      }, 500)
-    } else {
-      console.log('❌ Invite code search button not found')
-    }
-  } else {
-    console.log('❌ Search type toggle not found')
-  }
+  console.log('📝 Expected Status Groups:')
+  console.log('   1. ⏳ In Afwachting (Yellow background)')
+  console.log('   2. ✅ Bevestigd (Green background)')
+  console.log('   3. ❌ Afgewezen (Red background)')
+  console.log('   4. ⏰ Verlopen (Gray background)')
+  
+  console.log('📝 Expected Features:')
+  console.log('   - Meetups grouped by status')
+  console.log('   - Clear status descriptions')
+  console.log('   - Color-coded backgrounds')
+  console.log('   - Status icons for each group')
+  console.log('   - Count of meetups per status')
+  
+  console.log('💡 To test:')
+  console.log('   1. Search for an email with multiple meetups')
+  console.log('   2. Check if meetups are grouped by status')
+  console.log('   3. Verify status descriptions are clear')
+  console.log('   4. Confirm color coding is correct')
 }
 
-// Function to check if all statuses are supported
-function checkStatusSupport() {
-  console.log('🎯 Checking Status Support...')
+// Function to test status feedback
+function testStatusFeedback() {
+  console.log('🎯 Testing Status Feedback...')
   
-  // Look for status badges
-  const badges = document.querySelectorAll('[class*="badge"]')
-  if (badges.length > 0) {
-    const statuses = Array.from(badges).map(badge => badge.textContent)
-    console.log('📋 Current status badges:', statuses)
-    
-    // Check for specific statuses
-    const hasPending = statuses.some(s => s.includes('Wachten') || s.includes('pending'))
-    const hasConfirmed = statuses.some(s => s.includes('Bevestigd') || s.includes('confirmed'))
-    const hasDeclined = statuses.some(s => s.includes('Afgewezen') || s.includes('declined'))
-    const hasExpired = statuses.some(s => s.includes('Verlopen') || s.includes('expired'))
-    
-    console.log('✅ Pending status support:', hasPending)
-    console.log('✅ Confirmed status support:', hasConfirmed)
-    console.log('✅ Declined status support:', hasDeclined)
-    console.log('✅ Expired status support:', hasExpired)
-    
-    if (hasPending && hasConfirmed && hasDeclined) {
-      console.log('🎉 SUCCESS: All major statuses are supported!')
-    } else {
-      console.log('⚠️ WARNING: Some statuses might not be supported')
-    }
-  } else {
-    console.log('❌ No status badges found')
-  }
+  console.log('📝 Expected Status Badges:')
+  console.log('   - ⏳ In afwachting (Yellow)')
+  console.log('   - ✅ Bevestigd! (Green)')
+  console.log('   - ✅ Geaccepteerd! (Green)')
+  console.log('   - ❌ Afgewezen (Red)')
+  console.log('   - ⏰ Verlopen (Gray)')
+  
+  console.log('📝 Expected Status Information:')
+  console.log('   - Expiration date for pending meetups')
+  console.log('   - Chosen date/time for confirmed meetups')
+  console.log('   - Clear status descriptions')
+  
+  console.log('💡 To test:')
+  console.log('   1. Search for meetups with different statuses')
+  console.log('   2. Check if status badges are clear')
+  console.log('   3. Verify status information is helpful')
+  console.log('   4. Confirm expiration dates are shown')
 }
 
-// Function to simulate complete search flow
-function simulateSearchFlow() {
-  console.log('🎯 Simulating Complete Search Flow...')
+// Function to test all meetup statuses are shown
+function testAllStatusesShown() {
+  console.log('🎯 Testing All Statuses Are Shown...')
   
-  console.log('📝 Step 1: Navigate to homepage or search page')
-  console.log('📝 Step 2: Choose search type (email or invite code)')
-  console.log('📝 Step 3: Enter search criteria')
-  console.log('📝 Step 4: Click search button')
-  console.log('📝 Step 5: Check results')
+  console.log('📝 Expected Behavior:')
+  console.log('   - ALL meetup statuses should be shown')
+  console.log('   - Including pending, confirmed, declined, expired')
+  console.log('   - No meetups should be hidden')
+  console.log('   - Clear feedback for each status')
   
-  console.log('💡 Expected Results:')
-  console.log('   - Should show ALL meetups (pending, confirmed, declined, expired)')
-  console.log('   - Pending meetups should be highlighted')
-  console.log('   - Results should be sorted (pending first)')
-  console.log('   - Each meetup should have correct status badge')
-  console.log('   - Should show cafe details and organizer info')
+  console.log('💡 To test:')
+  console.log('   1. Search for an email with various meetup statuses')
+  console.log('   2. Verify all statuses are displayed')
+  console.log('   3. Check that no meetups are missing')
+  console.log('   4. Confirm status descriptions are helpful')
 }
 
-// Export functions for manual testing
-window.testEmailSearch = testEmailSearch
-window.testInviteCodeSearch = testInviteCodeSearch
-window.checkStatusSupport = checkStatusSupport
-window.simulateSearchFlow = simulateSearchFlow
+// Function to test improved user experience
+function testImprovedUX() {
+  console.log('🎯 Testing Improved User Experience...')
+  
+  console.log('📝 Expected Improvements:')
+  console.log('   - Clear status grouping')
+  console.log('   - Helpful status descriptions')
+  console.log('   - Visual status indicators')
+  console.log('   - Easy to understand feedback')
+  console.log('   - Actionable information')
+  
+  console.log('💡 To test:')
+  console.log('   1. Search for meetups')
+  console.log('   2. Check if grouping is helpful')
+  console.log('   3. Verify descriptions are clear')
+  console.log('   4. Confirm actions are obvious')
+  console.log('   5. Test that UX is improved')
+}
 
-console.log('🧪 Meetup Search Test Functions Loaded:')
-console.log('- testEmailSearch() - Test email search functionality')
-console.log('- testInviteCodeSearch() - Test invite code search')
-console.log('- checkStatusSupport() - Check if all statuses are supported')
-console.log('- simulateSearchFlow() - Show complete search flow steps')
-
-// Auto-detect and show relevant test
-const hasSearchForm = document.querySelector('input[type="email"]') || document.querySelector('input[placeholder*="code"]')
-if (hasSearchForm) {
-  console.log('🎯 Auto-detected search functionality')
-  console.log('💡 Run testEmailSearch() to test email search')
-  console.log('💡 Run testInviteCodeSearch() to test invite code search')
-  console.log('💡 Run checkStatusSupport() to check status support')
+// Auto-detect current page and show relevant tests
+const currentPath = window.location.pathname
+if (currentPath === '/') {
+  console.log('🎯 Auto-detected homepage')
+  console.log('💡 Run testEmailSearchWithStatusGrouping() to test email search')
+  console.log('💡 Run testStatusGrouping() to see expected status groups')
+  console.log('💡 Run testStatusFeedback() to test status feedback')
+  console.log('💡 Run testAllStatusesShown() to verify all statuses shown')
+  console.log('💡 Run testImprovedUX() to test improved user experience')
 } else {
-  console.log('💡 Navigate to a page with search functionality to test')
-} 
+  console.log('💡 Navigate to homepage to test meetup search')
+  console.log('💡 Run testEmailSearchWithStatusGrouping() to test search')
+}
+
+// Make functions globally available
+window.testEmailSearchWithStatusGrouping = testEmailSearchWithStatusGrouping
+window.testStatusGrouping = testStatusGrouping
+window.testStatusFeedback = testStatusFeedback
+window.testAllStatusesShown = testAllStatusesShown
+window.testImprovedUX = testImprovedUX
+
+console.log('✅ All test functions are now available globally')
+console.log('💡 Use the functions above to test the improved meetup search functionality') 

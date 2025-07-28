@@ -4,26 +4,41 @@ import { sendInviteEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
-    const { inviteCode, emails } = await request.json()
+    const body = await request.json()
+    const { inviteCode, email, emails } = body
 
-    if (!inviteCode || !emails || !Array.isArray(emails) || emails.length === 0) {
+    // Support both single email and multiple emails (legacy)
+    let emailList: string[] = []
+    
+    if (email && typeof email === 'string') {
+      // Single email (new preferred method)
+      emailList = [email]
+    } else if (emails && Array.isArray(emails)) {
+      // Multiple emails (legacy support)
+      emailList = emails
+    }
+
+    if (!inviteCode || emailList.length === 0) {
       return NextResponse.json(
-        { error: 'Invalid request: inviteCode and emails array required' },
+        { error: 'Invalid request: inviteCode and email required' },
         { status: 400 }
       )
     }
 
     // Validate emails
-    const validEmails = emails.filter((email: string) => 
-      email && typeof email === 'string' && email.includes('@')
+    const validEmails = emailList.filter((email: string) => 
+      email && typeof email === 'string' && email.includes('@') && email.length > 3
     )
 
     if (validEmails.length === 0) {
       return NextResponse.json(
-        { error: 'No valid email addresses provided' },
+        { error: 'No valid email address provided' },
         { status: 400 }
       )
     }
+
+    // Log for debugging
+    console.log('📧 Sending invite emails:', { inviteCode, validEmails })
 
     // Get invite details from database
     const supabase = createClient(
@@ -54,10 +69,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if email service is configured
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('⚠️  RESEND_API_KEY not configured, email functionality disabled')
+      return NextResponse.json(
+        { 
+          error: 'Email service not configured',
+          message: 'Email functionality is currently disabled. Please contact support.',
+          success: false 
+        },
+        { status: 503 }
+      )
+    }
+
     // Send emails to all recipients
     const emailPromises = validEmails.map(async (email: string) => {
       try {
-        await sendInviteEmail({
+        console.log(`📤 Attempting to send email to: ${email}`)
+        
+        const result = await sendInviteEmail({
           to: email,
           cafe: {
             name: invite.meetups.cafes?.name || 'Gekozen café',
@@ -72,10 +102,17 @@ export async function POST(request: NextRequest) {
           inviteLink: `${process.env.NEXT_PUBLIC_SITE_URL}/invite/${inviteCode}`,
           organizerName: invite.meetups.organizer_name,
         })
-        return { email, success: true }
+        
+        console.log(`✅ Email sent successfully to: ${email}`)
+        return { email, success: true, result }
       } catch (error) {
-        console.error(`Failed to send email to ${email}:`, error)
-        return { email, success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+        console.error(`❌ Failed to send email to ${email}:`, error)
+        return { 
+          email, 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Unknown error',
+          details: error
+        }
       }
     })
 

@@ -156,7 +156,7 @@ export function DateTimePreferences({
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                   {timeSlots
                     .filter(slot => availableTimes.includes(slot.value))
                     .map((slot) => {
@@ -166,14 +166,14 @@ export function DateTimePreferences({
                           key={slot.value}
                           type="button"
                           onClick={() => handleTimeToggle(date, slot.value)}
-                          className={`p-2 text-xs border rounded-md transition-all hover:scale-105 ${
+                          className={`p-2 sm:p-3 text-xs sm:text-sm border rounded-md transition-all hover:scale-105 min-h-[44px] touch-target ${
                             isSelected
                               ? 'bg-amber-100 border-amber-500 text-amber-700 shadow-md'
                               : 'bg-muted border-border hover:border-amber-300 hover:shadow-sm'
                           }`}
                         >
-                          <div className="text-sm mb-1">{slot.emoji}</div>
-                          <div className="font-medium">{slot.label}</div>
+                          <div className="text-sm sm:text-base mb-1">{slot.emoji}</div>
+                          <div className="font-medium text-xs sm:text-sm">{slot.label}</div>
                         </button>
                       )
                     })}

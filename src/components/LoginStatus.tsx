@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useSupabase } from '@/components/SupabaseProvider';
 import { useState, useEffect } from 'react';
 import { useToaster } from '@/components/ui/toaster';
+import { WelcomeSection } from '@/components/WelcomeSection';
 
 interface UserNickname {
   nickname: string | null;
@@ -98,27 +99,32 @@ export function LoginStatus() {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-        <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          <Link href="/auth/signin?redirect=%2Fcreate">
-            <Users className="w-6 h-6 mr-3" />
-            Start een Meetup
-          </Link>
-        </Button>
+      <div className="space-y-8">
+        {/* Welcome section for loading state */}
+        <WelcomeSection isLoggedIn={false} />
         
-        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-          <Link href="/auth/signin">
-            <LogIn className="w-6 h-6 mr-3" />
-            Inloggen
-          </Link>
-        </Button>
-        
-        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-          <Link href="/auth/signup">
-            <Calendar className="w-6 h-6 mr-3" />
-            Lid worden
-          </Link>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Link href="/auth/signin?redirect=%2Fcreate">
+              <Users className="w-6 h-6 mr-3" />
+              Start een Meetup
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+            <Link href="/auth/signin">
+              <LogIn className="w-6 h-6 mr-3" />
+              Inloggen
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+            <Link href="/auth/signup">
+              <Calendar className="w-6 h-6 mr-3" />
+              Lid worden
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -234,29 +240,34 @@ export function LoginStatus() {
     );
   }
 
-  // Not logged in - show normal buttons
+  // Not logged in - show welcome section and normal buttons
   return (
-    <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-      <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-        <Link href="/auth/signin?redirect=%2Fcreate">
-          <Users className="w-6 h-6 mr-3" />
-          Start een Meetup
-        </Link>
-      </Button>
+    <div className="space-y-8">
+      {/* Welcome section for non-logged-in users */}
+      <WelcomeSection isLoggedIn={false} />
       
-      <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-        <Link href="/auth/signin">
-          <LogIn className="w-6 h-6 mr-3" />
-          Inloggen
-        </Link>
-      </Button>
-      
-      <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-        <Link href="/auth/signup">
-          <Calendar className="w-6 h-6 mr-3" />
-          Lid worden
-        </Link>
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+        <Button asChild size="lg" className="text-lg px-10 py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          <Link href="/auth/signin?redirect=%2Fcreate">
+            <Users className="w-6 h-6 mr-3" />
+            Start een Meetup
+          </Link>
+        </Button>
+        
+        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+          <Link href="/auth/signin">
+            <LogIn className="w-6 h-6 mr-3" />
+            Inloggen
+          </Link>
+        </Button>
+        
+        <Button asChild variant="outline" size="lg" className="text-lg px-10 py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+          <Link href="/auth/signup">
+            <Calendar className="w-6 h-6 mr-3" />
+            Lid worden
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 } 

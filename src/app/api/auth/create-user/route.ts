@@ -6,10 +6,16 @@ import { sendEmailVerificationEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔧 Create user API: Starting request')
+    
     const { email, password } = await request.json()
+    console.log('🔧 Create user API: Email provided:', !!email)
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+      console.log('❌ Create user API: Missing email or password')
+      return NextResponse.json({ 
+        error: 'Email en wachtwoord zijn verplicht' 
+      }, { status: 400 })
     }
 
     // Generate nickname for the user
@@ -19,7 +25,7 @@ export async function POST(request: NextRequest) {
     if (!supabaseAdmin) {
       console.error('❌ Create user API: Supabase admin client not configured')
       return NextResponse.json(
-        { error: 'Server configuration error' },
+        { error: 'Server configuratie fout. Probeer het later opnieuw.' },
         { status: 500 }
       )
     }
@@ -39,8 +45,24 @@ export async function POST(request: NextRequest) {
     
     if (adminError) {
       console.error('❌ Admin user creation error:', adminError)
+      
+      // Provide specific Dutch error messages
+      let errorMessage = 'Er ging iets mis bij het aanmaken van je account. Probeer het opnieuw.'
+      
+      if (adminError.message.includes('already registered') || adminError.message.includes('already exists')) {
+        errorMessage = 'Dit email adres is al geregistreerd. Probeer in te loggen of gebruik een ander email adres.'
+      } else if (adminError.message.includes('Invalid email')) {
+        errorMessage = 'Voer een geldig email adres in.'
+      } else if (adminError.message.includes('password')) {
+        errorMessage = 'Wachtwoord moet minimaal 8 karakters lang zijn.'
+      } else if (adminError.message.includes('network') || adminError.message.includes('connection')) {
+        errorMessage = 'Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
+      } else if (adminError.message.includes('rate limit') || adminError.message.includes('too many')) {
+        errorMessage = 'Te veel pogingen. Wacht even en probeer opnieuw.'
+      }
+      
       return NextResponse.json({ 
-        error: 'Failed to create account. Please try again.',
+        error: errorMessage,
         details: adminError.message 
       }, { status: 400 })
     }
@@ -76,9 +98,14 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Create user error:', error)
+    console.error('❌ Create user error:', error)
+    console.error('❌ Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'Unknown'
+    })
     return NextResponse.json({ 
-      error: 'Failed to create user' 
+      error: 'Er ging iets mis bij het aanmaken van je account. Probeer het later opnieuw.' 
     }, { status: 500 })
   }
 } 

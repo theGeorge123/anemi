@@ -87,6 +87,10 @@ function SignUpPageContent() {
         errorMessage = '🌐 Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
       } else if (errorMessage.includes('rate limit') || errorMessage.includes('too many')) {
         errorMessage = '⏰ Te veel pogingen. Wacht even en probeer opnieuw.'
+      } else if (errorMessage.includes('Server configuratie')) {
+        errorMessage = '🔧 Technisch probleem. Probeer het later opnieuw.'
+      } else if (errorMessage.includes('Er ging iets mis')) {
+        errorMessage = '😅 Er ging iets mis. Probeer het opnieuw.'
       } else {
         errorMessage = `😅 ${errorMessage}`
       }

@@ -279,42 +279,125 @@ export default function InvitePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-2 sm:p-4">
-        <Card className="w-full max-w-md mx-2 sm:mx-4">
-          <CardContent className="p-4 sm:p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+        <Card className="w-full max-w-md shadow-xl border-0 bg-white/95 backdrop-blur-sm">
+          <CardContent className="p-6">
             <div className="text-center">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                <span className="text-2xl sm:text-3xl">😕</span>
+              {/* Error Icon */}
+              <div className="w-20 h-20 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                {error.includes('verlopen') ? (
+                  <span className="text-4xl">⏰</span>
+                ) : error.includes('niet gevonden') ? (
+                  <span className="text-4xl">🔍</span>
+                ) : (
+                  <span className="text-4xl">😕</span>
+                )}
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                {error.includes('verlopen') ? '⏰ Uitnodiging Verlopen' : '❌ Uitnodiging Niet Gevonden'}
+
+              {/* Error Title */}
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                {error.includes('verlopen') ? '⏰ Uitnodiging Verlopen' : 
+                 error.includes('niet gevonden') ? '🔍 Uitnodiging Niet Gevonden' :
+                 '❌ Oeps! Er ging iets mis'}
               </h2>
-              <p className="text-sm sm:text-base text-gray-600 mb-4">{error}</p>
-              
-              <div className="space-y-3">
+
+              {/* Error Message */}
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                {error.includes('verlopen') ? 
+                  'Deze uitnodiging is verlopen. Uitnodigingen zijn geldig voor een beperkte tijd om de planning soepel te houden.' :
+                 error.includes('niet gevonden') ?
+                  'We kunnen deze uitnodiging niet vinden. Controleer of je de juiste link hebt gebruikt.' :
+                  'Er is een probleem opgetreden bij het laden van de uitnodiging. Probeer het later opnieuw.'}
+              </p>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 mb-6">
                 <Button 
                   onClick={() => {
                     if (typeof window !== 'undefined') {
                       window.location.href = '/'
                     }
                   }}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white h-12 font-semibold shadow-lg"
                 >
-                  <Home className="w-4 h-4 mr-2" />
+                  <Home className="w-5 h-5 mr-2" />
                   Terug naar Home
                 </Button>
                 
-                <Link href="/contact">
-                  <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50">
-                    Hulp Nodig?
+                <Link href="/create">
+                  <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 h-12 font-medium">
+                    <span className="text-lg mr-2">☕</span>
+                    Nieuwe Meetup Maken
                   </Button>
                 </Link>
               </div>
-              
-              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-xs text-amber-700">
-                  <strong>💡 Tip:</strong> Controleer of je de juiste link hebt gebruikt of neem contact op met de organisator
-                </p>
+
+              {/* Help Section */}
+              <div className="space-y-4">
+                {/* What to do next */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                    <span className="text-lg">💡</span>
+                    Wat kun je doen?
+                  </h3>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    {error.includes('verlopen') ? (
+                      <>
+                        <li>• Vraag de organisator om een nieuwe uitnodiging</li>
+                        <li>• Maak zelf een nieuwe meetup aan</li>
+                        <li>• Bekijk andere beschikbare meetups</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>• Controleer of je de juiste link hebt gekregen</li>
+                        <li>• Neem contact op met de organisator</li>
+                        <li>• Maak je eigen meetup aan</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Contact section */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                    <span className="text-lg">📞</span>
+                    Hulp nodig?
+                  </h3>
+                  <p className="text-sm text-amber-700 mb-3">
+                    Neem contact op als je vragen hebt over je uitnodiging
+                  </p>
+                  <div className="flex gap-2">
+                    <Link href="/contact">
+                      <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+                        Contact
+                      </Button>
+                    </Link>
+                    <Link href="/system-status">
+                      <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-100">
+                        Systeem Status
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Technical details for debugging */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                    <details className="text-xs">
+                      <summary className="cursor-pointer text-gray-600 font-medium">
+                        🔧 Technische Details (Development)
+                      </summary>
+                      <div className="mt-2 p-2 bg-white rounded border">
+                        <p className="text-gray-700 font-mono break-all">
+                          Token: {token}
+                        </p>
+                        <p className="text-gray-700 font-mono break-all">
+                          Error: {error}
+                        </p>
+                      </div>
+                    </details>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

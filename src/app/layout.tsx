@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { GlobalErrorHandler } from '@/components/GlobalErrorHandler'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
+import { SessionManager } from '@/components/SessionManager'
 import { validateStartup } from '@/lib/startup'
 
 const inter = Inter({ 
@@ -98,11 +99,13 @@ export default function RootLayout({
             <EnvironmentBanner />
             <ToasterProvider>
             <SupabaseProvider>
-              <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-                <LayoutWrapper>
-                  {children}
-                </LayoutWrapper>
-              </BackgroundAgentProvider>
+              <SessionManager>
+                <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+                  <LayoutWrapper>
+                    {children}
+                  </LayoutWrapper>
+                </BackgroundAgentProvider>
+              </SessionManager>
               <Toaster />
             </SupabaseProvider>
             </ToasterProvider>

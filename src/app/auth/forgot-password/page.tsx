@@ -32,13 +32,22 @@ function ForgotPasswordPageContent() {
   } = useAsyncOperation(async () => {
     if (!supabase) throw new Error('No Supabase client')
     
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/verify`,
+    // Use our custom API route for password reset
+    const response = await fetch('/api/auth/send-password-reset', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
     })
-    
-    if (error) {
-      throw error
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to send password reset email')
     }
+
+    const data = await response.json()
+    console.log('Password reset email sent:', data)
   }, {
     onSuccess: () => {
       setEmailSent(true)

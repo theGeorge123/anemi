@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
 import { BackgroundAgentStatus } from '@/components/BackgroundAgentStatus'
-import { Home } from 'lucide-react'
+import { Home, Users, Calendar, Clock, Eye, Filter, SortAsc, SortDesc } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MeetupInvite {
@@ -52,6 +52,212 @@ interface MeetupInvite {
   }[]
 }
 
+interface ViewResponsesModalProps {
+  meetup: MeetupInvite | null
+  isOpen: boolean
+  onClose: () => void
+}
+
+function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps) {
+  if (!isOpen || !meetup) return null
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('nl-NL', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  const formatTime = (timeString: string) => {
+    return timeString
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return 'bg-green-100 text-green-800'
+      case 'declined':
+        return 'bg-red-100 text-red-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              📊 Reacties voor Meetup
+            </h2>
+            <Button onClick={onClose} variant="outline">
+              ✕ Sluiten
+            </Button>
+          </div>
+
+          {/* Meetup Summary */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-amber-800 mb-2">
+              ☕ {meetup.cafe?.name || 'Cafe'}
+            </h3>
+            <p className="text-sm text-amber-700">
+              📅 {formatDate(meetup.createdAt)} • 🎫 {meetup.totalInvites || 0} uitnodigingen
+            </p>
+          </div>
+
+          {/* Response Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">✅ Geaccepteerd</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {meetup.responses?.accepted || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">❌ Afgewezen</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {meetup.responses?.declined || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-red-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">⏳ In afwachting</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {meetup.responses?.pending || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-yellow-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Participants List */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              👥 Deelnemers ({meetup.participants?.length || 0})
+            </h3>
+
+            {meetup.participants && meetup.participants.length > 0 ? (
+              <div className="space-y-3">
+                {meetup.participants.map((participant, index) => (
+                  <Card key={index}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-medium text-gray-900">
+                              {participant.name || 'Anoniem'}
+                            </h4>
+                            <Badge className={getStatusColor(participant.status)}>
+                              {participant.status === 'accepted' ? '✅ Geaccepteerd' :
+                               participant.status === 'declined' ? '❌ Afgewezen' :
+                               '⏳ In afwachting'}
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm text-gray-600 mb-2">
+                            📧 {participant.email}
+                          </p>
+
+                          {participant.responseDate && (
+                            <p className="text-xs text-gray-500">
+                              📅 Reactie op: {formatDate(participant.responseDate)}
+                            </p>
+                          )}
+
+                          {participant.chosenDate && participant.chosenTime && (
+                            <div className="mt-2 p-2 bg-blue-50 rounded-md">
+                              <p className="text-sm text-blue-800">
+                                🗓️ Voorkeur: {formatDate(participant.chosenDate)} om {formatTime(participant.chosenTime)}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <p>Nog geen deelnemers</p>
+              </div>
+            )}
+          </div>
+
+          {/* Date/Time Preferences */}
+          {meetup.preferences && (
+            <div className="mt-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                📊 Datum/Tijd Voorkeuren
+              </h3>
+
+              {/* Date Preferences */}
+              {meetup.preferences.preferredDates && Object.keys(meetup.preferences.preferredDates).length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">📅 Datum Voorkeuren</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {Object.entries(meetup.preferences.preferredDates)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([date, count]) => (
+                        <div key={date} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{formatDate(date)}</span>
+                          <Badge variant="secondary">{count} stemmen</Badge>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Time Preferences */}
+              {meetup.preferences.preferredTimes && Object.keys(meetup.preferences.preferredTimes).length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">⏰ Tijd Voorkeuren</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {Object.entries(meetup.preferences.preferredTimes)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([time, count]) => (
+                        <div key={time} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{time}</span>
+                          <Badge variant="secondary">{count} stemmen</Badge>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardClient() {
   const { supabase, session } = useSupabase()
   const [meetups, setMeetups] = useState<MeetupInvite[]>([])
@@ -59,6 +265,13 @@ export default function DashboardClient() {
   const [error, setError] = useState<string | null>(null)
   const [editingMeetup, setEditingMeetup] = useState<MeetupInvite | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [viewResponsesModalOpen, setViewResponsesModalOpen] = useState(false)
+  
+  // Sorting and filtering state
+  const [sortBy, setSortBy] = useState<'date' | 'status' | 'responses'>('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [showUrgentOnly, setShowUrgentOnly] = useState(false)
 
   useEffect(() => {
     if (!session) {
@@ -220,10 +433,83 @@ export default function DashboardClient() {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      // Could show a toast here
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error)
+      console.log('✅ Link copied to clipboard')
+    } catch (err) {
+      console.error('❌ Failed to copy link:', err)
     }
+  }
+
+  // Sorting and filtering functions
+  const getSortedAndFilteredMeetups = () => {
+    let filteredMeetups = [...meetups]
+
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      filteredMeetups = filteredMeetups.filter(meetup => meetup.status === statusFilter)
+    }
+
+    // Apply urgent filter (meetups with pending responses or expiring soon)
+    if (showUrgentOnly) {
+      const now = new Date()
+      const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+      
+      filteredMeetups = filteredMeetups.filter(meetup => {
+        const hasPendingResponses = (meetup.responses?.pending || 0) > 0
+        const isExpiringSoon = new Date(meetup.expiresAt) < oneWeekFromNow
+        return hasPendingResponses || isExpiringSoon
+      })
+    }
+
+    // Apply sorting
+    filteredMeetups.sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortBy) {
+        case 'date':
+          aValue = new Date(a.createdAt).getTime()
+          bValue = new Date(b.createdAt).getTime()
+          break
+        case 'status':
+          aValue = a.status
+          bValue = b.status
+          break
+        case 'responses':
+          aValue = (a.responses?.accepted || 0) + (a.responses?.declined || 0)
+          bValue = (b.responses?.accepted || 0) + (b.responses?.declined || 0)
+          break
+        default:
+          return 0
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1
+      } else {
+        return aValue < bValue ? 1 : -1
+      }
+    })
+
+    return filteredMeetups
+  }
+
+  const handleSort = (newSortBy: 'date' | 'status' | 'responses') => {
+    if (sortBy === newSortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(newSortBy)
+      setSortOrder('desc')
+    }
+  }
+
+  const getUrgentCount = () => {
+    const now = new Date()
+    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+    
+    return meetups.filter(meetup => {
+      const hasPendingResponses = (meetup.responses?.pending || 0) > 0
+      const isExpiringSoon = new Date(meetup.expiresAt) < oneWeekFromNow
+      return hasPendingResponses || isExpiringSoon
+    }).length
   }
 
   if (error) {
@@ -461,6 +747,87 @@ export default function DashboardClient() {
           </div>
         )}
 
+        {/* Sorting and Filtering Controls */}
+        <div className="mb-6">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="flex flex-wrap gap-2">
+                  {/* Status Filter */}
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-gray-600" />
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                    >
+                      <option value="all">Alle Statussen</option>
+                      <option value="pending">⏳ Wachtend</option>
+                      <option value="accepted">✅ Geaccepteerd</option>
+                      <option value="confirmed">📅 Bevestigd</option>
+                      <option value="declined">❌ Afgewezen</option>
+                    </select>
+                  </div>
+
+                  {/* Urgent Filter */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={showUrgentOnly ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowUrgentOnly(!showUrgentOnly)}
+                      className="text-xs"
+                    >
+                      🚨 Urgent ({getUrgentCount()})
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Sorting Controls */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Sorteren op:</span>
+                  <div className="flex gap-1">
+                    <Button
+                      variant={sortBy === 'date' ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleSort('date')}
+                      className="text-xs"
+                    >
+                      <Calendar className="w-3 h-3 mr-1" />
+                      Datum
+                      {sortBy === 'date' && (
+                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
+                      )}
+                    </Button>
+                    <Button
+                      variant={sortBy === 'status' ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleSort('status')}
+                      className="text-xs"
+                    >
+                      Status
+                      {sortBy === 'status' && (
+                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
+                      )}
+                    </Button>
+                    <Button
+                      variant={sortBy === 'responses' ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleSort('responses')}
+                      className="text-xs"
+                    >
+                      <Users className="w-3 h-3 mr-1" />
+                      Reacties
+                      {sortBy === 'responses' && (
+                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-12">
@@ -487,9 +854,9 @@ export default function DashboardClient() {
         )}
 
         {/* Meetups Grid */}
-        {!isLoading && meetups.length > 0 && (
+        {!isLoading && getSortedAndFilteredMeetups().length > 0 && (
           <div className="grid gap-6">
-            {meetups.map((meetup) => (
+            {getSortedAndFilteredMeetups().map((meetup) => (
               <Card key={meetup.id} className="bg-white/80 backdrop-blur-sm border-amber-200">
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -538,6 +905,22 @@ export default function DashboardClient() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2">
+                      {/* View Responses Button */}
+                      {(meetup.participants && meetup.participants.length > 0) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingMeetup(meetup)
+                            setViewResponsesModalOpen(true)
+                          }}
+                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Bekijk Reacties
+                        </Button>
+                      )}
+                      
                       <Button
                         variant="outline"
                         size="sm"
@@ -622,6 +1005,15 @@ export default function DashboardClient() {
             }}
             onSave={handleSaveMeetup}
             onDelete={handleDeleteMeetup}
+          />
+        )}
+
+        {/* View Responses Modal */}
+        {viewResponsesModalOpen && (
+          <ViewResponsesModal
+            meetup={editingMeetup || null}
+            isOpen={viewResponsesModalOpen}
+            onClose={() => setViewResponsesModalOpen(false)}
           />
         )}
       </div>

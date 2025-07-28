@@ -78,13 +78,21 @@ function ResetPasswordPageContent() {
 
   // Check if we have the necessary tokens from the reset email
   useEffect(() => {
+    // Supabase admin.generateLink sends these parameters
     const accessToken = searchParams.get('access_token')
     const refreshToken = searchParams.get('refresh_token')
+    const type = searchParams.get('type')
+    
+    console.log('Reset password parameters:', {
+      accessToken: accessToken ? 'Present' : 'Missing',
+      refreshToken: refreshToken ? 'Present' : 'Missing',
+      type,
+      allParams: Object.fromEntries(searchParams.entries())
+    })
     
     if (!accessToken || !refreshToken) {
       console.error('Missing reset tokens')
-      // Redirect to forgot password if no tokens
-      router.push('/auth/forgot-password')
+      console.error('Ongeldige of ontbrekende reset link. Vraag een nieuwe reset link aan.')
       return
     }
 
@@ -92,8 +100,15 @@ function ResetPasswordPageContent() {
     supabase?.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
+    }).then(({ data, error }) => {
+      if (error) {
+        console.error('Error setting session:', error)
+        console.error('Er is een probleem met de reset link. Probeer opnieuw.')
+      } else {
+        console.log('Session set successfully for password reset')
+      }
     })
-  }, [searchParams, supabase, router])
+  }, [searchParams, supabase])
 
   if (passwordReset) {
     return (

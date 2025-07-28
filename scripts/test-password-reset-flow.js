@@ -3,196 +3,250 @@
 
 console.log('🧪 Testing Password Reset Flow...')
 
-// Function to test the complete password reset flow
-function testPasswordResetFlow() {
-  console.log('🎯 Step 1: Navigate to forgot password page')
-  console.log('🎯 Step 2: Enter email and submit')
-  console.log('🎯 Step 3: Check email for reset link')
-  console.log('🎯 Step 4: Click reset link')
-  console.log('🎯 Step 5: Set new password')
-  console.log('🎯 Expected: Password reset success')
+// Function to test forgot password page
+function testForgotPasswordPage() {
+  console.log('🎯 Testing Forgot Password Page...')
   
   // Check if we're on the forgot password page
-  if (window.location.pathname !== '/auth/forgot-password') {
-    console.log('❌ Not on forgot password page. Navigate to /auth/forgot-password first')
-    return
-  }
+  const isForgotPasswordPage = window.location.pathname === '/auth/forgot-password'
   
-  console.log('✅ On forgot password page')
-  
-  // Look for the email input
-  const emailInput = document.querySelector('input[type="email"]')
-  if (!emailInput) {
-    console.log('❌ Email input not found')
-    return
-  }
-  
-  console.log('✅ Email input found')
-  
-  // Look for the submit button
-  const submitButton = document.querySelector('button[type="submit"]')
-  if (!submitButton) {
-    console.log('❌ Submit button not found')
-    return
-  }
-  
-  console.log('✅ Submit button found')
-  console.log('🎯 Ready to test! Enter an email and click submit')
-  
-  // Add submit listener to monitor what happens
-  const form = emailInput.closest('form')
-  if (form) {
-    const originalSubmit = form.onsubmit
-    form.onsubmit = function(e) {
-      console.log('🎯 Form submitted!')
-      console.log('🎯 Email:', emailInput.value)
-      console.log('🎯 Checking if reset email is sent...')
+  if (isForgotPasswordPage) {
+    console.log('✅ Forgot password page detected')
+    
+    // Check for form elements
+    const emailInput = document.querySelector('input[type="email"]')
+    const submitButton = document.querySelector('button[type="submit"]')
+    const form = document.querySelector('form')
+    
+    console.log(`📋 Form elements: Email input=${!!emailInput}, Submit button=${!!submitButton}, Form=${!!form}`)
+    
+    if (emailInput && submitButton && form) {
+      console.log('🎉 SUCCESS: Forgot password form elements found!')
       
-      // Check if success message appears within 3 seconds
-      setTimeout(() => {
-        const successMessage = document.querySelector('.text-green-700') ||
-                              document.querySelector('[class*="green"]')
-        
-        if (successMessage && successMessage.textContent.includes('Email Verzonden')) {
-          console.log('✅ SUCCESS: Password reset email sent!')
-          console.log('💡 Check your email for the reset link')
-          console.log('💡 The link should go to /auth/reset-password')
-        } else {
-          console.log('❌ FAILED: No success message found')
-          console.log('❌ Check for error messages')
-        }
-      }, 3000)
+      // Test form validation
+      const testEmail = 'test@example.com'
+      emailInput.value = testEmail
+      emailInput.dispatchEvent(new Event('input', { bubbles: true }))
       
-      // Call original submit
-      if (originalSubmit) {
-        originalSubmit.call(this, e)
-      }
+      console.log('💡 Test email entered:', testEmail)
+      console.log('💡 You can now test the submit functionality')
+    } else {
+      console.log('⚠️ WARNING: Some form elements might be missing')
     }
+  } else {
+    console.log('💡 Navigate to /auth/forgot-password to test forgot password page')
   }
 }
 
-// Function to test the reset password page
+// Function to test reset password page
 function testResetPasswordPage() {
   console.log('🎯 Testing Reset Password Page...')
   
   // Check if we're on the reset password page
-  if (window.location.pathname !== '/auth/reset-password') {
-    console.log('❌ Not on reset password page. Navigate to /auth/reset-password first')
-    return
+  const isResetPasswordPage = window.location.pathname === '/auth/reset-password'
+  
+  if (isResetPasswordPage) {
+    console.log('✅ Reset password page detected')
+    
+    // Check URL parameters
+    const urlParams = new URLSearchParams(window.location.search)
+    const accessToken = urlParams.get('access_token')
+    const refreshToken = urlParams.get('refresh_token')
+    const type = urlParams.get('type')
+    
+    console.log('📋 URL Parameters:')
+    console.log(`   Access Token: ${accessToken ? 'Present' : 'Missing'}`)
+    console.log(`   Refresh Token: ${refreshToken ? 'Present' : 'Missing'}`)
+    console.log(`   Type: ${type || 'Missing'}`)
+    
+    if (accessToken && refreshToken) {
+      console.log('✅ Reset tokens present')
+      
+      // Check for form elements
+      const passwordInput = document.querySelector('input[type="password"]')
+      const confirmPasswordInput = document.querySelectorAll('input[type="password"]')[1]
+      const submitButton = document.querySelector('button[type="submit"]')
+      
+      console.log(`📋 Form elements: Password input=${!!passwordInput}, Confirm input=${!!confirmPasswordInput}, Submit button=${!!submitButton}`)
+      
+      if (passwordInput && confirmPasswordInput && submitButton) {
+        console.log('🎉 SUCCESS: Reset password form elements found!')
+        
+        // Test password validation
+        const testPassword = 'newpassword123'
+        passwordInput.value = testPassword
+        passwordInput.dispatchEvent(new Event('input', { bubbles: true }))
+        
+        confirmPasswordInput.value = testPassword
+        confirmPasswordInput.dispatchEvent(new Event('input', { bubbles: true }))
+        
+        console.log('💡 Test password entered:', testPassword)
+        console.log('💡 You can now test the password reset functionality')
+      } else {
+        console.log('⚠️ WARNING: Some form elements might be missing')
+      }
+    } else {
+      console.log('⚠️ WARNING: Reset tokens missing - check email link')
+    }
+  } else {
+    console.log('💡 Navigate to /auth/reset-password to test reset password page')
+  }
+}
+
+// Function to test email flow
+function testEmailFlow() {
+  console.log('🎯 Testing Email Flow...')
+  
+  console.log('📝 Expected Email Flow:')
+  console.log('   1. User requests password reset on /auth/forgot-password')
+  console.log('   2. API sends password reset email with recovery link')
+  console.log('   3. User clicks link in email')
+  console.log('   4. User lands on /auth/reset-password with tokens')
+  console.log('   5. User sets new password')
+  console.log('   6. User is redirected to /auth/signin')
+  
+  console.log('💡 To test this flow:')
+  console.log('   1. Go to /auth/forgot-password')
+  console.log('   2. Enter a valid email address')
+  console.log('   3. Submit the form')
+  console.log('   4. Check your email for the reset link')
+  console.log('   5. Click the link to test the reset page')
+}
+
+// Function to test API endpoint
+function testPasswordResetAPI() {
+  console.log('🎯 Testing Password Reset API...')
+  
+  // Test the API endpoint
+  fetch('/api/auth/send-password-reset', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: 'test@example.com' }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('📋 API Response:', data)
+    
+    if (data.success) {
+      console.log('✅ Password reset email sent successfully')
+    } else {
+      console.log('❌ Password reset email failed:', data.error)
+    }
+  })
+  .catch(error => {
+    console.error('❌ API Error:', error)
+  })
+}
+
+// Function to test token handling
+function testTokenHandling() {
+  console.log('🎯 Testing Token Handling...')
+  
+  const urlParams = new URLSearchParams(window.location.search)
+  const allParams = Object.fromEntries(urlParams.entries())
+  
+  console.log('📋 Current URL Parameters:', allParams)
+  
+  // Check for expected parameters
+  const expectedParams = ['access_token', 'refresh_token', 'type']
+  const missingParams = expectedParams.filter(param => !urlParams.get(param))
+  
+  if (missingParams.length === 0) {
+    console.log('✅ All expected parameters present')
+  } else {
+    console.log('⚠️ Missing parameters:', missingParams)
   }
   
-  console.log('✅ On reset password page')
-  
-  // Check for URL parameters
-  const urlParams = new URLSearchParams(window.location.search)
+  // Test token validation
   const accessToken = urlParams.get('access_token')
   const refreshToken = urlParams.get('refresh_token')
   
-  if (!accessToken || !refreshToken) {
-    console.log('❌ Missing reset tokens in URL')
-    console.log('💡 This page should be accessed via a reset email link')
-    return
-  }
-  
-  console.log('✅ Reset tokens found in URL')
-  console.log('🎯 Ready to test password reset!')
-  
-  // Look for password inputs
-  const passwordInput = document.querySelector('input[type="password"]')
-  const confirmPasswordInput = document.querySelectorAll('input[type="password"]')[1]
-  
-  if (!passwordInput || !confirmPasswordInput) {
-    console.log('❌ Password inputs not found')
-    return
-  }
-  
-  console.log('✅ Password inputs found')
-  
-  // Look for submit button
-  const submitButton = document.querySelector('button[type="submit"]')
-  if (!submitButton) {
-    console.log('❌ Submit button not found')
-    return
-  }
-  
-  console.log('✅ Submit button found')
-  console.log('🎯 Ready to test! Enter a new password and submit')
-  
-  // Add submit listener
-  const form = passwordInput.closest('form')
-  if (form) {
-    const originalSubmit = form.onsubmit
-    form.onsubmit = function(e) {
-      console.log('🎯 Password reset form submitted!')
-      console.log('🎯 Checking if password is updated...')
-      
-      // Check if success message appears within 3 seconds
-      setTimeout(() => {
-        const successMessage = document.querySelector('.text-green-700') ||
-                              document.querySelector('[class*="green"]')
-        
-        if (successMessage && successMessage.textContent.includes('Wachtwoord Gewijzigd')) {
-          console.log('✅ SUCCESS: Password reset completed!')
-          console.log('💡 You can now login with your new password')
-        } else {
-          console.log('❌ FAILED: No success message found')
-          console.log('❌ Check for error messages')
-        }
-      }, 3000)
-      
-      // Call original submit
-      if (originalSubmit) {
-        originalSubmit.call(this, e)
-      }
-    }
+  if (accessToken && refreshToken) {
+    console.log('✅ Valid tokens detected')
+    console.log('💡 Tokens should be used to set Supabase session')
+  } else {
+    console.log('⚠️ Invalid or missing tokens')
   }
 }
 
-// Function to simulate the complete flow
+// Function to test email templates
+function testEmailTemplates() {
+  console.log('🎯 Testing Email Templates...')
+  
+  console.log('📝 Expected Email Templates:')
+  console.log('   1. Password Reset Email:')
+  console.log('      - Subject: "Password Reset - Anemi Meets"')
+  console.log('      - Contains: Reset link with access_token and refresh_token')
+  console.log('      - Redirect: /auth/reset-password')
+  console.log('   2. Email Verification Email:')
+  console.log('      - Subject: "Verify your email - Anemi Meets"')
+  console.log('      - Contains: Verification link with token_hash')
+  console.log('      - Redirect: /auth/verify-email')
+  
+  console.log('💡 To test email templates:')
+  console.log('   1. Request password reset and check email')
+  console.log('   2. Register new account and check verification email')
+  console.log('   3. Verify links point to correct pages')
+  console.log('   4. Check that tokens are properly passed')
+}
+
+// Function to simulate complete password reset flow
 function simulatePasswordResetFlow() {
   console.log('🎯 Simulating Complete Password Reset Flow...')
   
-  // Step 1: Go to forgot password page
-  console.log('📝 Step 1: Navigate to /auth/forgot-password')
+  console.log('📝 Complete Flow Steps:')
+  console.log('   1. User forgets password')
+  console.log('   2. User goes to /auth/forgot-password')
+  console.log('   3. User enters email and submits')
+  console.log('   4. API sends password reset email')
+  console.log('   5. User receives email with reset link')
+  console.log('   6. User clicks link and lands on /auth/reset-password')
+  console.log('   7. Page extracts tokens from URL')
+  console.log('   8. Page sets Supabase session with tokens')
+  console.log('   9. User enters new password')
+  console.log('   10. API updates user password')
+  console.log('   11. User is redirected to /auth/signin')
+  console.log('   12. User can login with new password')
   
-  // Step 2: Fill in email
-  console.log('📝 Step 2: Enter your email address')
-  
-  // Step 3: Submit form
-  console.log('📝 Step 3: Click "Reset Link Versturen"')
-  
-  // Step 4: Check email
-  console.log('📝 Step 4: Check your email for reset link')
-  console.log('📝 Step 5: Click the reset link in the email')
-  console.log('📝 Step 6: Enter new password on reset page')
-  console.log('📝 Step 7: Confirm new password')
-  console.log('📝 Step 8: Click "Wachtwoord Wijzigen"')
-  
-  console.log('💡 Expected Flow:')
-  console.log('   - Email sent with reset link')
-  console.log('   - Reset link goes to /auth/reset-password')
-  console.log('   - Reset page shows password form')
-  console.log('   - Password update succeeds')
-  console.log('   - Success message appears')
+  console.log('💡 Test this flow manually:')
+  console.log('   1. Start at /auth/forgot-password')
+  console.log('   2. Follow the steps above')
+  console.log('   3. Check each step works correctly')
+  console.log('   4. Verify email templates are correct')
+  console.log('   5. Confirm tokens are handled properly')
 }
 
 // Export functions for manual testing
-window.testPasswordResetFlow = testPasswordResetFlow
+window.testForgotPasswordPage = testForgotPasswordPage
 window.testResetPasswordPage = testResetPasswordPage
+window.testEmailFlow = testEmailFlow
+window.testPasswordResetAPI = testPasswordResetAPI
+window.testTokenHandling = testTokenHandling
+window.testEmailTemplates = testEmailTemplates
 window.simulatePasswordResetFlow = simulatePasswordResetFlow
 
-console.log('🧪 Password Reset Test Functions Loaded:')
-console.log('- testPasswordResetFlow() - Test forgot password page')
+console.log('🧪 Password Reset Flow Test Functions Loaded:')
+console.log('- testForgotPasswordPage() - Test forgot password page')
 console.log('- testResetPasswordPage() - Test reset password page')
-console.log('- simulatePasswordResetFlow() - Show complete flow steps')
+console.log('- testEmailFlow() - Show expected email flow')
+console.log('- testPasswordResetAPI() - Test password reset API')
+console.log('- testTokenHandling() - Test token handling')
+console.log('- testEmailTemplates() - Show email template info')
+console.log('- simulatePasswordResetFlow() - Show complete flow')
 
-// Auto-detect current page and show relevant test
-if (window.location.pathname === '/auth/forgot-password') {
+// Auto-detect current page and show relevant tests
+const currentPath = window.location.pathname
+if (currentPath === '/auth/forgot-password') {
   console.log('🎯 Auto-detected forgot password page')
-  console.log('💡 Run testPasswordResetFlow() to start testing')
-} else if (window.location.pathname === '/auth/reset-password') {
+  console.log('💡 Run testForgotPasswordPage() to test forgot password')
+  console.log('💡 Run testPasswordResetAPI() to test API')
+} else if (currentPath === '/auth/reset-password') {
   console.log('🎯 Auto-detected reset password page')
-  console.log('💡 Run testResetPasswordPage() to start testing')
+  console.log('💡 Run testResetPasswordPage() to test reset password')
+  console.log('💡 Run testTokenHandling() to test token handling')
 } else {
-  console.log('💡 Navigate to /auth/forgot-password to test password reset flow')
+  console.log('💡 Navigate to /auth/forgot-password to test password reset')
+  console.log('💡 Run simulatePasswordResetFlow() to see complete flow')
 } 

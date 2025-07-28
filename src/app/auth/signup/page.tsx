@@ -83,14 +83,6 @@ function SignUpPageContent() {
         errorMessage = '📧 Voer een geldig email adres in.'
       } else if (errorMessage.includes('password')) {
         errorMessage = '🔒 Wachtwoord moet minimaal 8 karakters lang zijn.'
-      } else if (errorMessage.includes('SMTP') || errorMessage.includes('email configuration')) {
-        errorMessage = '📧 Account aangemaakt! Email verificatie is overgeslagen vanwege technische problemen. Je kunt nu direct inloggen.'
-        // This is actually a success case, not an error
-        const responseData = await createUserResponse.json()
-        if (responseData.nickname) {
-          setGeneratedNickname(responseData.nickname)
-        }
-        return responseData
       } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
         errorMessage = '🌐 Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
       } else if (errorMessage.includes('rate limit') || errorMessage.includes('too many')) {
@@ -120,24 +112,12 @@ function SignUpPageContent() {
     return responseData
   }, {
     onSuccess: (data: any) => {
-      // Check if email was skipped due to SMTP issues
-      if (data?.emailSkipped) {
-        console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
-        // Redirect to signin with the original redirect URL
-        const signinUrl = redirectUrl 
-          ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
-          : '/auth/signin?message=account_created'
-        router.push(signinUrl)
-      } else {
-        // Store redirect URL in sessionStorage for after verification
-        if (redirectUrl) {
-          sessionStorage.setItem('signup_redirect', redirectUrl)
-        }
-        
-        // Always redirect to verify-email page with email parameter
-        const verifyUrl = `/auth/verify-email?email=${encodeURIComponent(form.values.email)}`
-        router.push(verifyUrl)
-      }
+      console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
+      // Always redirect to signin since email verification is skipped
+      const signinUrl = redirectUrl 
+        ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
+        : '/auth/signin?message=account_created'
+      router.push(signinUrl)
     },
     onError: (err) => {
       console.error('Signup error:', err)

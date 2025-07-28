@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   authors: [{ name: 'Anemi Meets' }],
   creator: 'Anemi Meets',
   publisher: 'Anemi Meets',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
   formatDetection: {
     email: false,
     address: false,

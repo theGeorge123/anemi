@@ -523,10 +523,10 @@ export default function InvitePage() {
             {/* Date Selection */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                 Kies een datum:
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
                 {invite.availableDates.map((date) => {
                   const isSelected = selectedDate === date
                   const formattedDate = new Date(date).toLocaleDateString('nl-NL', { 
@@ -538,7 +538,7 @@ export default function InvitePage() {
                     <button
                       key={date}
                       onClick={() => setSelectedDate(date)}
-                      className={`p-3 rounded-lg border-2 transition-all duration-200 text-xs sm:text-sm font-medium ${
+                      className={`p-4 rounded-lg border-2 transition-all duration-200 text-sm font-medium min-h-[60px] flex items-center justify-center ${
                         isSelected 
                           ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
                           : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
@@ -554,17 +554,17 @@ export default function InvitePage() {
             {/* Time Selection */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                 Kies een tijd:
               </h3>
-              <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {invite.availableTimes.map((time) => {
                   const isSelected = selectedTime === time
                   return (
                     <button
                       key={time}
                       onClick={() => setSelectedTime(time)}
-                      className={`px-4 py-2 rounded-full border-2 transition-all duration-200 text-xs sm:text-sm font-medium ${
+                      className={`px-4 py-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium min-h-[50px] flex items-center justify-center ${
                         isSelected 
                           ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
                           : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'

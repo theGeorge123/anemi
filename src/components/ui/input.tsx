@@ -11,10 +11,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       type={type}
       ref={ref}
       className={cn(
-        'w-full rounded-xl border-2 border-amber-200 bg-white px-4 py-3 text-base shadow-sm transition-all duration-300',
+        'w-full rounded-xl border-2 border-amber-200 bg-white px-4 py-3 text-base shadow-sm transition-all duration-300 min-h-[44px]',
         'focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:ring-offset-2',
         'placeholder:text-muted-foreground/60',
         'hover:border-amber-300',
+        // Prevent zoom on iOS by ensuring font-size is at least 16px
+        'text-base',
         className
       )}
       {...props}

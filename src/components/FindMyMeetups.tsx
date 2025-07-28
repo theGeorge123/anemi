@@ -175,77 +175,77 @@ export function FindMyMeetups() {
   return (
     <div className="space-y-6">
       {/* Search Type Toggle */}
-      <div className="flex justify-center">
-        <div className="bg-gray-100 rounded-lg p-1">
+      <div className="flex justify-center px-4">
+        <div className="bg-gray-100 rounded-lg p-1 w-full max-w-sm">
           <button
             type="button"
             onClick={() => setSearchType('email')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`w-1/2 px-3 py-2 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
               searchType === 'email'
                 ? 'bg-white text-amber-700 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            📧 Email Zoeken
+            📧 <span className="hidden xs:inline">Email </span>Zoeken
           </button>
           <button
             type="button"
             onClick={() => setSearchType('code')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`w-1/2 px-3 py-2 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
               searchType === 'code'
                 ? 'bg-white text-amber-700 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            🔍 Code Zoeken
+            🔍 <span className="hidden xs:inline">Code </span>Zoeken
           </button>
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="space-y-4">
+      <form onSubmit={handleSearch} className="space-y-4 px-4">
         {searchType === 'email' ? (
-          <div>
+          <div className="space-y-3">
             <Label htmlFor="email" className="text-sm font-medium text-gray-700">
               Email adres
             </Label>
-            <div className="mt-1 flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="jouw@email.com"
-                className="flex-1"
+                className="flex-1 text-base"
                 required
               />
               <Button 
                 type="submit" 
                 disabled={isLoading || !email.trim()}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-2 text-base sm:whitespace-nowrap"
               >
                 {isLoading ? 'Zoeken...' : 'Zoeken'}
               </Button>
             </div>
           </div>
         ) : (
-          <div>
+          <div className="space-y-3">
             <Label htmlFor="inviteCode" className="text-sm font-medium text-gray-700">
               Uitnodigingscode
             </Label>
-            <div className="mt-1 flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
               <Input
                 id="inviteCode"
                 type="text"
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value)}
                 placeholder="Voer de uitnodigingscode in"
-                className="flex-1"
+                className="flex-1 text-base"
                 required
               />
               <Button 
                 type="submit" 
                 disabled={isLoading || !inviteCode.trim()}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-2 text-base sm:whitespace-nowrap"
               >
                 {isLoading ? 'Zoeken...' : 'Zoeken'}
               </Button>

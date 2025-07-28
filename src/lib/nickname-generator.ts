@@ -1,4 +1,16 @@
-// Dutch nickname generator
+// Dutch coffee-themed nickname generator
+const coffeeNicknames = [
+  'Koffiekoning', 'Espressoelf', 'Cappuccinocreatief', 'Lattelover', 'Mochamagie',
+  'Frappefan', 'Baristabuddy', 'Cafékampioen', 'Bruinegoudzoeker', 'Koffieklant',
+  'Espressoenthusiast', 'Melkschuimmeester', 'Bonenzoekers', 'Koffiecurator', 'Cafeïnekenner',
+  'Aroma-artiest', 'Filterfanaat', 'Koffieavonturier', 'Espressoexpert', 'Latte-kunstenaar',
+  'Mokameesters', 'Cappuccinochef', 'Baristaprins', 'Koffieconnoiseur', 'Cafécreatief',
+  'Espressoengelije', 'Melkschuimmagier', 'Bonenbaron', 'Aromadirecteur',
+  'Filterfee', 'Lattelieveling', 'Mokaminnaar', 'Cappuccinocommandant', 'Baristaboss',
+  'Koffiekeizer', 'Espressoenergie', 'Melkschuimmaakt', 'Bonenbewaker', 'Aromaalchemist'
+];
+
+// Legacy arrays for backwards compatibility
 const adjectives = [
   'Vrolijke', 'Gezellige', 'Koffie', 'Zonnige', 'Glimlachende', 'Warme', 'Vriendelijke',
   'Enthousiaste', 'Creatieve', 'Avontuurlijke', 'Rustige', 'Energieke', 'Gastvrije',
@@ -19,11 +31,9 @@ const nouns = [
 const emojis = ['☕', '🌟', '💫', '✨', '🎉', '🎊', '🎈', '🎪', '🎭', '🎨', '🎵', '🎶', '🎸', '🎹', '🎺', '🎻', '🥁', '🎤', '🎧', '🎼'];
 
 export function generateRandomNickname(): string {
-  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-  
-  return `${adjective} ${noun} ${emoji}`;
+  // Use the new coffee-themed nicknames for a cleaner, more consistent experience
+  const randomIndex = Math.floor(Math.random() * coffeeNicknames.length);
+  return coffeeNicknames[randomIndex] || 'Koffieliefhebber';
 }
 
 export function generateNicknameFromEmail(email: string): string {
@@ -33,9 +43,7 @@ export function generateNicknameFromEmail(email: string): string {
     return a & a;
   }, 0);
   
-  const adjective = adjectives[Math.abs(hash) % adjectives.length];
-  const noun = nouns[Math.abs(hash >> 8) % nouns.length];
-  const emoji = emojis[Math.abs(hash >> 16) % emojis.length];
-  
-  return `${adjective} ${noun} ${emoji}`;
+  // Use coffee nicknames for consistency
+  const nicknameIndex = Math.abs(hash) % coffeeNicknames.length;
+  return coffeeNicknames[nicknameIndex] || 'Koffieliefhebber';
 } 

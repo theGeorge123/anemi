@@ -38,6 +38,7 @@ export async function GET(
         cafeId: invite.cafeId,
         availableDates: invite.availableDates,
         availableTimes: invite.availableTimes,
+        dateTimePreferences: invite.dateTimePreferences as Record<string, string[]> | null,
         status: invite.status,
         expiresAt: invite.expiresAt,
         cafe: invite.cafe

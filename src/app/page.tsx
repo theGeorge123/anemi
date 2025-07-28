@@ -35,27 +35,27 @@ export default function HomePage() {
         {/* Login status and appropriate buttons */}
         <Suspense fallback={
           <div className="flex flex-col gap-4 sm:flex-row sm:gap-6 justify-center items-center mb-8 sm:mb-12 px-4">
-          <Button asChild size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-            <Link href="/create">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-              Start een Meetup
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-            <Link href="/auth/signin">
-              <LogIn className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-              Inloggen
-            </Link>
-          </Button>
-          
-          <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-            <Link href="/auth/signup">
-              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-              Lid worden
-            </Link>
-          </Button>
-        </div>
+            <Button asChild size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Link href="/create">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                Start een Meetup
+              </Link>
+            </Button>
+            
+            <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+              <Link href="/auth/signin">
+                <LogIn className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                Inloggen
+              </Link>
+            </Button>
+            
+            <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+              <Link href="/auth/signup">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                Lid worden
+              </Link>
+            </Button>
+          </div>
         }>
           <LoginStatus />
         </Suspense>

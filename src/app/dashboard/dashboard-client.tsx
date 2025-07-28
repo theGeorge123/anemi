@@ -513,17 +513,48 @@ export default function DashboardClient() {
   }
 
   if (error) {
+    const isAuthError = error.includes('token') || error.includes('authorization') || error.includes('Invalid') || error.includes('expired')
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-background to-orange-50 flex items-center justify-center px-4">
         <div className="max-w-md mx-auto text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-amber-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">❌ Error</h2>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <Button asChild className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/auth/signin">
-                🔐 Inloggen
-              </Link>
-            </Button>
+            {isAuthError ? (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">🔐 Inloggen Vereist</h2>
+                <p className="text-gray-600 mb-6">
+                  Je moet ingelogd zijn om je meetups te bekijken. Log in om door te gaan.
+                </p>
+                <Button asChild className="bg-amber-600 hover:bg-amber-700 w-full mb-3">
+                  <Link href="/auth/signin">
+                    🔐 Inloggen
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    ← Terug naar Home
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">⚠️ Er ging iets mis</h2>
+                <p className="text-gray-600 mb-6">
+                  We konden je meetups niet laden. Probeer het later opnieuw.
+                </p>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  className="bg-amber-600 hover:bg-amber-700 w-full mb-3"
+                >
+                  🔄 Opnieuw Proberen
+                </Button>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/">
+                    ← Terug naar Home
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

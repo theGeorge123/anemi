@@ -102,23 +102,43 @@ export interface EmailVerificationEmail {
  */
 export async function sendEmail(options: EmailOptions) {
   try {
+    // Validate required environment variables
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured. Please set this environment variable.');
+    }
+
+    // Validate email address
+    if (!options.to || !options.to.includes('@')) {
+      throw new Error(`Invalid email address: ${options.to}`);
+    }
+
+    console.log(`📧 Attempting to send email to: ${options.to} with subject: ${options.subject}`);
+
     const resendInstance = await getResend();
+    const fromEmail = options.from || process.env.EMAIL_FROM || 'noreply@anemi-meets.com';
+    
     const { data, error } = await resendInstance.emails.send({
-      from: options.from || process.env.EMAIL_FROM || 'noreply@anemi-meets.com',
+      from: fromEmail,
       to: options.to,
       subject: options.subject,
       html: options.html,
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      throw error;
+      console.error('❌ Resend API error:', error);
+      throw new Error(`Email service error: ${error.message || JSON.stringify(error)}`);
     }
 
-    console.log('Email sent successfully:', data);
+    console.log('✅ Email sent successfully:', { id: data?.id, to: options.to });
     return data;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('❌ Failed to send email:', {
+      error: error instanceof Error ? error.message : error,
+      to: options.to,
+      subject: options.subject,
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      hasEmailFrom: !!process.env.EMAIL_FROM
+    });
     throw error;
   }
 }
@@ -689,74 +709,76 @@ export async function sendEmailVerificationEmail(data: EmailVerificationEmail) {
   
   const html = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-      <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">📧 Email Verificatie</h1>
-        <p style="color: #bbf7d0; margin: 10px 0 0 0; font-size: 16px;">Bevestig je email adres</p>
+      <div style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Welkom bij Anemi Meets!</h1>
+        <p style="color: #fed7aa; margin: 10px 0 0 0; font-size: 16px;">Bevestig je email adres</p>
       </div>
       
       <div style="padding: 40px 20px; background-color: #ffffff;">
-        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Welkom${data.userName ? ` ${data.userName}` : ''}! 🎉</h2>
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hallo${data.userName ? ` ${data.userName}` : ''}! ☕</h2>
         
         <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-          Bedankt voor het aanmelden bij Anemi Meets! We zijn enthousiast om je te verwelkomen in onze community van koffieliefhebbers. 
-          Om je account te activeren, klik je op de onderstaande knop om je email adres te verifiëren.
+          Wat geweldig dat je je hebt aangemeld bij <strong>Anemi Meets</strong>! We zijn super enthousiast om je te verwelkomen in onze gezellige community van koffieliefhebbers. 
+          Om te beginnen met het plannen van geweldige koffie meetups, hoef je alleen maar je email adres te bevestigen.
         </p>
         
-        <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a34a;">
-          <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 18px;">✅ Email Verificatie</h3>
-          <p style="margin: 8px 0; color: #166534;">Deze link is <strong>24 uur geldig</strong>. Klik op de knop hieronder om je account te activeren.</p>
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #d97706;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">✅ Email Verificatie</h3>
+          <p style="margin: 8px 0; color: #92400e;">Deze link is <strong>24 uur geldig</strong>. Klik op de knop hieronder om je account te activeren.</p>
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="${data.verificationLink}" 
-             style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 16px 32px; 
+             style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: white; padding: 16px 32px; 
                     text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
-                    box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.3); transition: all 0.3s ease;">
-            ✅ Verifieer Mijn Email
+                    box-shadow: 0 4px 14px 0 rgba(217, 119, 6, 0.3); transition: all 0.3s ease;">
+            ☕ Verifieer Mijn Email
           </a>
         </div>
         
-        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
-          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🚀 Wat kun je doen na verificatie:</h3>
-          <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>Koffie meetups plannen met vrienden</li>
-            <li>Ontdek geweldige cafés in je stad</li>
-            <li>Deel je koffie ervaringen met de community</li>
-            <li>Ontvang persoonlijke aanbevelingen</li>
+        <div style="background-color: #fed7aa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ea580c;">
+          <h3 style="color: #c2410c; margin: 0 0 15px 0; font-size: 18px;">☕ Wat kun je straks doen:</h3>
+          <ul style="color: #c2410c; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>🗓️ Gezellige koffie meetups plannen met vrienden</li>
+            <li>🏪 Ontdek de leukste cafés in jouw stad</li>
+            <li>💬 Deel je koffie ervaringen met andere liefhebbers</li>
+            <li>⭐ Ontvang persoonlijke café aanbevelingen</li>
+            <li>📱 Eenvoudig uitnodigingen versturen en ontvangen</li>
           </ul>
         </div>
         
-        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
-          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">🔒 Account Veiligheid:</h3>
-          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li>We slaan je persoonlijke gegevens veilig op</li>
-            <li>Je email wordt nooit gedeeld met derden</li>
-            <li>Je kunt je account altijd verwijderen</li>
-            <li>We sturen alleen relevante updates</li>
+        <div style="background-color: #ffedd5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f97316;">
+          <h3 style="color: #ea580c; margin: 0 0 15px 0; font-size: 18px;">🔒 Jouw Privacy Is Veilig:</h3>
+          <ul style="color: #ea580c; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>🛡️ We slaan je persoonlijke gegevens veilig op</li>
+            <li>🚫 Je email wordt nooit gedeeld met derden</li>
+            <li>⚙️ Je hebt altijd controle over je account</li>
+            <li>📧 We sturen alleen relevante koffie-updates</li>
           </ul>
         </div>
         
         <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
-          <h3 style="color: #991b1b; margin: 0 0 15px 0; font-size: 18px;">❓ Problemen met de link?</h3>
+          <h3 style="color: #991b1b; margin: 0 0 15px 0; font-size: 18px;">🤔 Lukt het niet?</h3>
           <p style="color: #991b1b; margin: 0;">
-            Als de knop niet werkt, kopieer dan deze link naar je browser:<br>
-            <span style="word-break: break-all; font-family: monospace; background: #fff; padding: 4px; border-radius: 4px;">${data.verificationLink}</span>
+            Als de knop niet werkt, kun je deze link handmatig kopiëren naar je browser:<br>
+            <span style="word-break: break-all; font-family: monospace; background: #fff; padding: 4px; border-radius: 4px; font-size: 12px;">${data.verificationLink}</span>
           </p>
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${siteUrl}/contact" 
-             style="background-color: #6b7280; color: white; padding: 12px 24px; 
+          <a href="${siteUrl}/" 
+             style="background-color: #f97316; color: white; padding: 12px 24px; 
                     text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-            📞 Hulp Nodig?
+            🏠 Naar Anemi Meets
           </a>
         </div>
       </div>
       
-      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
-        <p style="color: #6b7280; font-size: 14px; margin: 0;">
-          Welkom bij de koffie community! ☕<br>
-          <strong>Het Anemi Meets Team</strong>
+      <div style="background-color: #fef3c7; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #92400e; font-size: 14px; margin: 0;">
+          Proost op geweldige koffie momenten! ☕<br>
+          <strong>Het Anemi Meets Team</strong><br>
+          <span style="font-size: 12px; color: #a16207;">P.S. We kijken uit naar je eerste meetup!</span>
         </p>
         <div style="margin-top: 15px;">
           <a href="${siteUrl}" 

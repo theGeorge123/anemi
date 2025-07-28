@@ -11,6 +11,7 @@ import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { SessionManager } from '@/components/SessionManager'
 import { validateStartup } from '@/lib/startup'
 import { AccountLinkingProvider } from '@/components/AccountLinkingProvider'
+import { OnboardingProvider } from '@/components/OnboardingProvider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -107,11 +108,13 @@ export default function RootLayout({
             <SupabaseProvider>
               <SessionManager>
                 <AccountLinkingProvider>
-                  <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-                    <LayoutWrapper>
-                      {children}
-                    </LayoutWrapper>
-                  </BackgroundAgentProvider>
+                  <OnboardingProvider>
+                    <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
+                      <LayoutWrapper>
+                        {children}
+                      </LayoutWrapper>
+                    </BackgroundAgentProvider>
+                  </OnboardingProvider>
                 </AccountLinkingProvider>
               </SessionManager>
               <Toaster />

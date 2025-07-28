@@ -161,7 +161,7 @@ export function FindMyMeetups() {
       <form onSubmit={handleSearch} className="space-y-4 px-4">
         <div className="space-y-3">
           <Label htmlFor="inviteCode" className="text-sm sm:text-base font-medium text-gray-700">
-            🔍 Vind je meetup met uitnodigingscode
+            🔑 Vind je meetup met invite token
           </Label>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
             <Input
@@ -169,7 +169,7 @@ export function FindMyMeetups() {
               type="text"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value)}
-              placeholder="Voer de uitnodigingscode in"
+              placeholder="Voer de invite token in (bijv. abc123def)"
               className="flex-1 text-base"
               required
             />
@@ -181,9 +181,10 @@ export function FindMyMeetups() {
               {isLoading ? 'Zoeken...' : 'Zoeken'}
             </Button>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 text-center">
-            De uitnodigingscode vind je in je uitnodiging email of WhatsApp bericht
-          </p>
+          <div className="text-xs sm:text-sm text-gray-500 text-center space-y-1">
+            <p>🔑 De invite token vind je in je uitnodiging (email of WhatsApp)</p>
+            <p>💡 Geen account nodig - gewoon je token invoeren!</p>
+          </div>
         </div>
       </form>
 

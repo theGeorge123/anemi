@@ -70,10 +70,10 @@ export default function HomePage() {
               Vind je Meetups
             </h3>
             <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6 leading-relaxed px-4">
-              Heb je een uitnodiging ontvangen maar geen account? 
+              Heb je een meetup uitnodiging ontvangen? 
             </p>
             <p className="text-amber-700 font-medium text-base sm:text-lg px-4">
-              Voer je uitnodigingscode hieronder in om je meetup te bekijken →
+              Voer je <strong>invite token</strong> hieronder in om je meetup te bekijken →
             </p>
           </div>
           

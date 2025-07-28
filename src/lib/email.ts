@@ -102,23 +102,43 @@ export interface EmailVerificationEmail {
  */
 export async function sendEmail(options: EmailOptions) {
   try {
+    // Validate required environment variables
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured. Please set this environment variable.');
+    }
+
+    // Validate email address
+    if (!options.to || !options.to.includes('@')) {
+      throw new Error(`Invalid email address: ${options.to}`);
+    }
+
+    console.log(`📧 Attempting to send email to: ${options.to} with subject: ${options.subject}`);
+
     const resendInstance = await getResend();
+    const fromEmail = options.from || process.env.EMAIL_FROM || 'noreply@anemi-meets.com';
+    
     const { data, error } = await resendInstance.emails.send({
-      from: options.from || process.env.EMAIL_FROM || 'noreply@anemi-meets.com',
+      from: fromEmail,
       to: options.to,
       subject: options.subject,
       html: options.html,
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      throw error;
+      console.error('❌ Resend API error:', error);
+      throw new Error(`Email service error: ${error.message || JSON.stringify(error)}`);
     }
 
-    console.log('Email sent successfully:', data);
+    console.log('✅ Email sent successfully:', { id: data?.id, to: options.to });
     return data;
   } catch (error) {
-    console.error('Failed to send email:', error);
+    console.error('❌ Failed to send email:', {
+      error: error instanceof Error ? error.message : error,
+      to: options.to,
+      subject: options.subject,
+      hasResendKey: !!process.env.RESEND_API_KEY,
+      hasEmailFrom: !!process.env.EMAIL_FROM
+    });
     throw error;
   }
 }

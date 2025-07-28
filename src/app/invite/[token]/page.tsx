@@ -18,6 +18,7 @@ interface InviteData {
   cafeId: string
   availableDates: string[]
   availableTimes: string[]
+  dateTimePreferences?: Record<string, string[]> // Date -> Times mapping
   status: string
   expiresAt: string
   cafe: {
@@ -537,7 +538,11 @@ export default function InvitePage() {
                   return (
                     <button
                       key={date}
-                      onClick={() => setSelectedDate(date)}
+                      onClick={() => {
+                        setSelectedDate(date)
+                        // Reset selected time when date changes since different dates may have different available times
+                        setSelectedTime('')
+                      }}
                       className={`p-4 rounded-lg border-2 transition-all duration-200 text-sm font-medium min-h-[60px] flex items-center justify-center ${
                         isSelected 
                           ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
@@ -557,24 +562,54 @@ export default function InvitePage() {
                 <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                 Kies een tijd:
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {invite.availableTimes.map((time) => {
-                  const isSelected = selectedTime === time
-                  return (
-                    <button
-                      key={time}
-                      onClick={() => setSelectedTime(time)}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium min-h-[50px] flex items-center justify-center ${
-                        isSelected 
-                          ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
-                          : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
-                      }`}
-                    >
-                    {time}
-                    </button>
-                  )
-                })}
-              </div>
+              {selectedDate ? (
+                <div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Beschikbare tijden voor {new Date(selectedDate).toLocaleDateString('nl-NL', { 
+                      weekday: 'long', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}:
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {(() => {
+                      // Get available times for the selected date
+                      let availableTimesForDate: string[] = []
+                      
+                      if (invite.dateTimePreferences && invite.dateTimePreferences[selectedDate]) {
+                        // Use specific times for this date
+                        availableTimesForDate = invite.dateTimePreferences[selectedDate]
+                      } else {
+                        // Fallback to all available times
+                        availableTimesForDate = invite.availableTimes
+                      }
+                      
+                      return availableTimesForDate.map((time) => {
+                        const isSelected = selectedTime === time
+                        return (
+                          <button
+                            key={time}
+                            onClick={() => setSelectedTime(time)}
+                            className={`px-4 py-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium min-h-[50px] flex items-center justify-center ${
+                              isSelected 
+                                ? 'bg-amber-500 text-white border-amber-500 shadow-md transform scale-105' 
+                                : 'bg-white text-gray-700 border-gray-200 hover:border-amber-300 hover:bg-amber-50'
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        )
+                      })
+                    })()}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <p className="text-amber-700 text-sm">
+                    Kies eerst een datum om de beschikbare tijden te zien
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Account Requirements Info */}

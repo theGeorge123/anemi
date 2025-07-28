@@ -166,6 +166,7 @@ model MeetupInvite {
   cafeId          String
   availableDates  String[]  // Array of ISO date strings
   availableTimes  String[]  // Array of time preferences
+  dateTimePreferences Json? // Store date-time mapping as JSON: {"2024-01-15": ["10:00", "14:00"], "2024-01-16": ["11:00"]}
   chosenDate      String?   // ISO date string
   chosenTime      String?   // Selected time
   status          String    @default("pending") // pending, confirmed, declined, expired

@@ -75,8 +75,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Email service not configured',
-          message: 'Email functionality is currently disabled. Please contact support.',
-          success: false 
+          message: 'Email functionality is currently disabled. Please configure RESEND_API_KEY environment variable.',
+          success: false,
+          debug: {
+            hasResendKey: !!process.env.RESEND_API_KEY,
+            hasEmailFrom: !!process.env.EMAIL_FROM,
+            node_env: process.env.NODE_ENV
+          }
         },
         { status: 503 }
       )

@@ -43,6 +43,26 @@ export async function POST(request: NextRequest) {
       }
     })
     
+    if (!adminError && adminData.user) {
+      // Manually confirm email in database to bypass Supabase email verification
+      console.log('🔧 Manually confirming email in database...')
+      try {
+        const { error: rpcError } = await supabaseAdmin.rpc('confirm_user_email', { 
+          user_id: adminData.user.id 
+        })
+        
+        if (rpcError) {
+          console.error('❌ RPC error:', rpcError)
+          throw rpcError
+        }
+        
+        console.log('✅ Email confirmed via RPC for user:', adminData.user.id)
+      } catch (error) {
+        console.error('❌ Failed to confirm email:', error)
+        // Continue anyway, user can still log in
+      }
+    }
+    
     if (adminError) {
       console.error('❌ Admin user creation error:', adminError)
       

@@ -7,7 +7,7 @@ import { useSupabase } from '@/components/SupabaseProvider'
 import { Home, Coffee } from 'lucide-react'
 
 export function Header() {
-  const { session, supabase } = useSupabase()
+  const { session, supabase, user } = useSupabase()
   
   return (
     <header className="sticky top-0 z-40 w-full border-b-2 border-amber-200 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
@@ -51,14 +51,31 @@ export function Header() {
           )}
         </nav>
 
-        {/* Only show login button for non-logged in users */}
-        {!supabase || !session ? (
+        {/* User menu for logged in users */}
+        {supabase && session && user ? (
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Welkom, <span className="font-medium text-amber-700">{user.email}</span>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut()
+              }}
+              className="border-amber-300 hover:bg-amber-50 hover:border-amber-400"
+            >
+              Uitloggen
+            </Button>
+          </div>
+        ) : (
+          /* Login button for non-logged in users */
           <Link href="/auth/signin">
             <Button variant="outline" size="lg" className="border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 px-6 py-3 rounded-full">
               Inloggen
             </Button>
           </Link>
-        ) : null}
+        )}
       </div>
     </header>
   )

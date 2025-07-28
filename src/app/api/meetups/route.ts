@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,35 +22,19 @@ export async function GET(request: NextRequest) {
     const token = authHeader.replace('Bearer ', '')
     console.log('🔍 Meetups API: Token length:', token.length)
 
-    // Check environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    console.log('🔍 Meetups API: Supabase URL present:', !!supabaseUrl)
-    console.log('🔍 Meetups API: Supabase key present:', !!supabaseAnonKey)
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('❌ Meetups API: Missing Supabase environment variables')
+    // Check if supabaseAdmin is available
+    if (!supabaseAdmin) {
+      console.error('❌ Meetups API: Supabase admin client not configured')
       return NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
       )
     }
 
-    const supabase = createClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      }
-    )
+    console.log('🔍 Meetups API: Using supabaseAdmin client')
 
-    console.log('🔍 Meetups API: Supabase client created, getting user...')
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    console.log('🔍 Meetups API: Getting user from token...')
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
 
     if (userError) {
       console.error('❌ Meetups API: User error:', userError)

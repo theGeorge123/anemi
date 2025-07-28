@@ -50,7 +50,7 @@ function VerifyPageContent() {
       // Verify the token with Supabase
       const { data, error } = await supabase.auth.verifyOtp({
         token_hash: token,
-        type: (type as EmailOtpType) || 'email'
+        type: (type as EmailOtpType) || 'recovery'
       })
 
       if (error) {

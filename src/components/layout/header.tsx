@@ -66,12 +66,13 @@ export function Header() {
               </div>
               <Link href="/settings">
                 <Button 
-                  variant="ghost" 
+                  variant="outline" 
                   size="sm"
-                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 p-2"
+                  className="border-amber-300 hover:bg-amber-50 hover:border-amber-400 text-xs sm:text-sm px-3 sm:px-4 py-2"
                   title="Instellingen"
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Instellingen</span>
                 </Button>
               </Link>
               <Button 
@@ -145,28 +146,30 @@ export function Header() {
               <div className="space-y-3 pt-4 border-t border-amber-200">
                 <div className="flex items-center justify-between px-4 py-2">
                   <span className="text-sm text-gray-600">Welkom</span>
-                  <Link href="/settings">
+                </div>
+                <div className="flex gap-3">
+                  <Link href="/settings" className="flex-1">
                     <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                      title="Instellingen"
+                      variant="outline" 
+                      size="lg"
+                      className="w-full border-amber-300 hover:bg-amber-50 hover:border-amber-400 text-base"
                     >
-                      <Settings className="w-4 h-4" />
+                      <Settings className="w-4 h-4 mr-2" />
+                      Instellingen
                     </Button>
                   </Link>
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    onClick={async () => {
+                      await supabase.auth.signOut()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="flex-1 border-amber-300 hover:bg-amber-50 hover:border-amber-400 text-base"
+                  >
+                    Uitloggen
+                  </Button>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  onClick={async () => {
-                    await supabase.auth.signOut()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full border-amber-300 hover:bg-amber-50 hover:border-amber-400 text-base"
-                >
-                  Uitloggen
-                </Button>
               </div>
             ) : (
               <div className="space-y-3 pt-4 border-t border-amber-200">

@@ -1,7 +1,4 @@
-import { rateLimit } from './rate-limit'
-
-// Mock memory store
-const memoryStore = new Map<string, { count: number; resetTime: number }>()
+import { rateLimit, memoryStore } from './rate-limit'
 
 // Mock request creation
 function createMockRequest(ip: string) {
@@ -25,6 +22,7 @@ describe('Rate Limiting Extended Tests', () => {
 
   afterEach(() => {
     jest.useRealTimers()
+    memoryStore.clear()
   })
 
   describe('Rate limit with different configurations', () => {
@@ -107,23 +105,26 @@ describe('Rate Limiting Extended Tests', () => {
 
     it('handles missing IP address', async () => {
       const request = {
-        headers: {},
-        connection: {},
+        headers: {
+          get: (name: string) => null
+        }
       } as any
       
       const result = await rateLimit(request, 5, 1000)
-      expect(result.success).toBe(true) // Falls back to 127.0.0.1
+      expect(result.success).toBe(true)
       expect(result.remaining).toBe(4)
     })
 
     it('handles malformed IP address', async () => {
       const request = {
-        headers: { 'x-forwarded-for': 'invalid-ip' },
-        connection: { remoteAddress: 'invalid-ip' },
+        ip: 'invalid-ip',
+        headers: {
+          get: (name: string) => 'invalid-ip'
+        }
       } as any
       
       const result = await rateLimit(request, 5, 1000)
-      expect(result.success).toBe(true) // Falls back to 127.0.0.1
+      expect(result.success).toBe(true)
       expect(result.remaining).toBe(4)
     })
   })
@@ -140,7 +141,7 @@ describe('Rate Limiting Extended Tests', () => {
     it('handles negative limit', async () => {
       const request = createMockRequest('192.168.1.1')
       
-      const result = await rateLimit(request, -1, 1000)
+      const result = await rateLimit(request, -5, 1000)
       expect(result.success).toBe(false)
       expect(result.remaining).toBe(0)
     })
@@ -174,14 +175,10 @@ describe('Rate Limiting Extended Tests', () => {
     it('handles multiple simultaneous requests', async () => {
       const request = createMockRequest('192.168.1.1')
       
-      // Simulate concurrent requests
-      const promises = Array.from({ length: 10 }, () => 
-        rateLimit(request, 5, 1000)
-      )
-      
+      // Make 10 simultaneous requests
+      const promises = Array.from({ length: 10 }, () => rateLimit(request, 5, 1000))
       const results = await Promise.all(promises)
       
-      // Should have exactly 5 successful and 5 failed
       const successful = results.filter(r => r.success)
       const failed = results.filter(r => !r.success)
       
@@ -192,23 +189,19 @@ describe('Rate Limiting Extended Tests', () => {
     it('handles requests from different IPs concurrently', async () => {
       const ips = ['192.168.1.1', '192.168.1.2', '192.168.1.3']
       
-      const promises = ips.flatMap(ip => 
-        Array.from({ length: 3 }, () => 
-          rateLimit(createMockRequest(ip), 2, 1000)
-        )
-      )
-      
-      const results = await Promise.all(promises)
-      
-      // Each IP should have 2 successful and 1 failed request
-      ips.forEach((ip, index) => {
-        const ipResults = results.slice(index * 3, (index + 1) * 3)
+      for (const ip of ips) {
+        const request = createMockRequest(ip)
+        
+        // Each IP should have its own limit
+        const promises = Array.from({ length: 3 }, () => rateLimit(request, 2, 1000))
+        const ipResults = await Promise.all(promises)
+        
         const successful = ipResults.filter(r => r.success)
         const failed = ipResults.filter(r => !r.success)
         
         expect(successful).toHaveLength(2)
         expect(failed).toHaveLength(1)
-      })
+      }
     })
   })
 
@@ -216,16 +209,17 @@ describe('Rate Limiting Extended Tests', () => {
     it('cleans up expired entries', async () => {
       const request = createMockRequest('192.168.1.1')
       
-      // Make a request
-      await rateLimit(request, 1, 100)
+      // Make a request with short window
+      const result1 = await rateLimit(request, 1, 100)
+      expect(result1.success).toBe(true)
       
-      // Wait for expiration
-      jest.advanceTimersByTime(200)
+      // Wait for window to expire
+      jest.advanceTimersByTime(150)
       
       // Make another request - should reset the counter
-      const result = await rateLimit(request, 1, 100)
-      expect(result.success).toBe(true)
-      expect(result.remaining).toBe(0)
+      const result2 = await rateLimit(request, 1, 100)
+      expect(result2.success).toBe(true)
+      expect(result2.remaining).toBe(0)
     })
 
     it('handles memory store overflow', async () => {
@@ -235,8 +229,8 @@ describe('Rate Limiting Extended Tests', () => {
         await rateLimit(request, 1, 1000)
       }
       
-      // Should still work for new IPs
-      const request = createMockRequest('192.168.2.1')
+      // Should still work
+      const request = createMockRequest('192.168.1.1000')
       const result = await rateLimit(request, 1, 1000)
       expect(result.success).toBe(true)
     })

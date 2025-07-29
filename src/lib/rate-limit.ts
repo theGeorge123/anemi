@@ -4,6 +4,11 @@ import { NextRequest } from 'next/server'
 export const memoryStore = new Map<string, { count: number; resetTime: number }>()
 
 export async function rateLimit(request: NextRequest, maxRequests = 10, windowMs = 10000) {
+  // Handle edge cases
+  if (maxRequests <= 0) {
+    return { success: false, remaining: 0 }
+  }
+  
   const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? '127.0.0.1'
   const now = Date.now()
   

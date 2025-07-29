@@ -44,8 +44,14 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(isows|@supabase)/)',
+    'node_modules/(?!(isows|@supabase|@supabase/realtime-js|@supabase/supabase-js|@supabase/auth-helpers-nextjs|@supabase/auth-helpers-react|@supabase/auth-ui-react|@supabase/ssr)/)',
   ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

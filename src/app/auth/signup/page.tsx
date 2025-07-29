@@ -60,21 +60,20 @@ function SignUpPageContent() {
 
     console.log('Attempting signup with email:', form.values.email)
     
-    // Create user via server-side API to avoid Supabase default emails
-    const createUserResponse = await fetch('/api/auth/create-user', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: form.values.email,
-        password: form.values.password,
-      }),
+    // Use Supabase's built-in signUp method
+    const { data, error } = await supabase.auth.signUp({
+      email: form.values.email,
+      password: form.values.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          nickname: form.values.email.split('@')[0] + Math.floor(Math.random() * 1000)
+        }
+      }
     })
 
-    if (!createUserResponse.ok) {
-      const errorData = await createUserResponse.json()
-      let errorMessage = errorData.error || 'Failed to create account'
+    if (error) {
+      let errorMessage = error.message
       
       // Provide more specific and friendly error messages
       if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
@@ -87,10 +86,6 @@ function SignUpPageContent() {
         errorMessage = '🌐 Netwerk probleem. Controleer je internet verbinding en probeer opnieuw.'
       } else if (errorMessage.includes('rate limit') || errorMessage.includes('too many')) {
         errorMessage = '⏰ Te veel pogingen. Wacht even en probeer opnieuw.'
-      } else if (errorMessage.includes('Server configuratie')) {
-        errorMessage = '🔧 Technisch probleem. Probeer het later opnieuw.'
-      } else if (errorMessage.includes('Er ging iets mis')) {
-        errorMessage = '😅 Er ging iets mis. Probeer het opnieuw.'
       } else {
         errorMessage = `😅 ${errorMessage}`
       }
@@ -99,21 +94,18 @@ function SignUpPageContent() {
       throw new Error(errorMessage)
     }
 
-    const responseData = await createUserResponse.json()
     console.log('User created successfully')
     
-    // Store the generated nickname
-    if (responseData.nickname) {
-      setGeneratedNickname(responseData.nickname)
+    // Store the generated nickname from user metadata
+    const nickname = data?.user?.user_metadata?.nickname
+    if (nickname) {
+      setGeneratedNickname(nickname)
     }
     
-    // The verification email is now sent automatically by the create-user API
-    // No need to call a separate verify-email endpoint
-    
-    // The user profile will be created automatically by the SQL trigger
-    // No need to call the API endpoint manually
+    // Supabase will automatically send verification email
+    // The user profile will be created automatically by database triggers
 
-    return responseData
+    return data
   }, {
     onSuccess: (data: any) => {
         console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)

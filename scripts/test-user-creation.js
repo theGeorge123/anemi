@@ -1,18 +1,18 @@
-// Test script voor account creation
-// Run dit script om te testen of account creation werkt
+// Test script voor user creation debugging
+// Run dit script om te testen of users correct worden aangemaakt
 
 const https = require('https');
 const http = require('http');
 
-console.log('🧪 Account Creation Test')
-console.log('========================')
+console.log('🧪 User Creation Debug Test')
+console.log('============================')
 
 // Test configuration
 const BASE_URL = 'http://localhost:3000'
 const API_ENDPOINT = '/api/auth/create-user'
 
 // Test data
-const testEmail = 'test-account-' + Date.now() + '@example.com'
+const testEmail = 'test-debug-' + Date.now() + '@example.com'
 const testPassword = 'testpassword123'
 
 console.log('📝 Test Configuration:')
@@ -63,9 +63,9 @@ function makeRequest(url, options) {
   });
 }
 
-// Test account creation API
-async function testAccountCreation() {
-  console.log('\n🎯 Testing Account Creation API...')
+// Test user creation API
+async function testUserCreation() {
+  console.log('\n🎯 Testing User Creation API...')
   
   const requestBody = JSON.stringify({
     email: testEmail,
@@ -92,24 +92,23 @@ async function testAccountCreation() {
     
     console.log('\n📡 API Response:')
     console.log('   Status Code:', response.statusCode)
+    console.log('   Headers:', response.headers)
     console.log('   Data:', JSON.stringify(response.data, null, 2))
     
     if (response.statusCode === 200) {
-      console.log('\n✅ SUCCESS: Account creation successful!')
+      console.log('\n✅ SUCCESS: User creation successful!')
       console.log('✅ User ID:', response.data.user?.id)
       console.log('✅ User Email:', response.data.user?.email)
       console.log('✅ Nickname:', response.data.nickname)
+      console.log('✅ User Created Flag:', response.data.userCreated)
       
       // Test if user can be found in database
       await testUserInDatabase(response.data.user?.id);
-      
-      // Test if user can login
-      await testUserLogin(response.data.user?.email, testPassword);
-      
     } else {
-      console.log('\n❌ FAILED: Account creation failed')
+      console.log('\n❌ FAILED: User creation failed')
       console.log('❌ Status Code:', response.statusCode)
       console.log('❌ Error:', response.data.error)
+      console.log('❌ Details:', response.data.details)
     }
     
   } catch (error) {
@@ -146,38 +145,37 @@ async function testUserInDatabase(userId) {
   }
 }
 
-// Test if user can login
-async function testUserLogin(email, password) {
-  console.log('\n🎯 Testing if user can login...')
+// Test environment variables
+async function testEnvironmentVariables() {
+  console.log('\n🎯 Testing Environment Variables...')
   
   try {
-    // This would normally test the login API
-    // For now, we'll just confirm the user exists
-    console.log('📊 Login Test:')
-    console.log('   Email:', email)
-    console.log('   Password:', password)
-    console.log('✅ User credentials ready for login test')
-    console.log('💡 To test login, go to /auth/signin and try logging in with these credentials')
+    const response = await fetch(`${BASE_URL}/api/debug-env`);
+    const data = await response.json();
+    
+    console.log('📊 Environment Variables Status:')
+    console.log('   Supabase URL:', data.variables?.NEXT_PUBLIC_SUPABASE_URL?.set ? '✅ Set' : '❌ Missing')
+    console.log('   Supabase Anon Key:', data.variables?.NEXT_PUBLIC_SUPABASE_ANON_KEY?.set ? '✅ Set' : '❌ Missing')
+    console.log('   Supabase Service Role Key:', data.variables?.SUPABASE_SERVICE_ROLE_KEY?.set ? '✅ Set' : '❌ Missing')
+    console.log('   Database URL:', data.variables?.DATABASE_URL?.set ? '✅ Set' : '❌ Missing')
     
   } catch (error) {
-    console.error('❌ Login test error:', error.message)
+    console.error('❌ Environment test error:', error.message)
   }
 }
 
 // Main test function
 async function runAllTests() {
-  console.log('🚀 Starting Account Creation Tests...\n')
+  console.log('🚀 Starting User Creation Debug Tests...\n')
   
   try {
-    // Test account creation
-    await testAccountCreation();
+    // Test environment variables first
+    await testEnvironmentVariables();
+    
+    // Test user creation
+    await testUserCreation();
     
     console.log('\n🎉 All tests completed!')
-    console.log('\n📝 Summary:')
-    console.log('   ✅ Account creation works')
-    console.log('   ✅ Users are saved to database')
-    console.log('   ✅ Users can be found in database')
-    console.log('   💡 Test login manually at /auth/signin')
     
   } catch (error) {
     console.error('\n❌ Test suite failed:', error)
@@ -190,8 +188,8 @@ if (require.main === module) {
 }
 
 module.exports = {
-  testAccountCreation,
+  testUserCreation,
   testUserInDatabase,
-  testUserLogin,
+  testEnvironmentVariables,
   runAllTests
 }; 

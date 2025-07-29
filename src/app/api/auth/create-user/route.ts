@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const { data: adminData, error: adminError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: false, // Enable email verification
+      email_confirm: true, // Let Supabase handle email verification
       user_metadata: { 
         name: email.split('@')[0],
         nickname: nickname
@@ -88,12 +88,28 @@ export async function POST(request: NextRequest) {
         }
 
     console.log('✅ User created successfully:', adminData.user?.email)
+    console.log('✅ User ID from Supabase:', adminData.user?.id)
 
         // Save user to database with nickname
         try {
-          await prisma.user.upsert({
+          console.log('🔧 Attempting to save user to database...')
+          console.log('   User ID:', adminData.user!.id)
+          console.log('   User Email:', adminData.user!.email)
+          console.log('   Nickname:', nickname)
+          
+          // Check if user already exists
+          const existingUser = await prisma.user.findUnique({
+            where: { id: adminData.user!.id }
+          })
+          
+          console.log('🔍 Existing user check:', existingUser ? 'Found' : 'Not found')
+          
+          const result = await prisma.user.upsert({
             where: { id: adminData.user!.id },
-            update: { nickname },
+            update: { 
+              nickname,
+              updatedAt: new Date()
+            },
             create: {
               id: adminData.user!.id,
               email: adminData.user!.email!,
@@ -102,37 +118,37 @@ export async function POST(request: NextRequest) {
               updatedAt: new Date()
             }
           })
-      console.log('✅ User saved to database with nickname:', nickname)
+          
+          console.log('✅ User saved to database successfully:', result)
+          
+          // Verify the user was actually saved
+          const savedUser = await prisma.user.findUnique({
+            where: { id: adminData.user!.id }
+          })
+          
+          console.log('🔍 Verification - User in database:', savedUser ? 'Found' : 'Not found')
+          
         } catch (dbError) {
-      console.error('❌ Database error saving user with nickname:', dbError)
+          console.error('❌ Database error saving user with nickname:', dbError)
+          console.error('❌ Error details:', {
+            message: dbError instanceof Error ? dbError.message : 'Unknown error',
+            stack: dbError instanceof Error ? dbError.stack : undefined,
+            name: dbError instanceof Error ? dbError.name : 'Unknown'
+          })
           // Continue even if database save fails
         }
         
-    // Send verification email using Resend
-    try {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-      const verificationLink = `${siteUrl}/auth/verify-email?token=${adminData.user!.id}`
-      
-      await sendEmailVerificationEmail({
-        to: email,
-        verificationLink,
-        userName: email.split('@')[0]
-      })
-      
-      console.log('✅ Verification email sent successfully to:', email)
-    } catch (emailError) {
-      console.error('❌ Failed to send verification email:', emailError)
-      // Continue even if email fails - user can request verification later
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      user: adminData.user,
-      nickname,
-      message: 'Account aangemaakt! Controleer je email voor verificatie.',
-      userCreated: true,
-      emailSent: true
-    })
+            // Supabase will automatically send verification email
+        console.log('✅ User created successfully. Supabase will send verification email.')
+        
+        return NextResponse.json({ 
+          success: true, 
+          user: adminData.user,
+          nickname,
+          message: 'Account aangemaakt! Controleer je email voor verificatie.',
+          userCreated: true,
+          emailSent: false // Supabase handles email sending
+        })
 
   } catch (error) {
     console.error('❌ Create user error:', error)

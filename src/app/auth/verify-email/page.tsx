@@ -39,9 +39,9 @@ function VerifyEmailPageContent() {
   const handleVerification = useCallback(async () => {
     if (!token || !email || isVerifying) {
       console.error('Missing token or email, or already verifying:', { token, email, isVerifying })
-    if (!token || !email) {
-      setVerificationStatus('error')
-      console.error('Email verificatie parameters ontbreken. Controleer je email link.')
+      if (!token || !email) {
+        setVerificationStatus('error')
+        console.error('Email verificatie parameters ontbreken. Controleer je email link.')
       }
       return
     }
@@ -67,42 +67,15 @@ function VerifyEmailPageContent() {
         setVerificationStatus('success')
         console.log('🎉 Email succesvol geverifieerd! Welkom bij Anemi Meets!')
         
-        // Send welcome email after successful verification
-        try {
-          const response = await fetch('/api/auth/welcome-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              email,
-              userName: email.split('@')[0] // Use email prefix as username
-            }),
-          })
-
-          if (response.ok) {
-            console.log('Welcome email sent successfully')
-          } else {
-            console.error('Failed to send welcome email')
-          }
-        } catch (error) {
-          console.error('Error sending welcome email:', error)
-        }
-        
         // Start countdown for redirect
         setCountdown(3)
         const countdownInterval = setInterval(() => {
           setCountdown(prev => {
             if (prev <= 1) {
               clearInterval(countdownInterval)
-              // Check if there's a stored redirect URL from signup
-              const storedRedirect = sessionStorage.getItem('signup_redirect')
-              sessionStorage.removeItem('signup_redirect') // Clean up
-              
-              const signinUrl = storedRedirect 
-                ? `/auth/signin?redirect=${storedRedirect}&message=verified`
-                : '/auth/signin?message=verified'
-              router.push(signinUrl)
+              // Redirect to signin page with success message
+              router.push('/auth/signin?message=verified')
+              return 0
             }
             return prev - 1
           })
@@ -112,13 +85,12 @@ function VerifyEmailPageContent() {
         setVerificationStatus('error')
       }
     } catch (error) {
-      console.error('Email verification error:', error)
+      console.error('Unexpected error during verification:', error)
       setVerificationStatus('error')
-      console.error('Email verifiëren mislukt. Probeer opnieuw.')
     } finally {
       setIsVerifying(false)
     }
-  }, [token, email, type, supabase, router, isVerifying])
+  }, [token, email, type, isVerifying, supabase.auth, router])
 
   // Auto-verify when component mounts
   useEffect(() => {
@@ -135,9 +107,6 @@ function VerifyEmailPageContent() {
 
       return () => clearTimeout(timeoutId)
     }
-    
-    // Return undefined for cases where we don't set up a timeout
-    return undefined
   }, [token, email, verificationStatus, isVerifying, handleVerification])
 
   const resendVerification = async () => {
@@ -153,34 +122,67 @@ function VerifyEmailPageContent() {
       })
 
       if (error) {
-        console.error('Resend error:', error)
-        console.error('Verificatie email versturen mislukt. Probeer opnieuw.')
+        console.error('Failed to resend verification email:', error)
       } else {
-        console.log('📧 Verificatie email verstuurd! Check je inbox.')
+        console.log('Verification email resent successfully')
       }
     } catch (error) {
-      console.error('Resend error:', error)
-      console.error('Verificatie email versturen mislukt. Probeer opnieuw.')
+      console.error('Error resending verification email:', error)
     }
   }
 
+  // Loading state
+  if (verificationStatus === 'pending' && isVerifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <RefreshCw className="w-8 h-8 text-white animate-spin" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-amber-700 mb-1">Email Verificeren</CardTitle>
+            <CardDescription className="text-base text-gray-500">
+              Even geduld...
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-gray-600">Je email wordt geverifieerd...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Success state
   if (verificationStatus === 'success') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-              🎉 Email Geverifieerd!
-            </CardTitle>
-            <CardDescription className="text-lg text-gray-600">
-              Je email is succesvol geverifieerd. Je wordt over {countdown} seconde{countdown !== 1 ? 'n' : ''} doorgestuurd naar de inlogpagina.
+            <CardTitle className="text-2xl font-bold text-green-700 mb-1">Email Geverifieerd! 🎉</CardTitle>
+            <CardDescription className="text-base text-gray-500">
+              Je account is succesvol geactiveerd
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Link href="/auth/signin">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+              <p className="text-green-800 font-medium mb-2">✅ Verificatie Succesvol</p>
+              <p className="text-green-600 text-sm">
+                Je email is geverifieerd en je account is actief.
+              </p>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <p className="text-blue-800 font-medium mb-2">⏰ Automatische Redirect</p>
+              <p className="text-blue-600 text-sm">
+                Je wordt over {countdown} seconden doorgestuurd naar de login pagina.
+              </p>
+            </div>
+            
+            <Link href="/auth/signin?message=verified">
               <Button className="w-full bg-amber-600 hover:bg-amber-700">
                 <Home className="w-4 h-4 mr-2" />
                 Nu Inloggen
@@ -192,48 +194,44 @@ function VerifyEmailPageContent() {
     )
   }
 
+  // Error state
   if (verificationStatus === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <XCircle className="w-10 h-10 text-red-600" />
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-              ❌ Verificatie Mislukt
-            </CardTitle>
-            <CardDescription className="text-lg text-gray-600">
-              Er is een probleem met de email verificatie. Controleer je email link of probeer opnieuw.
+            <CardTitle className="text-2xl font-bold text-red-700 mb-1">Verificatie Mislukt</CardTitle>
+            <CardDescription className="text-base text-gray-500">
+              Er ging iets mis bij het verifiëren van je email
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="text-center">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <p className="text-red-800 font-medium mb-2">❌ Verificatie Fout</p>
+              <p className="text-red-600 text-sm">
+                De verificatie link is ongeldig of verlopen. Controleer je email of probeer opnieuw.
+              </p>
+            </div>
+            
             <div className="space-y-3">
               <Button 
                 onClick={resendVerification}
-                variant="outline" 
-                className="w-full"
+                variant="outline"
+                className="w-full border-amber-300 hover:bg-amber-50"
               >
                 <Mail className="w-4 h-4 mr-2" />
-                Nieuwe Verificatie Email Versturen
+                Verificatie Email Opnieuw Versturen
               </Button>
               
               <Link href="/auth/signin">
                 <Button variant="outline" className="w-full">
                   <Home className="w-4 h-4 mr-2" />
-                  Terug naar Inloggen
+                  Terug naar Login
                 </Button>
               </Link>
-            </div>
-            
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <h3 className="font-semibold text-amber-800 mb-2">💡 Tips</h3>
-              <ul className="text-sm text-amber-700 space-y-1">
-                <li>• Controleer je spam/junk folder</li>
-                <li>• Zorg dat je de juiste email gebruikt</li>
-                <li>• Klik op de link in de email</li>
-                <li>• Probeer een nieuwe verificatie email</li>
-              </ul>
             </div>
           </CardContent>
         </Card>
@@ -241,24 +239,30 @@ function VerifyEmailPageContent() {
     )
   }
 
+  // Default state (should not be reached)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <RefreshCw className={`w-10 h-10 text-amber-600 ${isVerifying ? 'animate-spin' : ''}`} />
+        <CardHeader className="text-center pb-2">
+          <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-            🔐 Email Verifiëren
-          </CardTitle>
-          <CardDescription className="text-lg text-gray-600">
-            {isVerifying ? 'Je email wordt geverifieerd...' : 'Email verificatie wordt voorbereid...'}
+          <CardTitle className="text-2xl font-bold text-amber-700 mb-1">Email Verificatie</CardTitle>
+          <CardDescription className="text-base text-gray-500">
+            Controleer je email voor de verificatie link
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-          </div>
+          <p className="text-gray-600 mb-4">
+            Klik op de link in je email om je account te activeren.
+          </p>
+          
+          <Link href="/auth/signin">
+            <Button variant="outline" className="w-full">
+              <Home className="w-4 h-4 mr-2" />
+              Terug naar Login
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
@@ -268,17 +272,11 @@ function VerifyEmailPageContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <RefreshCw className="w-10 h-10 text-amber-600 animate-spin" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
-              🔐 Loading...
-            </CardTitle>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
       </div>
     }>
       <VerifyEmailPageContent />

@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from '@/components/ui/button';
-import { LogIn, Calendar, LogOut, Eye } from 'lucide-react';
+import { LogIn, Calendar, LogOut, Eye, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useSupabase } from '@/components/SupabaseProvider';
 
@@ -105,17 +105,30 @@ export function LoginStatus() {
             </div>
 
             <div className="flex justify-center">
-              <Button 
-                variant="ghost" 
-                size="lg" 
-                onClick={async () => {
-                  await supabase.auth.signOut()
-                }}
-                className="text-sm sm:text-base lg:text-lg text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 px-4 sm:px-6 py-2 sm:py-3"
-              >
-                <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Uitloggen
-              </Button>
+              <div className="flex gap-3 sm:gap-4">
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  asChild
+                  className="text-sm sm:text-base lg:text-lg text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 px-4 sm:px-6 py-2 sm:py-3"
+                >
+                  <Link href="/settings">
+                    <Settings className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    Instellingen
+                  </Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={async () => {
+                    await supabase.auth.signOut()
+                  }}
+                  className="text-sm sm:text-base lg:text-lg text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 px-4 sm:px-6 py-2 sm:py-3"
+                >
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Uitloggen
+                </Button>
+              </div>
             </div>
           </div>
         </div>

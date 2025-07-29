@@ -79,12 +79,19 @@ export function Header() {
             </Button>
           </div>
         ) : (
-          /* Login button for non-logged in users */
-          <Link href="/auth/signin">
-            <Button variant="outline" size="lg" className="border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 px-6 py-3 rounded-full">
-              Inloggen
-            </Button>
-          </Link>
+          /* Login and Register buttons for non-logged in users */
+          <div className="flex items-center gap-3">
+            <Link href="/auth/signin">
+              <Button variant="outline" size="lg" className="border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 px-6 py-3 rounded-full">
+                Inloggen
+              </Button>
+            </Link>
+            <Link href="/auth/signup">
+              <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white transition-all duration-200 px-6 py-3 rounded-full">
+                Registreren
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
     </header>

@@ -38,12 +38,6 @@ function SignUpPageContent() {
     }],
   })
 
-  // Helper function to generate nickname
-  const generateNickname = (email: string): string => {
-    const parts = email.split('@')
-    return parts[0] + Math.floor(Math.random() * 1000)
-  }
-
   const {
     execute: signUpAsync,
     isLoading: signUpLoading,
@@ -72,8 +66,8 @@ function SignUpPageContent() {
       throw new Error('Email is required')
     }
     
-    // Generate nickname from validated email
-    const nickname = generateNickname(email)
+    // Generate nickname directly with type assertion
+    const nickname = (email as string).split('@')[0] + Math.floor(Math.random() * 1000)
     
     // Use Supabase's built-in signUp method
     const { data, error } = await supabase.auth.signUp({

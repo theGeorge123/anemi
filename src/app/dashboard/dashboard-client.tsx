@@ -89,13 +89,13 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+      <div className="bg-white rounded-lg max-w-2xl sm:max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               📊 Reacties voor Meetup
             </h2>
-            <Button onClick={onClose} variant="outline">
+            <Button onClick={onClose} variant="outline" size="sm" className="text-xs sm:text-sm">
               ✕ Sluiten
             </Button>
           </div>
@@ -600,59 +600,59 @@ export default function DashboardClient() {
         {/* Statistics Section */}
         {meetups.length > 0 && (
           <div className="mb-4 sm:mb-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
               <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-blue-600 font-medium">📧 Uitnodigingen Verzonden</p>
-                      <p className="text-2xl font-bold text-blue-700">
+                      <p className="text-xs sm:text-sm text-blue-600 font-medium">📧 Uitnodigingen</p>
+                      <p className="text-lg sm:text-2xl font-bold text-blue-700">
                         {meetups.reduce((sum, meetup) => sum + (meetup.totalInvites || 0), 0)}
                       </p>
                     </div>
-                    <div className="text-3xl">📧</div>
+                    <div className="text-2xl sm:text-3xl">📧</div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-green-600 font-medium">✅ Geaccepteerd</p>
-                      <p className="text-2xl font-bold text-green-700">
+                      <p className="text-xs sm:text-sm text-green-600 font-medium">✅ Geaccepteerd</p>
+                      <p className="text-lg sm:text-2xl font-bold text-green-700">
                         {meetups.reduce((sum, meetup) => sum + (meetup.responses?.accepted || 0), 0)}
                       </p>
                     </div>
-                    <div className="text-3xl">✅</div>
+                    <div className="text-2xl sm:text-3xl">✅</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs sm:text-sm text-yellow-600 font-medium">⏳ In Afwachting</p>
+                      <p className="text-lg sm:text-2xl font-bold text-yellow-700">
+                        {meetups.reduce((sum, meetup) => sum + (meetup.responses?.pending || 0), 0)}
+                      </p>
+                    </div>
+                    <div className="text-2xl sm:text-3xl">⏳</div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-r from-red-50 to-rose-50 border-red-200">
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-red-600 font-medium">❌ Afgewezen</p>
-                      <p className="text-2xl font-bold text-red-700">
+                      <p className="text-xs sm:text-sm text-red-600 font-medium">❌ Afgewezen</p>
+                      <p className="text-lg sm:text-2xl font-bold text-red-700">
                         {meetups.reduce((sum, meetup) => sum + (meetup.responses?.declined || 0), 0)}
                       </p>
                     </div>
-                    <div className="text-3xl">❌</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-amber-600 font-medium">⏳ In Afwachting</p>
-                      <p className="text-2xl font-bold text-amber-700">
-                        {meetups.reduce((sum, meetup) => sum + (meetup.responses?.pending || 0), 0)}
-                      </p>
-                    </div>
-                    <div className="text-3xl">⏳</div>
+                    <div className="text-2xl sm:text-3xl">❌</div>
                   </div>
                 </CardContent>
               </Card>
@@ -791,85 +791,63 @@ export default function DashboardClient() {
           </div>
         )}
 
-        {/* Sorting and Filtering Controls */}
-        <div className="mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="flex flex-wrap gap-2">
-                  {/* Status Filter */}
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-gray-600" />
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="px-3 py-1 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="all">Alle Statussen</option>
-                      <option value="pending">⏳ Wachtend</option>
-                      <option value="accepted">✅ Geaccepteerd</option>
-                      <option value="confirmed">📅 Bevestigd</option>
-                      <option value="declined">❌ Afgewezen</option>
-                    </select>
-                  </div>
-
-                  {/* Urgent Filter */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={showUrgentOnly ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setShowUrgentOnly(!showUrgentOnly)}
-                      className="text-xs"
-                    >
-                      🚨 Urgent ({getUrgentCount()})
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Sorting Controls */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Sorteren op:</span>
-                  <div className="flex gap-1">
-                    <Button
-                      variant={sortBy === 'date' ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleSort('date')}
-                      className="text-xs"
-                    >
-                      <Calendar className="w-3 h-3 mr-1" />
-                      Datum
-                      {sortBy === 'date' && (
-                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
-                      )}
-                    </Button>
-                    <Button
-                      variant={sortBy === 'status' ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleSort('status')}
-                      className="text-xs"
-                    >
-                      Status
-                      {sortBy === 'status' && (
-                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
-                      )}
-                    </Button>
-                    <Button
-                      variant={sortBy === 'responses' ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handleSort('responses')}
-                      className="text-xs"
-                    >
-                      <Users className="w-3 h-3 mr-1" />
-                      Reacties
-                      {sortBy === 'responses' && (
-                        sortOrder === 'asc' ? <SortAsc className="w-3 h-3 ml-1" /> : <SortDesc className="w-3 h-3 ml-1" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
+        {/* Filters and Controls */}
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-gray-600" />
+                <span className="text-sm sm:text-base font-medium text-gray-700">Filter:</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={statusFilter === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStatusFilter('all')}
+                  className="text-xs sm:text-sm"
+                >
+                  Alle ({meetups.length})
+                </Button>
+                <Button
+                  variant={statusFilter === 'pending' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStatusFilter('pending')}
+                  className="text-xs sm:text-sm"
+                >
+                  In Afwachting ({meetups.filter(m => (m.responses?.pending || 0) > 0).length})
+                </Button>
+                <Button
+                  variant={showUrgentOnly ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setShowUrgentOnly(!showUrgentOnly)}
+                  className="text-xs sm:text-sm"
+                >
+                  🚨 Urgent ({getUrgentCount()})
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm sm:text-base font-medium text-gray-700">Sorteer:</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSort(sortBy === 'date' ? 'date' : 'date')}
+                className="text-xs sm:text-sm"
+              >
+                {sortBy === 'date' ? <SortDesc className="w-3 h-3 sm:w-4 sm:h-4" /> : <SortAsc className="w-3 h-3 sm:w-4 sm:h-4" />}
+                Datum
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSort('responses')}
+                className="text-xs sm:text-sm"
+              >
+                Reacties
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Loading State */}
@@ -881,189 +859,105 @@ export default function DashboardClient() {
         )}
 
         {/* Meetups List */}
-        {!isLoading && meetups.length === 0 && (
-          <div className="text-center py-12">
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-amber-200 max-w-md mx-auto">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">☕ Nog geen meetups</h3>
-              <p className="text-gray-600 mb-6">
-                Je hebt nog geen meetups gemaakt. Start je eerste koffie avontuur!
-              </p>
-              <Button asChild className="bg-amber-600 hover:bg-amber-700">
-                <Link href="/create">
-                  🚀 Maak je eerste Meetup
-                </Link>
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Meetups Grid */}
-        {!isLoading && getSortedAndFilteredMeetups().length > 0 && (
-          <div className="grid gap-6">
-            {getSortedAndFilteredMeetups().map((meetup) => (
-              <Card key={meetup.id} className="bg-white/80 backdrop-blur-sm border-amber-200">
-                <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        {getStatusBadge(meetup.status)}
-                        {meetup.createdBy === session?.user?.email && (
-                          <Badge variant="outline">👤 Organisator</Badge>
-                        )}
-                        {meetup.inviteeEmail === session?.user?.email && (
-                          <Badge variant="outline">👥 Deelnemer</Badge>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="space-y-3 sm:space-y-4">
+          {getSortedAndFilteredMeetups().map((meetup) => (
+            <Card key={meetup.id} className="hover:shadow-md transition-shadow duration-200">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  {/* Meetup Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-3">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                         ☕ {meetup.cafe.name}
                       </h3>
-                      
-                      <p className="text-gray-600 mb-2">
-                        📍 {meetup.cafe.address}
-                      </p>
-                      
-                      <p className="text-sm text-gray-500 mb-3">
-                        🗓️ {formatDate(meetup.createdAt)}
-                      </p>
-
-                      {meetup.chosenDate && (
-                        <p className="text-sm text-green-600 font-medium">
-                          ✅ Gekozen: {formatDate(meetup.chosenDate)}
-                        </p>
-                      )}
-
-                      {/* Quick Stats */}
-                      {meetup.totalInvites && (
-                        <div className="flex gap-4 mt-3 text-sm">
-                          <span className="text-blue-600">📧 {meetup.totalInvites} uitnodigingen</span>
-                          {meetup.responses && (
-                            <>
-                              <span className="text-green-600">✅ {meetup.responses.accepted} geaccepteerd</span>
-                              <span className="text-red-600">❌ {meetup.responses.declined} afgewezen</span>
-                              <span className="text-amber-600">⏳ {meetup.responses.pending} in afwachting</span>
-                            </>
-                          )}
-                        </div>
-                      )}
+                      {getStatusBadge(meetup.status)}
                     </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      {/* View Responses Button */}
-                      {(meetup.participants && meetup.participants.length > 0) && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingMeetup(meetup)
-                            setViewResponsesModalOpen(true)
-                          }}
-                          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          Bekijk Reacties
-                        </Button>
-                      )}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(getInviteLink(meetup.token))}
-                      >
-                        📋 Kopieer Link
-                      </Button>
-                      
-                      {meetup.createdBy === session?.user?.email && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditMeetup(meetup)}
-                          >
-                            ✏️ Bewerken
-                          </Button>
-                          
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteMeetup(meetup.id)}
-                          >
-                            🗑️ Verwijderen
-                          </Button>
-                        </>
-                      )}
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Organisator: {meetup.organizerName}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Gemaakt: {formatDate(meetup.createdAt)}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span>Vervalt: {formatDate(meetup.expiresAt)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-2 sm:mt-3 flex flex-wrap gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        ✅ {meetup.responses?.accepted || 0} Geaccepteerd
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        ⏳ {meetup.responses?.pending || 0} In Afwachting
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        ❌ {meetup.responses?.declined || 0} Afgewezen
+                      </Badge>
                     </div>
                   </div>
 
-                  {/* Participants List */}
-                  {meetup.participants && meetup.participants.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <h4 className="font-medium text-gray-900 mb-3">👥 Deelnemers ({meetup.participants.length})</h4>
-                      <div className="grid gap-2">
-                        {meetup.participants.map((participant, index) => (
-                          <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900">{participant.name}</span>
-                                <span className="text-sm text-gray-500">({participant.email})</span>
-                                {participant.status === 'accepted' && (
-                                  <Badge className="bg-green-100 text-green-800 border-green-200">✅ Geaccepteerd</Badge>
-                                )}
-                                {participant.status === 'declined' && (
-                                  <Badge className="bg-red-100 text-red-800 border-red-200">❌ Afgewezen</Badge>
-                                )}
-                                {participant.status === 'pending' && (
-                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">⏳ Wachten</Badge>
-                                )}
-                              </div>
-                              {participant.chosenDate && participant.chosenTime && (
-                                <p className="text-sm text-green-600 mt-1">
-                                  📅 Gekozen: {formatDate(participant.chosenDate)} om {participant.chosenTime}
-                                </p>
-                              )}
-                              {participant.responseDate && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Reageerde op: {formatDate(participant.responseDate)}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingMeetup(meetup)}
+                      className="text-xs sm:text-sm"
+                    >
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      <span className="hidden sm:inline">Bekijk Reacties</span>
+                      <span className="sm:hidden">Reacties</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditMeetup(meetup)}
+                      className="text-xs sm:text-sm"
+                    >
+                      <span className="hidden sm:inline">Bewerken</span>
+                      <span className="sm:hidden">Edit</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(getInviteLink(meetup.token))}
+                      className="text-xs sm:text-sm"
+                    >
+                      <span className="hidden sm:inline">Kopieer Link</span>
+                      <span className="sm:hidden">Link</span>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-        {/* No Meetups State */}
-        {!isLoading && !error && meetups.length === 0 && (
-          <Card className="bg-white/80 backdrop-blur-sm border-amber-200">
-            <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-4">☕</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Nog geen meetups
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Je hebt nog geen koffie meetups georganiseerd of uitnodigingen ontvangen. 
-                Start je eerste meetup om vrienden uit te nodigen voor een kopje koffie!
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button asChild className="bg-amber-600 hover:bg-amber-700">
-                  <Link href="/create">
-                    🚀 Nieuwe Meetup Maken
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                  <Link href="/">
-                    🏠 Terug naar Home
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Empty State */}
+        {getSortedAndFilteredMeetups().length === 0 && (
+          <div className="text-center py-8 sm:py-12">
+            <div className="text-6xl sm:text-8xl mb-4">☕</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+              {meetups.length === 0 ? 'Nog geen meetups' : 'Geen meetups gevonden'}
+            </h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">
+              {meetups.length === 0 
+                ? 'Start je eerste koffie meetup en nodig vrienden uit!'
+                : 'Probeer andere filters of maak een nieuwe meetup aan.'
+              }
+            </p>
+            <Button asChild className="bg-amber-600 hover:bg-amber-700">
+              <Link href="/create">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Start een Meetup
+              </Link>
+            </Button>
+          </div>
         )}
 
         {/* Edit Modal */}

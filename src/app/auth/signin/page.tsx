@@ -137,39 +137,41 @@ function SignInPageContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
       {/* Back to Home Button */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
         <Link href="/">
           <Button 
             variant="ghost" 
-            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs sm:text-sm"
           >
-            <Home className="w-4 h-4" />
-            ← Terug naar Home
+            <Home className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">← Terug naar Home</span>
+            <span className="sm:hidden">← Home</span>
           </Button>
         </Link>
       </div>
 
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm sm:max-w-md">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">☕ Welkom Terug!</CardTitle>
-            <CardDescription className="text-base text-gray-500">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-amber-700 mb-1">☕ Welkom Terug!</CardTitle>
+            <CardDescription className="text-sm sm:text-base text-gray-500">
               {redirectUrl 
                 ? 'Log in om door te gaan naar je bestemming'
                 : 'Klaar voor je volgende koffie avontuur?'
               }
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-5">
+          <CardContent className="p-4 sm:p-6">
+            <form onSubmit={handleSignIn} className="space-y-4 sm:space-y-5">
               {/* Success message */}
               {successMessage && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-700 text-sm">{successMessage}</p>
+                <div className="p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-700 text-xs sm:text-sm">{successMessage}</p>
                 </div>
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
@@ -178,11 +180,12 @@ function SignInPageContent() {
                   onChange={(e) => form.handleChange('email')(e)}
                   onBlur={form.handleBlur('email')}
                   required
+                  className="text-sm sm:text-base"
                 />
-                {form.errors.email && <p className="text-red-500 text-sm">{form.errors.email}</p>}
+                {form.errors.email && <p className="text-red-500 text-xs sm:text-sm">{form.errors.email}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Wachtwoord</Label>
+                <Label htmlFor="password" className="text-sm sm:text-base">Wachtwoord</Label>
                 <Input
                   id="password"
                   type="password"
@@ -191,21 +194,22 @@ function SignInPageContent() {
                   onChange={(e) => form.handleChange('password')(e)}
                   onBlur={form.handleBlur('password')}
                   required
+                  className="text-sm sm:text-base"
                 />
-                {form.errors.password && <p className="text-red-500 text-sm">{form.errors.password}</p>}
+                {form.errors.password && <p className="text-red-500 text-xs sm:text-sm">{form.errors.password}</p>}
               </div>
               
               {/* Specific error message */}
               {specificError && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 text-sm">{specificError}</p>
+                <div className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-xs sm:text-sm">{specificError}</p>
                 </div>
               )}
               
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
                   type="submit" 
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg font-semibold" 
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-sm sm:text-lg font-semibold py-3 sm:py-4" 
                   disabled={signInLoading}
                 >
                   {signInLoading ? '🔄 Inloggen...' : '☕ Log In'}
@@ -217,7 +221,7 @@ function SignInPageContent() {
                   <Button 
                     type="button"
                     variant="outline"
-                    className="w-full border-2 border-amber-500 text-amber-700 hover:bg-amber-50 hover:border-amber-600 text-lg font-semibold"
+                    className="w-full border-2 border-amber-500 text-amber-700 hover:bg-amber-50 hover:border-amber-600 text-sm sm:text-lg font-semibold py-3 sm:py-4"
                   >
                     ✨ Registreer
                   </Button>
@@ -225,23 +229,18 @@ function SignInPageContent() {
               </div>
             </form>
             
-            <div className="mt-6 text-center text-sm text-gray-600">
+            <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600">
               Nieuw bij Anemi Meets? Klik hierboven op{' '}
-              <span className="font-semibold text-amber-700">Registreer</span>{' '}
-              om een gratis account aan te maken!
+              <Link href={`/auth/signup${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
+                Registreer
+              </Link>{' '}
+              om een account aan te maken.
             </div>
             
-            <div className="mt-4 text-center space-y-2">
-              <div>
-                <Link href="/auth/verify" className="text-amber-600 hover:underline text-sm">
-                  Email nog niet geverifieerd?
-                </Link>
-              </div>
-              <div>
-                <Link href="/auth/forgot-password" className="text-amber-600 hover:underline font-medium text-sm">
-                  🔐 Wachtwoord vergeten?
-                </Link>
-              </div>
+            <div className="mt-4 text-center">
+              <Link href="/auth/forgot-password" className="text-xs sm:text-sm text-amber-700 hover:underline">
+                Wachtwoord vergeten?
+              </Link>
             </div>
           </CardContent>
         </Card>

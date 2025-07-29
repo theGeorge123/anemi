@@ -131,18 +131,18 @@ function SignUpPageContent() {
   if (!supabase) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-background to-orange-50 p-4">
-        <div className="w-full max-w-md">
-          <Card className="rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
+        <div className="w-full max-w-sm sm:max-w-md">
+          <Card className="rounded-xl sm:rounded-2xl shadow-xl border-0 bg-white/90 backdrop-blur-md">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Service Unavailable</CardTitle>
-              <CardDescription className="text-base text-gray-500">
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-amber-700 mb-1">Service Unavailable</CardTitle>
+              <CardDescription className="text-sm sm:text-base text-gray-500">
                 Authentication service is not available. Please refresh the page and try again.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
                 onClick={() => window.location.reload()} 
-                className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-sm sm:text-lg font-semibold py-3 sm:py-4"
               >
                 Refresh Page
               </Button>
@@ -156,32 +156,34 @@ function SignUpPageContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
       {/* Back to Home Button */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
         <Link href="/">
           <Button 
             variant="ghost" 
-            className="flex items-center gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs sm:text-sm"
           >
-            <Home className="w-4 h-4" />
-            ← Terug naar Home
+            <Home className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">← Terug naar Home</span>
+            <span className="sm:hidden">← Home</span>
           </Button>
         </Link>
       </div>
 
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm sm:max-w-md">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Maak je account aan</CardTitle>
-          <CardDescription className="text-base text-gray-500">
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-amber-700 mb-1">Maak je account aan</CardTitle>
+          <CardDescription className="text-sm sm:text-base text-gray-500">
             {redirectUrl 
               ? 'Registreer om door te gaan naar je bestemming'
               : 'Registreer in seconden en ontgrendel een wereld van koffie meetups, reconnect met vrienden, en goede vibes. ☕️✨'
             }
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSignUp} className="space-y-5">
+        <CardContent className="p-4 sm:p-6">
+          <form onSubmit={handleSignUp} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email" className="text-sm sm:text-base">E-mail</Label>
               <Input
                 id="email"
                 type="email"
@@ -190,11 +192,12 @@ function SignUpPageContent() {
                 onChange={form.handleChange('email')}
                 onBlur={form.handleBlur('email')}
                 required
+                className="text-sm sm:text-base"
               />
-              {form.errors.email && <p className="text-red-500">{form.errors.email}</p>}
+              {form.errors.email && <p className="text-red-500 text-xs sm:text-sm">{form.errors.email}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Wachtwoord</Label>
+              <Label htmlFor="password" className="text-sm sm:text-base">Wachtwoord</Label>
               <Input
                 id="password"
                 type="password"
@@ -204,14 +207,15 @@ function SignUpPageContent() {
                 onBlur={form.handleBlur('password')}
                 required
                 minLength={8}
+                className="text-sm sm:text-base"
               />
-              {form.errors.password && <p className="text-red-500">{form.errors.password}</p>}
+              {form.errors.password && <p className="text-red-500 text-xs sm:text-sm">{form.errors.password}</p>}
               
               {/* Password Strength Indicator */}
               <PasswordStrength password={form.values.password} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Bevestig Wachtwoord</Label>
+              <Label htmlFor="confirmPassword" className="text-sm sm:text-base">Bevestig Wachtwoord</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -220,22 +224,23 @@ function SignUpPageContent() {
                 onChange={form.handleChange('confirmPassword')}
                 onBlur={form.handleBlur('confirmPassword')}
                 required
+                className="text-sm sm:text-base"
               />
-              {form.errors.confirmPassword && <p className="text-red-500">{form.errors.confirmPassword}</p>}
+              {form.errors.confirmPassword && <p className="text-red-500 text-xs sm:text-sm">{form.errors.confirmPassword}</p>}
             </div>
             
             {/* Specific error message */}
             {specificError && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-700 text-sm">{specificError}</p>
+              <div className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-xs sm:text-sm">{specificError}</p>
               </div>
             )}
             
-            <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold" disabled={signUpLoading}>
+            <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-sm sm:text-lg font-semibold py-3 sm:py-4" disabled={signUpLoading}>
               {signUpLoading ? 'Account aanmaken...' : 'Account Aanmaken'}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-gray-600">
             Heb je al een account?{' '}
             <Link href={`/auth/signin${redirectUrl ? `?redirect=${redirectUrl}` : ''}`} className="text-amber-700 hover:underline font-medium">
               Log in

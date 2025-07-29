@@ -56,18 +56,20 @@ export function Footer() {
 
   return (
     <footer className="border-t-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
-      <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          <div className="space-y-4">
-            <h3 className="text-xl font-display font-bold text-foreground">Anemi Meets</h3>
-            <p className="text-base text-muted-foreground leading-relaxed">
+      <div className="container py-8 sm:py-12 md:py-16 px-4 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10">
+          {/* Company Info */}
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-lg sm:text-xl font-display font-bold text-foreground">Anemi Meets</h3>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Verbind met je community over koffie. Ontdek lokale meetups en koffie shops.
             </p>
           </div>
           
-          <div className="space-y-4">
-            <h4 className="text-lg font-display font-semibold text-foreground">Platform</h4>
-            <ul className="space-y-3 text-base">
+          {/* Platform Links */}
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="text-base sm:text-lg font-display font-semibold text-foreground">Platform</h4>
+            <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base">
               <li>
                 <Link href="/create" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Meetup Maken
@@ -81,9 +83,10 @@ export function Footer() {
             </ul>
           </div>
           
-          <div className="space-y-4">
-            <h4 className="text-lg font-display font-semibold text-foreground">Ondersteuning</h4>
-            <ul className="space-y-3 text-base">
+          {/* Support Links */}
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="text-base sm:text-lg font-display font-semibold text-foreground">Ondersteuning</h4>
+            <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base">
               <li>
                 <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Contact
@@ -97,9 +100,10 @@ export function Footer() {
             </ul>
           </div>
           
-          <div className="space-y-4">
-            <h4 className="text-lg font-display font-semibold text-foreground">Rechtelijk</h4>
-            <ul className="space-y-3 text-base">
+          {/* Legal Links */}
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="text-base sm:text-lg font-display font-semibold text-foreground">Rechtelijk</h4>
+            <ul className="space-y-2 sm:space-y-3 text-sm sm:text-base">
               <li>
                 <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground transition-colors duration-200">
                   Privacybeleid
@@ -117,7 +121,7 @@ export function Footer() {
                     className="text-red-600 hover:text-red-700 text-left w-full flex items-center gap-2 transition-colors duration-200"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Account Verwijderen
+                    <span className="text-sm sm:text-base">Account Verwijderen</span>
                   </button>
                 </li>
               )}
@@ -125,8 +129,8 @@ export function Footer() {
           </div>
         </div>
         
-        <div className="mt-12 pt-8 border-t-2 border-amber-200">
-          <p className="text-center text-base text-muted-foreground">
+        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t-2 border-amber-200">
+          <p className="text-center text-sm sm:text-base text-muted-foreground">
             © 2024 Anemi Meets. Alle rechten voorbehouden.
           </p>
         </div>
@@ -135,17 +139,17 @@ export function Footer() {
       {/* Account Deletion Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
             <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
-              <h3 className="text-lg font-semibold text-gray-900">Account Verwijderen</h3>
+              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" />
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Account Verwijderen</h3>
             </div>
             
-            <div className="mb-6">
-              <p className="text-gray-600 mb-3">
+            <div className="mb-4 sm:mb-6">
+              <p className="text-sm sm:text-base text-gray-600 mb-3">
                 Weet je zeker dat je je account wilt verwijderen? Deze actie is <strong>onomkeerbaar</strong>.
               </p>
-              <ul className="text-sm text-gray-500 space-y-1">
+              <ul className="text-xs sm:text-sm text-gray-500 space-y-1">
                 <li>• Al je meetups worden verwijderd</li>
                 <li>• Je profiel en instellingen gaan verloren</li>
                 <li>• Je kunt niet meer inloggen met dit account</li>
@@ -155,16 +159,16 @@ export function Footer() {
 
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-600 text-sm">{error}</p>
+                <p className="text-red-600 text-xs sm:text-sm">{error}</p>
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
                 variant="destructive"
-                className="flex-1"
+                className="flex-1 text-sm sm:text-base"
               >
                 {isDeleting ? 'Verwijderen...' : 'Ja, Verwijder Account'}
               </Button>
@@ -174,7 +178,7 @@ export function Footer() {
                   setError(null)
                 }}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 text-sm sm:text-base"
                 disabled={isDeleting}
               >
                 Annuleren

@@ -852,88 +852,90 @@ export default function DashboardClient() {
           </div>
         )}
 
-        {/* Meetups List */}
-        <div className="space-y-3 sm:space-y-4">
-          {getSortedAndFilteredMeetups().map((meetup) => (
-            <Card key={meetup.id} className="hover:shadow-md transition-shadow duration-200">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                  {/* Meetup Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
-                        ☕ {meetup.cafe.name}
-                      </h3>
-                      {getStatusBadge(meetup.status)}
+        {/* Meetups List - Only show when not loading */}
+        {!isLoading && (
+          <div className="space-y-3 sm:space-y-4">
+            {getSortedAndFilteredMeetups().map((meetup) => (
+              <Card key={meetup.id} className="hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                    {/* Meetup Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2 sm:mb-3">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                          ☕ {meetup.cafe.name}
+                        </h3>
+                        {getStatusBadge(meetup.status)}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Organisator: {meetup.organizerName}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Gemaakt: {formatDate(meetup.createdAt)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span>Vervalt: {formatDate(meetup.expiresAt)}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2 sm:mt-3 flex flex-wrap gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          ✅ {meetup.responses?.accepted || 0} Geaccepteerd
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          ⏳ {meetup.responses?.pending || 0} In Afwachting
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          ❌ {meetup.responses?.declined || 0} Afgewezen
+                        </Badge>
+                      </div>
                     </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Organisator: {meetup.organizerName}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Gemaakt: {formatDate(meetup.createdAt)}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                        <span>Vervalt: {formatDate(meetup.expiresAt)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-2 sm:mt-3 flex flex-wrap gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        ✅ {meetup.responses?.accepted || 0} Geaccepteerd
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        ⏳ {meetup.responses?.pending || 0} In Afwachting
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        ❌ {meetup.responses?.declined || 0} Afgewezen
-                      </Badge>
+
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingMeetup(meetup)}
+                        className="text-xs sm:text-sm"
+                      >
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        <span className="hidden sm:inline">Bekijk Reacties</span>
+                        <span className="sm:hidden">Reacties</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditMeetup(meetup)}
+                        className="text-xs sm:text-sm"
+                      >
+                        <span className="hidden sm:inline">Bewerken</span>
+                        <span className="sm:hidden">Edit</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(getInviteLink(meetup.token))}
+                        className="text-xs sm:text-sm"
+                      >
+                        <span className="hidden sm:inline">Kopieer Link</span>
+                        <span className="sm:hidden">Link</span>
+                      </Button>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
-                  {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingMeetup(meetup)}
-                      className="text-xs sm:text-sm"
-                    >
-                      <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                      <span className="hidden sm:inline">Bekijk Reacties</span>
-                      <span className="sm:hidden">Reacties</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditMeetup(meetup)}
-                      className="text-xs sm:text-sm"
-                    >
-                      <span className="hidden sm:inline">Bewerken</span>
-                      <span className="sm:hidden">Edit</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(getInviteLink(meetup.token))}
-                      className="text-xs sm:text-sm"
-                    >
-                      <span className="hidden sm:inline">Kopieer Link</span>
-                      <span className="sm:hidden">Link</span>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {getSortedAndFilteredMeetups().length === 0 && (
+        {/* Empty State - Only show when not loading and no meetups */}
+        {!isLoading && getSortedAndFilteredMeetups().length === 0 && (
           <div className="text-center py-8 sm:py-12">
             <div className="text-6xl sm:text-8xl mb-4">☕</div>
             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">

@@ -42,8 +42,7 @@ export async function GET(request: NextRequest) {
       profile: profile || null,
       user: {
         id: user.id,
-        email: user.email,
-        nickname: user.user_metadata?.nickname || null
+        email: user.email
       }
     })
 
@@ -65,7 +64,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { settings, profile, nickname } = body
+    const { settings, profile } = body
 
     const updates = []
 
@@ -101,19 +100,7 @@ export async function PUT(request: NextRequest) {
       updates.push('profile')
     }
 
-    // Update nickname if provided
-    if (nickname !== undefined) {
-      const { error: nicknameError } = await supabase
-        .from('User')
-        .update({ nickname })
-        .eq('id', user.id)
 
-      if (nicknameError) {
-        console.error('Error updating nickname:', nicknameError)
-        return NextResponse.json({ error: 'Fout bij opslaan bijnaam' }, { status: 500 })
-      }
-      updates.push('nickname')
-    }
 
     return NextResponse.json({
       success: true,

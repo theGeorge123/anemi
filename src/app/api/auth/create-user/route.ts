@@ -38,9 +38,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Generate nickname
-    const nickname = email.split('@')[0] + Math.floor(Math.random() * 1000)
-
     // Check if supabaseAdmin is available
     if (!supabaseAdmin) {
       console.error('❌ Create user API: Supabase admin client not configured')
@@ -56,11 +53,7 @@ export async function POST(request: NextRequest) {
     const { data: adminData, error: adminError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Let Supabase handle email verification
-      user_metadata: { 
-        name: email.split('@')[0],
-        nickname: nickname
-      }
+      email_confirm: true // Let Supabase handle email verification
     })
 
     if (adminError) {
@@ -90,12 +83,11 @@ export async function POST(request: NextRequest) {
     console.log('✅ User created successfully:', adminData.user?.email)
     console.log('✅ User ID from Supabase:', adminData.user?.id)
 
-        // Save user to database with nickname
+        // Save user to database
         try {
           console.log('🔧 Attempting to save user to database...')
           console.log('   User ID:', adminData.user!.id)
           console.log('   User Email:', adminData.user!.email)
-          console.log('   Nickname:', nickname)
           
           // Check if user already exists
           const existingUser = await prisma.user.findUnique({
@@ -107,13 +99,11 @@ export async function POST(request: NextRequest) {
           const result = await prisma.user.upsert({
             where: { id: adminData.user!.id },
             update: { 
-              nickname,
               updatedAt: new Date()
             },
             create: {
               id: adminData.user!.id,
               email: adminData.user!.email!,
-              nickname,
               createdAt: new Date(),
               updatedAt: new Date()
             }
@@ -129,7 +119,7 @@ export async function POST(request: NextRequest) {
           console.log('🔍 Verification - User in database:', savedUser ? 'Found' : 'Not found')
           
         } catch (dbError) {
-          console.error('❌ Database error saving user with nickname:', dbError)
+          console.error('❌ Database error saving user:', dbError)
           console.error('❌ Error details:', {
             message: dbError instanceof Error ? dbError.message : 'Unknown error',
             stack: dbError instanceof Error ? dbError.stack : undefined,
@@ -144,7 +134,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ 
           success: true, 
           user: adminData.user,
-          nickname,
           message: 'Account aangemaakt! Controleer je email voor verificatie.',
           userCreated: true,
           emailSent: false // Supabase handles email sending

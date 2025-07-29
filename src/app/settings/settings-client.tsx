@@ -84,7 +84,6 @@ export default function SettingsClient() {
   const [activeTab, setActiveTab] = useState('profile')
   
   // Form states
-  const [nickname, setNickname] = useState('')
   const [bio, setBio] = useState('')
   const [location, setLocation] = useState('')
   const [phone, setPhone] = useState('')
@@ -162,10 +161,7 @@ export default function SettingsClient() {
         setSkills(profileData.skills || [])
       }
 
-      // Load nickname from user metadata
-      if (user?.user_metadata?.nickname) {
-        setNickname(user.user_metadata.nickname)
-      }
+
 
     } catch (error) {
       console.error('Error loading user data:', error)
@@ -225,16 +221,7 @@ export default function SettingsClient() {
         throw new Error(profileError.message)
       }
 
-      // Save nickname to user metadata
-      if (nickname !== user?.user_metadata?.nickname) {
-        const { error: nicknameError } = await supabase.auth.updateUser({
-          data: { nickname }
-        })
 
-        if (nicknameError) {
-          throw new Error(nicknameError.message)
-        }
-      }
 
       addToast({
         title: 'Opgeslagen',
@@ -400,21 +387,7 @@ export default function SettingsClient() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Nickname */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bijnaam
-                </label>
-                <Input
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder="Jouw bijnaam"
-                  className="max-w-md"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Deze naam wordt getoond aan andere gebruikers
-                </p>
-              </div>
+
 
               {/* Bio */}
               <div>

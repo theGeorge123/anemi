@@ -107,6 +107,7 @@ function VerifyEmailPageContent() {
 
       return () => clearTimeout(timeoutId)
     }
+    return undefined
   }, [token, email, verificationStatus, isVerifying, handleVerification])
 
   const resendVerification = async () => {

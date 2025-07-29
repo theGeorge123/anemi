@@ -117,23 +117,76 @@ export async function testSupabaseAuth(): Promise<{ success: boolean; error?: st
   }
 }
 
-// Clear stale tokens function
+/**
+ * Clear all stale Supabase tokens from localStorage and cookies
+ * This helps fix authentication issues when switching between localhost and production
+ */
 export function clearStaleTokens(): void {
   if (typeof window === 'undefined') return
 
+  console.log('🧹 Clearing stale Supabase tokens...')
+
   // Clear localStorage items
-  Object.keys(localStorage).forEach(key => {
-    if (key.includes('supabase') && (key.includes('localhost') || key.includes('127.0.0.1'))) {
-      localStorage.removeItem(key)
-    }
+  const localStorageKeys = Object.keys(localStorage)
+  const supabaseKeys = localStorageKeys.filter(key => 
+    key.startsWith('sb-') || 
+    key.includes('supabase') || 
+    key.includes('auth')
+  )
+  
+  supabaseKeys.forEach(key => {
+    console.log(`🗑️ Removing localStorage key: ${key}`)
+    localStorage.removeItem(key)
   })
 
   // Clear cookies
-  document.cookie.split(';').forEach(cookie => {
-    const [name] = cookie.split('=')
-    const cookieName = name?.trim()
-    if (cookieName && cookieName.includes('supabase') && (cookieName.includes('localhost') || cookieName.includes('127.0.0.1'))) {
-      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+  const cookies = document.cookie.split(';')
+  cookies.forEach(cookie => {
+    const [name] = cookie.trim().split('=')
+    if (name && (name.startsWith('sb-') || name.includes('supabase') || name.includes('auth'))) {
+      console.log(`🗑️ Removing cookie: ${name}`)
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
     }
   })
+
+  // Clear sessionStorage
+  const sessionStorageKeys = Object.keys(sessionStorage)
+  const sessionSupabaseKeys = sessionStorageKeys.filter(key => 
+    key.startsWith('sb-') || 
+    key.includes('supabase') || 
+    key.includes('auth')
+  )
+  
+  sessionSupabaseKeys.forEach(key => {
+    console.log(`🗑️ Removing sessionStorage key: ${key}`)
+    sessionStorage.removeItem(key)
+  })
+
+  console.log(`✅ Cleared ${supabaseKeys.length} localStorage items, ${sessionSupabaseKeys.length} sessionStorage items, and related cookies`)
+}
+
+/**
+ * Get count of existing Supabase tokens
+ */
+export function getTokenCount(): number {
+  if (typeof window === 'undefined') return 0
+
+  const localStorageKeys = Object.keys(localStorage).filter(key => 
+    key.startsWith('sb-') || 
+    key.includes('supabase') || 
+    key.includes('auth')
+  )
+  
+  const sessionStorageKeys = Object.keys(sessionStorage).filter(key => 
+    key.startsWith('sb-') || 
+    key.includes('supabase') || 
+    key.includes('auth')
+  )
+
+  const cookies = document.cookie.split(';').filter(cookie => {
+    const [name] = cookie.trim().split('=')
+    return name && (name.startsWith('sb-') || name.includes('supabase') || name.includes('auth'))
+  })
+
+  return localStorageKeys.length + sessionStorageKeys.length + cookies.length
 } 

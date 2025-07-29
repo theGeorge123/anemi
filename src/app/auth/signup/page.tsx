@@ -117,11 +117,9 @@ function SignUpPageContent() {
   }, {
     onSuccess: (data: any) => {
       console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
-      // Always redirect to signin since email verification is skipped
-      const signinUrl = redirectUrl 
-        ? `/auth/signin?redirect=${redirectUrl}&message=account_created`
-        : '/auth/signin?message=account_created'
-      router.push(signinUrl)
+      // Redirect to email verification page
+      const verifyUrl = `/auth/verify-email?email=${encodeURIComponent(form.values.email)}&message=check_email`
+      router.push(verifyUrl)
     },
     onError: (err) => {
       console.error('Signup error:', err)
@@ -139,7 +137,7 @@ function SignUpPageContent() {
     })(e)
   }
 
-  // Show success state with nickname
+  // Show success state with email verification
   if (generatedNickname) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 p-4">
@@ -148,12 +146,23 @@ function SignUpPageContent() {
             <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Coffee className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Welkom! 🎉</CardTitle>
+            <CardTitle className="text-3xl font-bold text-amber-700 mb-1">Account Aangemaakt! 🎉</CardTitle>
             <CardDescription className="text-base text-gray-500">
-              Je account is succesvol aangemaakt
+              Controleer je email voor verificatie
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <p className="text-blue-800 font-medium mb-2">📧 Email Verificatie</p>
+              <p className="text-blue-600 text-sm">
+                We hebben een verificatie email gestuurd naar:<br/>
+                <strong>{form.values.email}</strong>
+              </p>
+              <p className="text-blue-600 text-xs mt-2">
+                Klik op de link in de email om je account te activeren
+              </p>
+            </div>
+            
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
               <p className="text-green-800 font-medium mb-2">Je bijnaam:</p>
               <p className="text-green-600 text-lg font-bold">{generatedNickname}</p>
@@ -164,18 +173,18 @@ function SignUpPageContent() {
             
             <div className="space-y-3">
               <Button 
-                onClick={() => router.push('/auth/signin')}
+                onClick={() => router.push('/auth/verify-email?email=' + encodeURIComponent(form.values.email))}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-lg font-semibold"
               >
-                Inloggen
+                📧 Ga naar Verificatie
               </Button>
               
               <Button 
                 variant="outline"
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/auth/signin')}
                 className="w-full"
               >
-                Terug naar Home
+                Inloggen
               </Button>
             </div>
           </CardContent>

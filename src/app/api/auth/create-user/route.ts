@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { prisma } from '@/lib/prisma'
-import { generateNicknameFromEmail } from '@/lib/nickname-generator'
 import { sendEmailVerificationEmail } from '@/lib/email'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
     console.log('🔧 Create user API: Starting request')
     
     const { email, password } = await request.json()
+    
     console.log('🔧 Create user API: Email provided:', !!email)
-
+    
+    // Server-side validation
     if (!email || !password) {
       console.log('❌ Create user API: Missing email or password')
       return NextResponse.json({ 
@@ -18,15 +21,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Validate password length
-    if (password.length < 8) {
-      console.log('❌ Create user API: Password too short')
-      return NextResponse.json({ 
-        error: 'Wachtwoord moet minimaal 8 karakters lang zijn.' 
-      }, { status: 400 })
-    }
-
-    // Validate email format
+    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       console.log('❌ Create user API: Invalid email format')
@@ -35,8 +30,16 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Generate nickname for the user
-    const nickname = generateNicknameFromEmail(email)
+    // Password length validation
+    if (password.length < 8) {
+      console.log('❌ Create user API: Password too short')
+      return NextResponse.json({ 
+        error: 'Wachtwoord moet minimaal 8 karakters lang zijn.' 
+      }, { status: 400 })
+    }
+
+    // Generate nickname
+    const nickname = email.split('@')[0] + Math.floor(Math.random() * 1000)
 
     // Check if supabaseAdmin is available
     if (!supabaseAdmin) {
@@ -47,38 +50,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user directly without email verification
-    console.log('🔧 Creating user without email verification...')
+    // Create user with email verification enabled
+    console.log('🔧 Creating user with email verification...')
     
     const { data: adminData, error: adminError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Skip email verification
+      email_confirm: false, // Enable email verification
       user_metadata: { 
         name: email.split('@')[0],
         nickname: nickname
       }
     })
-    
-    if (!adminError && adminData.user) {
-      // Manually confirm email in database to bypass Supabase email verification
-      console.log('🔧 Manually confirming email in database...')
-      try {
-        const { error: rpcError } = await supabaseAdmin.rpc('confirm_user_email', { 
-          user_id: adminData.user.id 
-        })
-        
-        if (rpcError) {
-          console.error('❌ RPC error:', rpcError)
-          throw rpcError
-        }
-        
-        console.log('✅ Email confirmed via RPC for user:', adminData.user.id)
-      } catch (error) {
-        console.error('❌ Failed to confirm email:', error)
-        // Continue anyway, user can still log in
-      }
-    }
     
     if (adminError) {
       console.error('❌ Admin user creation error:', adminError)
@@ -124,14 +107,31 @@ export async function POST(request: NextRequest) {
       console.error('❌ Database error saving user with nickname:', dbError)
       // Continue even if database save fails
     }
+
+    // Send verification email using Resend
+    try {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      const verificationLink = `${siteUrl}/auth/verify-email?token=${adminData.user!.id}`
+      
+      await sendEmailVerificationEmail({
+        to: email,
+        verificationLink,
+        userName: email.split('@')[0]
+      })
+      
+      console.log('✅ Verification email sent successfully to:', email)
+    } catch (emailError) {
+      console.error('❌ Failed to send verification email:', emailError)
+      // Continue even if email fails - user can request verification later
+    }
     
     return NextResponse.json({ 
       success: true,
       user: adminData.user,
       nickname,
-      message: 'Account created successfully! You can now log in.',
+      message: 'Account aangemaakt! Controleer je email voor verificatie.',
       userCreated: true,
-      emailSkipped: true
+      emailSent: true
     })
 
   } catch (error) {

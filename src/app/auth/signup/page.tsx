@@ -60,6 +60,15 @@ function SignUpPageContent() {
 
     console.log('Attempting signup with email:', form.values.email)
     
+    // Validate email exists
+    const email = form.values.email
+    if (!email) {
+      throw new Error('Email is required')
+    }
+    
+    // Generate nickname
+    const nickname = (email as string).split('@')[0] + Math.floor(Math.random() * 1000)
+    
     // Use Supabase's built-in signUp method
     const { data, error } = await supabase.auth.signUp({
       email: form.values.email,
@@ -67,7 +76,7 @@ function SignUpPageContent() {
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
-          nickname: form.values.email.split('@')[0] + Math.floor(Math.random() * 1000)
+          nickname
         }
       }
     })
@@ -97,9 +106,9 @@ function SignUpPageContent() {
     console.log('User created successfully')
     
     // Store the generated nickname from user metadata
-    const nickname = data?.user?.user_metadata?.nickname
-    if (nickname) {
-      setGeneratedNickname(nickname)
+    const userNickname = data?.user?.user_metadata?.nickname
+    if (userNickname) {
+      setGeneratedNickname(userNickname)
     }
     
     // Supabase will automatically send verification email

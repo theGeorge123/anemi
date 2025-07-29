@@ -312,9 +312,21 @@ export default function DashboardClient() {
         const data = await response.json()
         console.log('📊 Fetched meetups:', data.meetups.length)
         setMeetups(data.meetups)
+        
+        // Clear any previous errors if successful
+        setError(null)
       } catch (error) {
         console.error('❌ Error fetching meetups:', error)
-        setError(error instanceof Error ? error.message : 'Failed to fetch meetups')
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch meetups'
+        
+        // Only set error if it's a real error, not just no meetups
+        if (!errorMessage.includes('No meetups found') && !errorMessage.includes('empty')) {
+          setError(errorMessage)
+        } else {
+          // If it's just no meetups, don't show an error
+          setMeetups([])
+          setError(null)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -1024,6 +1036,34 @@ export default function DashboardClient() {
               </Card>
             ))}
           </div>
+        )}
+
+        {/* No Meetups State */}
+        {!isLoading && !error && meetups.length === 0 && (
+          <Card className="bg-white/80 backdrop-blur-sm border-amber-200">
+            <CardContent className="p-8 text-center">
+              <div className="text-6xl mb-4">☕</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nog geen meetups
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Je hebt nog geen koffie meetups georganiseerd of uitnodigingen ontvangen. 
+                Start je eerste meetup om vrienden uit te nodigen voor een kopje koffie!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button asChild className="bg-amber-600 hover:bg-amber-700">
+                  <Link href="/create">
+                    🚀 Nieuwe Meetup Maken
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/">
+                    🏠 Terug naar Home
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Edit Modal */}

@@ -75,6 +75,14 @@ export async function GET(request: NextRequest) {
 
     console.log('✅ Meetups API: Found', meetups.length, 'meetups')
 
+    // If no meetups found, return empty array instead of error
+    if (meetups.length === 0) {
+      console.log('ℹ️ Meetups API: No meetups found for user, returning empty array')
+      return NextResponse.json({
+        meetups: []
+      })
+    }
+
     // For each meetup, get additional metrics
     const meetupsWithMetrics = await Promise.all(
       meetups.map(async (meetup) => {

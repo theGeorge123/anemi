@@ -60,14 +60,8 @@ function SignUpPageContent() {
 
     console.log('Attempting signup with email:', form.values.email)
     
-    // Validate email exists
-    const email = form.values.email
-    if (!email) {
-      throw new Error('Email is required')
-    }
-    
-    // Generate nickname
-    const nickname = (email as string).split('@')[0] + Math.floor(Math.random() * 1000)
+    // Generate nickname directly from email
+    const nickname = form.values.email!.split('@')[0] + Math.floor(Math.random() * 1000)
     
     // Use Supabase's built-in signUp method
     const { data, error } = await supabase.auth.signUp({

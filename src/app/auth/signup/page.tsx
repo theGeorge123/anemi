@@ -116,10 +116,10 @@ function SignUpPageContent() {
     return responseData
   }, {
     onSuccess: (data: any) => {
-      console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
+        console.log(`🎉 Account created! Je bijnaam is: ${data.nickname || 'Onbekend'}`)
       // Redirect to email verification page
       const verifyUrl = `/auth/verify-email?email=${encodeURIComponent(form.values.email)}&message=check_email`
-      router.push(verifyUrl)
+        router.push(verifyUrl)
     },
     onError: (err) => {
       console.error('Signup error:', err)

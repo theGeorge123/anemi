@@ -220,7 +220,7 @@ function ResetPasswordPageContent() {
               </div>
               {form.errors.password && <p className="text-red-500 text-sm">{form.errors.password}</p>}
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Bevestig Nieuw Wachtwoord</Label>
               <div className="relative">

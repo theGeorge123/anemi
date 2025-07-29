@@ -12,21 +12,21 @@ export default function DebugEnvPage() {
   const [tokenCount, setTokenCount] = useState(0)
   const [clearingTokens, setClearingTokens] = useState(false)
 
-  const checkEnvironment = async () => {
+    const checkEnvironment = async () => {
     setLoading(true)
-    try {
-      const response = await fetch('/api/debug-env')
-      const data = await response.json()
-      setEnvStatus(data)
+      try {
+        const response = await fetch('/api/debug-env')
+        const data = await response.json()
+        setEnvStatus(data)
       
       // Update token count
       setTokenCount(getTokenCount())
-    } catch (error) {
-      setEnvStatus({ error: 'Failed to check environment' })
-    } finally {
-      setLoading(false)
+      } catch (error) {
+        setEnvStatus({ error: 'Failed to check environment' })
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
   const handleClearTokens = () => {
     setClearingTokens(true)

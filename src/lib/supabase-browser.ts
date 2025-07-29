@@ -136,7 +136,7 @@ export function clearStaleTokens(): void {
   
   supabaseKeys.forEach(key => {
     console.log(`🗑️ Removing localStorage key: ${key}`)
-    localStorage.removeItem(key)
+      localStorage.removeItem(key)
   })
 
   // Clear cookies

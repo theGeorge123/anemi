@@ -38,22 +38,22 @@ describe('Validation Schemas', () => {
 
   describe('sendInviteSchema', () => {
     const validCafe = {
-      id: '1',
-      name: 'Test Cafe',
-      city: 'Amsterdam',
-      address: 'Test Address',
-      priceRange: 'MODERATE',
-      rating: 4.5,
+          id: '1',
+          name: 'Test Cafe',
+          city: 'Amsterdam',
+          address: 'Test Address',
+          priceRange: 'MODERATE',
+          rating: 4.5,
       isVerified: true,
       description: 'A test cafe'
     }
 
     const validFormData = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      city: 'Amsterdam' as const,
-      priceRange: 'MODERATE' as const,
-      dates: ['2024-01-15'],
+          name: 'John Doe',
+          email: 'john@example.com',
+          city: 'Amsterdam' as const,
+          priceRange: 'MODERATE' as const,
+          dates: ['2024-01-15'],
       times: ['14:00'],
       dateTimePreferences: {
         '2024-01-15': ['14:00', '15:00']

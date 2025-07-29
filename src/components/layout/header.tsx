@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { Home, Coffee } from 'lucide-react'
+import { Home, Coffee, Settings } from 'lucide-react'
 
 export function Header() {
   const { session, supabase, user } = useSupabase()
@@ -55,8 +55,18 @@ export function Header() {
         {supabase && session && user ? (
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-600">
-              Welkom, <span className="font-medium text-amber-700">{user.email}</span>
+              Welkom
             </div>
+            <Link href="/settings">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                title="Instellingen"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               size="sm"

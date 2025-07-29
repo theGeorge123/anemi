@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     console.log('✅ Meetups API: User authenticated:', user.email)
 
     console.log('🔍 Meetups API: Querying database for user:', user.email, 'ID:', user.id)
-    
+
     // Get all meetups for the user
     const meetups = await prisma.meetupInvite.findMany({
       where: {

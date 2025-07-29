@@ -103,7 +103,7 @@ function testFormValidationErrors() {
         console.log('✅ Form has error handling')
       } else {
         console.log('⚠️ Form might not have error handling')
-      }
+    }
     })
   } else {
     console.log('❌ No forms found')
@@ -136,7 +136,7 @@ function testServerErrorHandling() {
   console.log('   - Shows user-friendly server error message')
   console.log('   - Provides retry functionality')
   console.log('   - Suggests trying again later')
-  
+    
   console.log('💡 To test server errors:')
   console.log('   1. Try to access non-existent endpoints')
   console.log('   2. Check if server error is shown')

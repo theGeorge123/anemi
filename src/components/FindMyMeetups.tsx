@@ -63,12 +63,12 @@ export function FindMyMeetups() {
 
     try {
       const response = await fetch('/api/meetups/find-by-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ inviteCode: inviteCode.trim() }),
-      })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ inviteCode: inviteCode.trim() }),
+        })
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -226,89 +226,89 @@ export function FindMyMeetups() {
   }
 
   const renderMeetupCard = (meetup: Meetup) => (
-    <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <h5 className="font-semibold text-gray-900 mb-1">
-              Koffie bij {meetup.cafe.name}
-            </h5>
-            <div className="flex items-center gap-2 mb-2">
-              {getStatusBadge(meetup.status)}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => copyToClipboard(`https://anemi-meets.vercel.app/invite/${meetup.token}`)}
-              className="border-amber-300 text-amber-700 hover:bg-amber-50"
-            >
-              {copiedToken === meetup.token ? (
-                <>
-                  <Check className="w-3 h-3 mr-1" />
-                  Gekopieerd!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3 h-3 mr-1" />
-                  Link
-                </>
-              )}
-            </Button>
+              <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h5 className="font-semibold text-gray-900 mb-1">
+                        Koffie bij {meetup.cafe.name}
+                      </h5>
+                      <div className="flex items-center gap-2 mb-2">
+                        {getStatusBadge(meetup.status)}
+                      </div>
+                    </div>
+                                         <div className="flex gap-2">
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => copyToClipboard(`https://anemi-meets.vercel.app/invite/${meetup.token}`)}
+                         className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                       >
+                         {copiedToken === meetup.token ? (
+                           <>
+                             <Check className="w-3 h-3 mr-1" />
+                             Gekopieerd!
+                           </>
+                         ) : (
+                           <>
+                             <Copy className="w-3 h-3 mr-1" />
+                             Link
+                           </>
+                         )}
+                       </Button>
             {meetup.chosenDate && meetup.chosenTime && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => addToCalendar(meetup)}
-                className="border-green-300 text-green-700 hover:bg-green-50"
-              >
-                <Plus className="w-3 h-3 mr-1" />
-                Kalender
-              </Button>
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => addToCalendar(meetup)}
+                         className="border-green-300 text-green-700 hover:bg-green-50"
+                       >
+                         <Plus className="w-3 h-3 mr-1" />
+                         Kalender
+                       </Button>
             )}
-            <Link href={`/invite/${meetup.token}`}>
-              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
-                <ExternalLink className="w-3 h-3 mr-1" />
-                Bekijk
-              </Button>
-            </Link>
-          </div>
-        </div>
+                       <Link href={`/invite/${meetup.token}`}>
+                         <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
+                           <ExternalLink className="w-3 h-3 mr-1" />
+                           Bekijk
+                         </Button>
+                       </Link>
+                     </div>
+                  </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-3 h-3" />
-              <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <Users className="w-3 h-3" />
-              <span>Door: {meetup.organizerName}</span>
-            </div>
-          </div>
-          
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-gray-600">
-              <Calendar className="w-3 h-3" />
-              <span>{formatDate(meetup.createdAt)}</span>
-            </div>
-            {meetup.chosenDate && meetup.chosenTime && (
-              <div className="flex items-center gap-2 text-green-600 font-medium">
-                <Clock className="w-3 h-3" />
-                <span>Gekozen: {meetup.chosenDate} om {meetup.chosenTime}</span>
-              </div>
-            )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <MapPin className="w-3 h-3" />
+                        <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Users className="w-3 h-3" />
+                        <span>Door: {meetup.organizerName}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Calendar className="w-3 h-3" />
+                        <span>{formatDate(meetup.createdAt)}</span>
+                      </div>
+                      {meetup.chosenDate && meetup.chosenTime && (
+                        <div className="flex items-center gap-2 text-green-600 font-medium">
+                          <Clock className="w-3 h-3" />
+                          <span>Gekozen: {meetup.chosenDate} om {meetup.chosenTime}</span>
+                        </div>
+                      )}
             {meetup.status === 'pending' && (
               <div className="flex items-center gap-2 text-yellow-600 font-medium">
                 <Clock className="w-3 h-3" />
                 <span>Verloopt: {formatDate(meetup.expiresAt)}</span>
               </div>
             )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
   )
 
   return (

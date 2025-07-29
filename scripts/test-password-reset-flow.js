@@ -94,18 +94,18 @@ function testResetPasswordPage() {
   
   if (isResetPasswordPage) {
     console.log('✅ Reset password page detected')
-    
-    // Check for form elements
-    const passwordInput = document.querySelector('input[type="password"]')
-    const confirmPasswordInput = document.querySelectorAll('input[type="password"]')[1]
-    const submitButton = document.querySelector('button[type="submit"]')
-    const form = document.querySelector('form')
-    
-    console.log(`📋 Form elements: Password input=${!!passwordInput}, Confirm password input=${!!confirmPasswordInput}, Submit button=${!!submitButton}, Form=${!!form}`)
-    
-    if (passwordInput && confirmPasswordInput && submitButton && form) {
-      console.log('🎉 SUCCESS: Reset password form elements found!')
       
+      // Check for form elements
+      const passwordInput = document.querySelector('input[type="password"]')
+      const confirmPasswordInput = document.querySelectorAll('input[type="password"]')[1]
+      const submitButton = document.querySelector('button[type="submit"]')
+    const form = document.querySelector('form')
+      
+    console.log(`📋 Form elements: Password input=${!!passwordInput}, Confirm password input=${!!confirmPasswordInput}, Submit button=${!!submitButton}, Form=${!!form}`)
+      
+    if (passwordInput && confirmPasswordInput && submitButton && form) {
+        console.log('🎉 SUCCESS: Reset password form elements found!')
+        
       // Check if page shows invalid link error
       const invalidLinkError = document.querySelector('.text-red-700')
       if (invalidLinkError) {

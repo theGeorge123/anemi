@@ -119,7 +119,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 <p>Als het probleem aanhoudt, neem dan contact met ons op.</p>
                 <Link href="/contact" className="text-amber-600 hover:underline">
                   Contact opnemen
-                </Link>
+                  </Link>
               </div>
             </CardContent>
           </Card>

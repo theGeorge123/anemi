@@ -39,9 +39,9 @@ function VerifyEmailPageContent() {
   const handleVerification = useCallback(async () => {
     if (!token || !email || isVerifying) {
       console.error('Missing token or email, or already verifying:', { token, email, isVerifying })
-      if (!token || !email) {
-        setVerificationStatus('error')
-        console.error('Email verificatie parameters ontbreken. Controleer je email link.')
+    if (!token || !email) {
+      setVerificationStatus('error')
+      console.error('Email verificatie parameters ontbreken. Controleer je email link.')
       }
       return
     }

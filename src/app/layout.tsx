@@ -7,7 +7,6 @@ import { LayoutWrapper } from '@/components/layout/LayoutWrapper'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { GlobalErrorHandler } from '@/components/GlobalErrorHandler'
 import { EnvironmentBanner } from '@/components/EnvironmentBanner'
-import { BackgroundAgentProvider } from '@/components/BackgroundAgentProvider'
 import { SessionManager } from '@/components/SessionManager'
 import { validateStartup } from '@/lib/startup'
 import { AccountLinkingProvider } from '@/components/AccountLinkingProvider'
@@ -109,11 +108,9 @@ export default function RootLayout({
               <SessionManager>
                 <AccountLinkingProvider>
                   <OnboardingProvider>
-                    <BackgroundAgentProvider autoRegister={true} enableNotifications={true}>
-                      <LayoutWrapper>
-                        {children}
-                      </LayoutWrapper>
-                    </BackgroundAgentProvider>
+                    <LayoutWrapper>
+                      {children}
+                    </LayoutWrapper>
                   </OnboardingProvider>
                 </AccountLinkingProvider>
               </SessionManager>

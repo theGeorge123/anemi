@@ -109,8 +109,8 @@ function MeetupWizardContent() {
 
   return (
     <div className="meetup-wizard">
-      <Card className="shadow-lg animate-bounceIn max-w-4xl mx-auto">
-        <CardContent className="p-3 sm:p-4 lg:p-8">
+      <Card className="shadow-lg animate-bounceIn max-w-4xl mx-auto min-h-screen sm:min-h-0">
+        <CardContent className="p-4 sm:p-6 lg:p-8">
           <StepIndicator 
             currentStep={currentStep} 
             totalSteps={totalSteps} 

@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://anemi-meets.vercel.app/sitemap.xml
+
+# Important pages
+Allow: /find-meetups
+Allow: /create
+Allow: /dashboard
+Allow: /auth/signin
+Allow: /auth/signup
+
+# Disallow admin/debug pages
+Disallow: /debug-*
+Disallow: /test-*
+Disallow: /api/
+Disallow: /_next/
+Disallow: /site-access
+
+# Crawl delay (optional)
+Crawl-delay: 1 

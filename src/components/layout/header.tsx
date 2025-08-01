@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { Home, Coffee, Settings, Menu, X } from 'lucide-react'
+import { Home, Coffee, Settings, Menu, X, Search } from 'lucide-react'
 import { useState } from 'react'
 
 export function Header() {
@@ -36,6 +36,12 @@ export function Header() {
         
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8">
+          {/* Find Meetups Link - Always visible */}
+          <Link href="/find-meetups" className="text-sm xl:text-base font-medium transition-colors hover:text-primary hover:scale-105 flex items-center gap-1">
+            <Search className="w-4 h-4" />
+            <span>Vind Meetups</span>
+          </Link>
+          
           {supabase && session && (
             <Link href="/dashboard" className="text-sm xl:text-base font-medium transition-colors hover:text-primary hover:scale-105">
               Mijn Meetups
@@ -121,6 +127,12 @@ export function Header() {
           <div className="container px-4 py-4 space-y-4">
             {/* Mobile Navigation Links */}
             <nav className="space-y-3">
+              {/* Find Meetups Link - Always visible */}
+              <Link href="/find-meetups" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                Vind Meetups
+              </Link>
+              
               {supabase && session && (
                 <Link href="/dashboard" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors">
                   Mijn Meetups

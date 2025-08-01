@@ -406,29 +406,63 @@ export async function sendWelcomeEmailAfterVerification(emailData: WelcomeEmail)
  * Send meetup invitation email
  */
 export async function sendMeetupInvitation(emailData: MeetupInvitationEmail) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Je bent uitgenodigd voor een koffie meetup!</h2>
-      
-      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0;">${emailData.meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${emailData.meetupDate}</p>
-        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${emailData.meetupLocation}</p>
-        <p style="margin: 5px 0;"><strong>👤 Organisator:</strong> ${emailData.organizerName}</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Koffie Meetup Uitnodiging!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je bent uitgenodigd voor een gezellige koffie meetup</p>
       </div>
       
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${emailData.invitationLink}" 
-           style="background-color: #f59e0b; color: white; padding: 12px 24px; 
-                  text-decoration: none; border-radius: 6px; display: inline-block;">
-          Deel Meetup
-        </a>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé daar! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Geweldig nieuws! <strong>${emailData.organizerName}</strong> heeft je uitgenodigd voor een gezellige koffie meetup. 
+          Dit wordt een geweldige gelegenheid om nieuwe mensen te ontmoeten en geweldige koffie te proeven!
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Meetup Details</h3>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Evenement:</strong> ${emailData.meetupTitle}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Datum:</strong> ${emailData.meetupDate}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📍 Locatie:</strong> ${emailData.meetupLocation}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>👤 Organisator:</strong> ${emailData.organizerName}</p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${emailData.invitationLink}" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            ☕ Bekijk Uitnodiging
+          </a>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Wat kun je verwachten:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Gezellige sfeer met andere koffie liefhebbers</li>
+            <li>Ontdekking van nieuwe koffie spots</li>
+            <li>Leuke gesprekken en nieuwe vriendschappen</li>
+            <li>Geweldige koffie ervaringen delen</li>
+          </ul>
+        </div>
       </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Deze uitnodiging werd verzonden vanuit Anemi Meets. 
-        Verbind je met koffie liefhebbers in je gemeenschap!
-      </p>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          We kijken uit naar je komst! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 
@@ -443,43 +477,72 @@ export async function sendMeetupInvitation(emailData: MeetupInvitationEmail) {
  * Send welcome email to new users
  */
 export async function sendWelcomeEmail(emailData: WelcomeEmail) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Welkom bij Anemi Meets!</h2>
-      
-      <p>Hé ${emailData.userName},</p>
-      
-      <p>Welkom bij Anemi Meets! We zijn enthousiast om je te helpen wondervolle koffiewinkels 
-      en mensen met dezelfde interesses in je buurt te verbinden.</p>
-      
-      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 15px 0;">Wat je kunt doen:</h3>
-        <ul style="margin: 0; padding-left: 20px;">
-          <li>Ontdek lokale koffiewinkels met beoordelingen en reviews</li>
-          <li>Deel meetups of maak je eigen</li>
-          <li>Verbonden met koffie liefhebbers in je buurt</li>
-          <li>Ontvang persoonlijke koffie aanbevelingen</li>
-        </ul>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Welkom bij Anemi Meets!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je koffie avontuur begint hier</p>
       </div>
       
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${process.env.NEXT_PUBLIC_SUPABASE_URL}/explore" 
-           style="background-color: #f59e0b; color: white; padding: 12px 24px; 
-                  text-decoration: none; border-radius: 6px; display: inline-block;">
-          Start Explorando
-        </a>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé ${emailData.userName}! 👋</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Wat geweldig dat je je hebt aangemeld bij <strong>Anemi Meets</strong>! We zijn super enthousiast om je te verwelkomen in onze gezellige community van koffieliefhebbers. 
+          Samen gaan we de leukste cafés ontdekken en geweldige koffie momenten delen.
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">🚀 Wat je nu kunt doen:</h3>
+          <ul style="color: #92400e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>🗺️ Ontdek lokale koffiewinkels met beoordelingen en reviews ☕</li>
+            <li>👥 Deel meetups of maak je eigen koffie avonturen</li>
+            <li>💫 Verbind met koffie liefhebbers in je buurt</li>
+            <li>⭐ Ontvang persoonlijke koffie aanbevelingen</li>
+            <li>📸 Deel je koffie ontdekkingen met de community</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/dashboard" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            🗺️ Start Explorando
+          </a>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Tips voor een Geweldige Avontuur:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Voltooi je profiel om betere aanbevelingen te krijgen</li>
+            <li>Volg koffiewinkels die je leuk vindt om op de hoogte te blijven</li>
+            <li>Doe mee aan onze community discussies over koffie</li>
+            <li>Deel je favoriete koffie spots met vrienden</li>
+          </ul>
+        </div>
       </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Veel plezier bij je koffie avonturen!<br>
-        Het Anemi Meets Team
-      </p>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          Klaar om je koffie avontuur te starten?<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 
   return sendEmail({
     to: emailData.to,
-    subject: '☕ Welkom bij Anemi Meets!',
+    subject: '☕ Welkom bij Anemi Meets! Je koffie avontuur begint nu',
     html,
   });
 }
@@ -493,27 +556,68 @@ export async function sendMeetupReminder(
   meetupDate: string,
   meetupLocation: string
 ) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Meetup Herinnering</h2>
-      
-      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0;">${meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${meetupDate}</p>
-        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${meetupLocation}</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">⏰ Meetup Herinnering</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Vergeet je koffie meetup niet!</p>
       </div>
       
-      <p>Vergeet je koffie meetup niet! We kijken ernaar uit om je daar te zien.</p>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé daar! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Dit is een vriendelijke herinnering voor je aankomende koffie meetup. 
+          We kijken er naar uit om je daar te zien en een geweldige tijd te hebben!
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Meetup Details</h3>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Evenement:</strong> ${meetupTitle}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Datum:</strong> ${meetupDate}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📍 Locatie:</strong> ${meetupLocation}</p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Tips voor een Geweldige Meetup:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Kom op tijd om de beste plek te vinden</li>
+            <li>Neem je favoriete koffie verhalen mee</li>
+            <li>Wees open voor nieuwe koffie ervaringen</li>
+            <li>Deel je koffie kennis met anderen</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/dashboard" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            📱 Bekijk in App
+          </a>
+        </div>
+      </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Deze herinnering werd verzonden vanuit Anemi Meets.
-      </p>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          Veel plezier bij je koffie meetup! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 
   return sendEmail({
     to,
-    subject: `☕ Herinnering: ${meetupTitle}`,
+    subject: `⏰ Herinnering: ${meetupTitle}`,
     html,
   });
 }
@@ -529,21 +633,62 @@ export async function sendMeetupCancellation(
 ) {
   console.log('📧 sendMeetupCancellation called with:', { to, meetupTitle, meetupDate, reason })
   
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #ef4444;">☕ Meetup Geannuleerd</h2>
-      
-      <div style="background-color: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0;">${meetupTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📅 Datum:</strong> ${meetupDate}</p>
-        ${reason ? `<p style="margin: 5px 0;"><strong>Reden:</strong> ${reason}</p>` : ''}
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Geannuleerd</h1>
+        <p style="color: #fecaca; margin: 10px 0 0 0; font-size: 16px;">Helaas is deze meetup afgelast</p>
       </div>
       
-      <p>Helaas, deze meetup is geannuleerd. We zullen je op de hoogte brengen van eventuele herschoven evenementen.</p>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé daar! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Helaas moeten we je laten weten dat de volgende koffie meetup is geannuleerd. 
+          We begrijpen dat dit teleurstellend is, maar we hopen je snel weer te zien bij een andere meetup!
+        </p>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+          <h3 style="color: #991b1b; margin: 0 0 15px 0; font-size: 18px;">📋 Geannuleerde Meetup</h3>
+          <p style="margin: 8px 0; color: #991b1b;"><strong>📅 Evenement:</strong> ${meetupTitle}</p>
+          <p style="margin: 8px 0; color: #991b1b;"><strong>📅 Geplande Datum:</strong> ${meetupDate}</p>
+          ${reason ? `<p style="margin: 8px 0; color: #991b1b;"><strong>📝 Reden:</strong> ${reason}</p>` : ''}
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Wat kun je nu doen:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Bekijk andere beschikbare meetups in je buurt</li>
+            <li>Maak je eigen koffie meetup aan</li>
+            <li>Ontdek nieuwe cafés in je omgeving</li>
+            <li>Blijf verbonden met de koffie community</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/dashboard" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            🗺️ Ontdek Nieuwe Meetups
+          </a>
+        </div>
+      </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Deze melding werd verzonden vanuit Anemi Meets.
-      </p>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          We hopen je snel weer te zien! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 
@@ -566,9 +711,10 @@ export async function sendMeetupCancellation(
  * Generate HTML template for invite email
  */
 function generateInviteEmailHTML(data: InviteEmailData): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const datesList = data.dates.map(date => {
     const dateObj = new Date(date);
-    return dateObj.toLocaleDateString('en-US', { 
+    return dateObj.toLocaleDateString('nl-NL', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -577,37 +723,64 @@ function generateInviteEmailHTML(data: InviteEmailData): string {
   }).join(', ');
 
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">☕ Koffie Meetup Uitnodiging</h2>
-      
-      <p>Hé!</p>
-      
-      <p>Je bent uitgenodigd om deel te nemen aan een koffie meetup bij <strong>${data.cafe.name}</strong>!</p>
-      
-      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 15px 0;">Meetup Details</h3>
-        <p style="margin: 5px 0;"><strong>📍 Café:</strong> ${data.cafe.name}</p>
-        <p style="margin: 5px 0;"><strong>🏠 Adres:</strong> ${data.cafe.address}</p>
-        <p style="margin: 5px 0;"><strong>💰 Prijs Bereik:</strong> ${data.cafe.priceRange}</p>
-        <p style="margin: 5px 0;"><strong>⭐ Beoordeling:</strong> ${data.cafe.rating}/5</p>
-        <p style="margin: 5px 0;"><strong>🕒 Uren:</strong> ${data.cafe.openHours}</p>
-        <p style="margin: 5px 0;"><strong>📅 Datums:</strong> ${datesList}</p>
-        ${data.times ? `<p style="margin: 5px 0;"><strong>⏰ Tijden:</strong> ${data.times.join(', ')}</p>` : ''}
-        <p style="margin: 5px 0;"><strong>👤 Organisator:</strong> ${data.organizerName}</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Koffie Meetup Uitnodiging!</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Je bent uitgenodigd voor een gezellige koffie meetup</p>
       </div>
       
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${data.inviteLink || '#'}" 
-           style="background-color: #f59e0b; color: white; padding: 12px 24px; 
-                  text-decoration: none; border-radius: 6px; display: inline-block;">
-          Deel Meetup
-        </a>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé daar! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Geweldig nieuws! <strong>${data.organizerName}</strong> heeft je uitgenodigd voor een gezellige koffie meetup bij <strong>${data.cafe.name}</strong>. 
+          Dit wordt een geweldige gelegenheid om nieuwe mensen te ontmoeten en geweldige koffie te proeven!
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Meetup Details</h3>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📍 Café:</strong> ${data.cafe.name}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>🏠 Adres:</strong> ${data.cafe.address}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>💰 Prijs Bereik:</strong> ${data.cafe.priceRange}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>⭐ Beoordeling:</strong> ${data.cafe.rating}/5</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>🕒 Openingstijden:</strong> ${data.cafe.openHours}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Beschikbare Datums:</strong> ${datesList}</p>
+          ${data.times ? `<p style="margin: 8px 0; color: #92400e;"><strong>⏰ Beschikbare Tijden:</strong> ${data.times.join(', ')}</p>` : ''}
+          <p style="margin: 8px 0; color: #92400e;"><strong>👤 Organisator:</strong> ${data.organizerName}</p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${data.inviteLink || '#'}" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            ☕ Bekijk Uitnodiging
+          </a>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Wat kun je verwachten:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Gezellige sfeer met andere koffie liefhebbers</li>
+            <li>Ontdekking van nieuwe koffie spots</li>
+            <li>Leuke gesprekken en nieuwe vriendschappen</li>
+            <li>Geweldige koffie ervaringen delen</li>
+          </ul>
+        </div>
       </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Deze uitnodiging werd verzonden vanuit Anemi Meets. 
-        Verbind je met koffie liefhebbers in je gemeenschap!
-      </p>
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          We kijken uit naar je komst! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -807,22 +980,65 @@ export async function sendEmailVerificationEmail(data: EmailVerificationEmail) {
  * Send calendar invite email
  */
 export async function sendCalendarInvite(data: CalendarInviteData) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #f59e0b;">📅 Agenda Uitnodiging</h2>
-      
-      <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0;">${data.eventTitle}</h3>
-        <p style="margin: 5px 0;"><strong>📝 Beschrijving:</strong> ${data.eventDescription}</p>
-        <p style="margin: 5px 0;"><strong>📍 Locatie:</strong> ${data.eventLocation}</p>
-        <p style="margin: 5px 0;"><strong>⏰ Start Tijd:</strong> ${data.eventStartTime}</p>
-        <p style="margin: 5px 0;"><strong>⏰ Eind Tijd:</strong> ${data.eventEndTime}</p>
-        <p style="margin: 5px 0;"><strong>👤 Aanwezige:</strong> ${data.attendeeName}</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">📅 Agenda Uitnodiging</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Voeg deze koffie meetup toe aan je agenda</p>
       </div>
       
-      <p style="color: #6b7280; font-size: 14px;">
-        Deze agenda uitnodiging werd verzonden vanuit Anemi Meets.
-      </p>
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé ${data.attendeeName}! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          Perfect! Hier is je agenda uitnodiging voor de koffie meetup. 
+          Voeg deze toe aan je agenda zodat je het niet vergeet!
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Evenement Details</h3>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📅 Evenement:</strong> ${data.eventTitle}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📝 Beschrijving:</strong> ${data.eventDescription}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📍 Locatie:</strong> ${data.eventLocation}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>⏰ Start Tijd:</strong> ${data.eventStartTime}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>⏰ Eind Tijd:</strong> ${data.eventEndTime}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>👤 Aanwezige:</strong> ${data.attendeeName}</p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Agenda Tips:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Stel een herinnering in voor 15 minuten voor aanvang</li>
+            <li>Voeg de locatie toe aan je navigatie app</li>
+            <li>Plan wat extra tijd voor reizen</li>
+            <li>Deel je agenda met vrienden</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/dashboard" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            📱 Bekijk in App
+          </a>
+        </div>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          We kijken uit naar je komst! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
     </div>
   `;
 

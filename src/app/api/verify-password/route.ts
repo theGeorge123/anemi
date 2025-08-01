@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const CORRECT_PASSWORD = 'Lu0oriWkOz2hj48'
-
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
+    const correctPassword = process.env.SITE_ACCESS_PASSWORD
 
-    if (password === CORRECT_PASSWORD) {
+    if (!correctPassword) {
+      console.error('❌ SITE_ACCESS_PASSWORD environment variable not set')
+      return NextResponse.json({ success: false, error: 'Server configuration error' }, { status: 500 })
+    }
+
+    if (password === correctPassword) {
       const response = NextResponse.json({ success: true })
       
       // Set a cookie that expires in 24 hours
@@ -23,6 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Incorrect password' }, { status: 401 })
     }
   } catch (error) {
+    console.error('❌ Error in verify-password API:', error)
     return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 })
   }
 }

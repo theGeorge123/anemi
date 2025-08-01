@@ -227,32 +227,34 @@ export function FindMyMeetups() {
 
   const renderMeetupCard = (meetup: Meetup) => (
               <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3">
                     <div className="flex-1">
-                      <h5 className="font-semibold text-gray-900 mb-1">
+                      <h5 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
                         Koffie bij {meetup.cafe.name}
                       </h5>
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-3">
                         {getStatusBadge(meetup.status)}
                       </div>
                     </div>
-                                         <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                        <Button
                          size="sm"
                          variant="outline"
                          onClick={() => copyToClipboard(`https://anemi-meets.vercel.app/invite/${meetup.token}`)}
-                         className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                         className="border-amber-300 text-amber-700 hover:bg-amber-50 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                        >
                          {copiedToken === meetup.token ? (
                            <>
-                             <Check className="w-3 h-3 mr-1" />
-                             Gekopieerd!
+                             <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                             <span className="hidden sm:inline">Gekopieerd!</span>
+                             <span className="sm:hidden">✓</span>
                            </>
                          ) : (
                            <>
-                             <Copy className="w-3 h-3 mr-1" />
-                             Link
+                             <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                             <span className="hidden sm:inline">Link</span>
+                             <span className="sm:hidden">📋</span>
                            </>
                          )}
                        </Button>
@@ -261,16 +263,18 @@ export function FindMyMeetups() {
                          size="sm"
                          variant="outline"
                          onClick={() => addToCalendar(meetup)}
-                         className="border-green-300 text-green-700 hover:bg-green-50"
+                         className="border-green-300 text-green-700 hover:bg-green-50 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
                        >
-                         <Plus className="w-3 h-3 mr-1" />
-                         Kalender
+                         <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                         <span className="hidden sm:inline">Kalender</span>
+                         <span className="sm:hidden">📅</span>
                        </Button>
             )}
                        <Link href={`/invite/${meetup.token}`}>
-                         <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
-                           <ExternalLink className="w-3 h-3 mr-1" />
-                           Bekijk
+                         <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
+                           <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                           <span className="hidden sm:inline">Bekijk</span>
+                           <span className="sm:hidden">👁️</span>
                          </Button>
                        </Link>
                      </div>
@@ -314,30 +318,30 @@ export function FindMyMeetups() {
   return (
     <div className="space-y-6">
 
-      <form onSubmit={handleSearch} className="space-y-4 px-4">
-        <div className="space-y-3">
-          <Label htmlFor="inviteCode" className="text-sm sm:text-base font-medium text-gray-700">
+      <form onSubmit={handleSearch} className="space-y-6 px-4">
+        <div className="space-y-4">
+          <Label htmlFor="inviteCode" className="text-base sm:text-lg font-medium text-gray-700">
             🔑 Vind je meetup met invite token
           </Label>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-3">
             <Input
               id="inviteCode"
               type="text"
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value)}
               placeholder="Voer de invite token in (bijv. abc123def)"
-              className="flex-1 text-base"
+              className="flex-1 text-base sm:text-lg px-4 py-3 sm:py-4"
               required
             />
             <Button 
               type="submit" 
               disabled={isLoading || !inviteCode.trim()}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 text-base sm:whitespace-nowrap touch-target"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 sm:py-4 text-base sm:text-lg font-medium touch-target"
             >
               {isLoading ? 'Zoeken...' : 'Zoeken'}
             </Button>
           </div>
-          <div className="text-xs sm:text-sm text-gray-500 text-center space-y-1">
+          <div className="text-sm sm:text-base text-gray-500 text-center space-y-2">
             <p>🔑 De invite token vind je in je uitnodiging (email of WhatsApp)</p>
             <p>💡 Geen account nodig - gewoon je token invoeren!</p>
           </div>

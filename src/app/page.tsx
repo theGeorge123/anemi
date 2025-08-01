@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin } from 'lucide-react';
+import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense, lazy } from 'react';
 import { LoginStatus } from '@/components/LoginStatus';
@@ -85,6 +85,16 @@ export default function HomePage() {
           }>
             <FindMyMeetups />
           </Suspense>
+          
+          {/* Link to dedicated page */}
+          <div className="mt-6 text-center">
+            <Link href="/find-meetups">
+              <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-50 flex items-center gap-2 mx-auto">
+                <Search className="w-4 h-4" />
+                Bekijk Volledige Pagina
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

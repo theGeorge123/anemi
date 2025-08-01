@@ -268,7 +268,7 @@ export function CafeChoiceStep({ selectedCity, onCafeSelect, onChooseOwn, onBack
         <h4 className="font-medium text-blue-800 mb-2">💡 Handige Tips</h4>
         <ul className="text-sm text-blue-700 space-y-1">
           <li>• Gebruik de shuffle knop om andere cafes te ontdekken</li>
-          <li>• Klik op "Zelf kiezen" om een specifiek cafe te selecteren</li>
+          <li>• Klik op &quot;Zelf kiezen&quot; om een specifiek cafe te selecteren</li>
           <li>• Alle cafes hebben wifi en zijn geschikt voor meetups</li>
         </ul>
       </div>

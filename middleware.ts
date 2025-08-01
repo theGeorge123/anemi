@@ -5,6 +5,7 @@ export function middleware(request: NextRequest) {
   // Temporarily disabled site access check to fix authentication issues
   return NextResponse.next()
   
+  /* 
   // Allow access to the password entry page and API
   if (request.nextUrl.pathname === '/site-access' || 
       request.nextUrl.pathname === '/api/verify-password' ||
@@ -22,6 +23,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect to password entry page
   return NextResponse.redirect(new URL('/site-access', request.url))
+  */
 }
 
 export const config = {

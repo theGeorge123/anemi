@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { DeclineModal } from '@/components/meetups/DeclineModal'
-import { Calendar, MapPin, Star, Clock, Users, Home, LogIn, UserPlus } from 'lucide-react'
+import { MapPin, Star, Clock, Users, Home, LogIn, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { useSupabase } from '@/components/SupabaseProvider'
 
@@ -191,52 +191,7 @@ export default function InvitePage() {
     }
   }
 
-  const addToCalendar = () => {
-    if (!invite) return
 
-    // Use selected date and time if available, otherwise use first available
-    const dateToUse = selectedDate || invite.availableDates[0]
-    const timeToUse = selectedTime || invite.availableTimes[0]
-    
-    if (!dateToUse || !timeToUse) {
-      alert('Kies eerst een datum en tijd')
-      return
-    }
-
-    // Parse date and time
-    const date = new Date(dateToUse)
-    const timeParts = timeToUse.split(':').map(Number)
-    const hours = timeParts[0] || 0
-    const minutes = timeParts[1] || 0
-    date.setHours(hours, minutes, 0, 0)
-    
-    // End time (1 hour later)
-    const endDate = new Date(date)
-    endDate.setHours(endDate.getHours() + 1)
-
-    // Format for Google Calendar (YYYYMMDDTHHMMSSZ)
-    const formatDate = (d: Date) => {
-      return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
-    }
-
-    const startDateTime = formatDate(date)
-    const endDateTime = formatDate(endDate)
-
-    // Create calendar event data
-    const event = {
-      title: `☕ Koffie meetup met ${invite.organizerName}`,
-      description: `Koffie meetup bij ${invite.cafe.name}\n\nAdres: ${invite.cafe.address}\n\nGekozen datum: ${dateToUse}\nGekozen tijd: ${timeToUse}`,
-      location: invite.cafe.address,
-      startDateTime,
-      endDateTime
-    }
-
-    // Create Google Calendar URL
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}&dates=${event.startDateTime}/${event.endDateTime}`
-
-    // Open in new tab
-    window.open(googleCalendarUrl, '_blank')
-  }
 
   const openInMaps = () => {
     if (!invite?.cafe) return
@@ -507,24 +462,13 @@ export default function InvitePage() {
                   <span className="hidden sm:inline">Open in Maps</span>
                   <span className="sm:hidden">Maps</span>
                 </Button>
-                
-                <Button
-                  onClick={addToCalendar}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 h-8 sm:h-auto"
-                >
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Toevoegen aan Kalender</span>
-                  <span className="sm:hidden">Kalender</span>
-                </Button>
               </div>
             </div>
 
             {/* Date Selection */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                📅
                 Kies een datum:
               </h3>
               <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
@@ -770,7 +714,7 @@ export default function InvitePage() {
                 <div className="space-y-2 text-xs sm:text-sm">
                   {selectedDate && (
                     <div className="flex items-center gap-2 bg-white/50 p-2 rounded">
-                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                      📅
                       <span className="text-green-700 font-medium">
                         {new Date(selectedDate).toLocaleDateString('nl-NL', { 
                           weekday: 'long', 

@@ -21,6 +21,7 @@ function VerifyEmailPageContent() {
   const token = searchParams.get('token_hash') || searchParams.get('token')
   const emailParam = searchParams.get('email')
   const type = searchParams.get('type')
+  const redirectUrl = searchParams.get('redirect')
 
   // Debug: Log all parameters
   console.log('Email verification parameters:', {
@@ -73,8 +74,11 @@ function VerifyEmailPageContent() {
           setCountdown(prev => {
             if (prev <= 1) {
               clearInterval(countdownInterval)
-              // Redirect to signin page with success message
-              router.push('/auth/signin?message=verified')
+              // Redirect to signin page with success message and original redirect
+              const signinUrl = redirectUrl 
+                ? `/auth/signin?message=verified&redirect=${encodeURIComponent(redirectUrl)}`
+                : '/auth/signin?message=verified'
+              router.push(signinUrl)
               return 0
             }
             return prev - 1
@@ -90,7 +94,7 @@ function VerifyEmailPageContent() {
     } finally {
       setIsVerifying(false)
     }
-  }, [token, email, type, isVerifying, supabase.auth, router])
+  }, [token, email, type, isVerifying, supabase.auth, router, redirectUrl])
 
   // Auto-verify when component mounts
   useEffect(() => {
@@ -183,7 +187,10 @@ function VerifyEmailPageContent() {
               </p>
             </div>
             
-            <Link href="/auth/signin?message=verified">
+            <Link href={redirectUrl 
+              ? `/auth/signin?message=verified&redirect=${encodeURIComponent(redirectUrl)}`
+              : '/auth/signin?message=verified'
+            }>
               <Button className="w-full bg-amber-600 hover:bg-amber-700">
                 <Home className="w-4 h-4 mr-2" />
                 Nu Inloggen

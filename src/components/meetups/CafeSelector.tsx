@@ -77,7 +77,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Voor nu overslaan
+          🎲 Ik wil toch verrast worden
         </button>
       </div>
     )
@@ -91,7 +91,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           onClick={onSkip}
           className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
         >
-          Voor nu overslaan
+          🎲 Ik wil toch verrast worden
         </button>
       </div>
     )
@@ -104,7 +104,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           🏪 Kies je favoriete cafe in {selectedCity}
         </h4>
         <p className="text-sm text-gray-600">
-          Kies een cafe of sla over om ons te laten kiezen
+          Kies een cafe of laat ons je verrassen met een random keuze
         </p>
       </div>
 
@@ -186,7 +186,7 @@ export function CafeSelector({ selectedCity, selectedCafeId, onCafeSelect, onSki
           onClick={onSkip}
           className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
         >
-          Overslaan - laat jullie kiezen voor mij
+          🎲 Ik wil toch verrast worden
         </button>
       </div>
     </div>

@@ -759,6 +759,21 @@ function generateInviteEmailHTML(data: InviteEmailData): string {
         </div>
         
         <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">🔑 Invite Code</h3>
+          <p style="color: #0c4a6e; font-size: 14px; margin: 0 0 10px 0;">
+            Wil je deze uitnodiging doorsturen naar iemand anders? Gebruik dan deze invite code:
+          </p>
+          <div style="background-color: #ffffff; border: 2px solid #0ea5e9; border-radius: 6px; padding: 12px; margin: 10px 0;">
+            <code style="color: #0c4a6e; font-size: 16px; font-weight: 600; font-family: 'Courier New', monospace; letter-spacing: 1px;">
+              ${data.token}
+            </code>
+          </div>
+          <p style="color: #0c4a6e; font-size: 12px; margin: 10px 0 0 0; font-style: italic;">
+            📋 Klik op de code hierboven om deze te kopiëren, of deel de volledige link: ${data.inviteLink}
+          </p>
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
           <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Wat kun je verwachten:</h3>
           <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
             <li>Gezellige sfeer met andere koffie liefhebbers</li>
@@ -1048,3 +1063,87 @@ export async function sendCalendarInvite(data: CalendarInviteData) {
     html,
   });
 } 
+
+/**
+ * Send meetup decline notification email to organizer
+ */
+export async function sendMeetupDeclineNotification(
+  organizerEmail: string,
+  organizerName: string,
+  inviteeName: string,
+  inviteeEmail: string,
+  meetupTitle: string,
+  cafeName: string,
+  reason?: string
+) {
+  console.log('📧 sendMeetupDeclineNotification called with:', { 
+    organizerEmail, organizerName, inviteeName, inviteeEmail, meetupTitle, cafeName, reason 
+  })
+  
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px 20px; text-align: center; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">☕ Meetup Update</h1>
+        <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Iemand heeft je uitnodiging afgewezen</p>
+      </div>
+      
+      <div style="padding: 40px 20px; background-color: #ffffff;">
+        <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px;">Hé ${organizerName}! ☕</h2>
+        
+        <p style="color: #6b7280; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+          We willen je laten weten dat <strong>${inviteeName}</strong> heeft afgewezen voor je koffie meetup. 
+          Dit is normaal en gebeurt vaak - niet iedereen kan altijd meedoen!
+        </p>
+        
+        <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 18px;">📋 Afwijzing Details</h3>
+          <p style="margin: 8px 0; color: #92400e;"><strong>👤 Afgewezen door:</strong> ${inviteeName}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📧 Email:</strong> ${inviteeEmail}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>☕ Meetup:</strong> ${meetupTitle}</p>
+          <p style="margin: 8px 0; color: #92400e;"><strong>📍 Locatie:</strong> ${cafeName}</p>
+          ${reason ? `<p style="margin: 8px 0; color: #92400e;"><strong>📝 Reden:</strong> ${reason}</p>` : ''}
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <h3 style="color: #0c4a6e; margin: 0 0 15px 0; font-size: 18px;">💡 Wat kun je nu doen:</h3>
+          <ul style="color: #0c4a6e; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li>Nodig andere vrienden uit voor je meetup</li>
+            <li>Bekijk wie nog wel kan komen</li>
+            <li>Plan een nieuwe meetup voor een andere datum</li>
+            <li>Blijf positief - er zijn altijd mensen die wel kunnen!</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${siteUrl}/dashboard" 
+             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px 32px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;
+                    box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+            📊 Bekijk Meetup Details
+          </a>
+        </div>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+        <p style="color: #6b7280; font-size: 14px; margin: 0;">
+          Blijf je meetups organiseren! ☕<br>
+          <strong>Het Anemi Meets Team</strong>
+        </p>
+        <div style="margin-top: 15px;">
+          <a href="${siteUrl}" 
+             style="color: #f59e0b; text-decoration: none; font-size: 14px;">
+            Bezoek Anemi Meets
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: organizerEmail,
+    subject: `☕ ${inviteeName} heeft je meetup afgewezen`,
+    html,
+  });
+}

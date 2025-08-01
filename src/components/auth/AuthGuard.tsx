@@ -15,7 +15,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(!!session);
       setIsLoading(false);
       if (!session) {
-        router.push('/auth/signin');
+        // Redirect to signin with current page as redirect parameter
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/dashboard';
+        router.push(`/auth/signin?redirect=${encodeURIComponent(currentPath)}`);
       }
     }
   }, [session, loading, router]);

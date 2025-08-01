@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus, AlertTriangle, CheckCircle, XCircle, Clock as ClockIcon } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus, AlertTriangle, CheckCircle, XCircle, Clock as ClockIcon, Home, Search, Sparkles, Coffee, Heart, Share2, CalendarDays } from 'lucide-react'
 import Link from 'next/link'
 import { errorService, useErrorService } from '@/lib/error-service'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
@@ -136,7 +136,7 @@ export function FindMyMeetups() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">⏳ In afwachting</Badge>
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 animate-pulse">⏳ In afwachting</Badge>
       case 'confirmed':
         return <Badge className="bg-green-100 text-green-800 border-green-200">✅ Bevestigd!</Badge>
       case 'accepted':
@@ -226,103 +226,128 @@ export function FindMyMeetups() {
   }
 
   const renderMeetupCard = (meetup: Meetup) => (
-              <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3">
-                    <div className="flex-1">
-                      <h5 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
-                        Koffie bij {meetup.cafe.name}
-                      </h5>
-                      <div className="flex items-center gap-2 mb-3">
-                        {getStatusBadge(meetup.status)}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                       <Button
-                         size="sm"
-                         variant="outline"
-                         onClick={() => copyToClipboard(`https://anemi-meets.vercel.app/invite/${meetup.token}`)}
-                         className="border-amber-300 text-amber-700 hover:bg-amber-50 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
-                       >
-                         {copiedToken === meetup.token ? (
-                           <>
-                             <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                             <span className="hidden sm:inline">Gekopieerd!</span>
-                             <span className="sm:hidden">✓</span>
-                           </>
-                         ) : (
-                           <>
-                             <Copy className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                             <span className="hidden sm:inline">Link</span>
-                             <span className="sm:hidden">📋</span>
-                           </>
-                         )}
-                       </Button>
+    <Card key={meetup.id} className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 hover:shadow-xl hover:scale-105 transition-all duration-300 transform">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3">
+          <div className="flex-1">
+            <h5 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg flex items-center gap-2">
+              <Coffee className="w-4 h-4 text-amber-600" />
+              Koffie bij {meetup.cafe.name}
+            </h5>
+            <div className="flex items-center gap-2 mb-3">
+              {getStatusBadge(meetup.status)}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => copyToClipboard(`https://anemi-meets.vercel.app/invite/${meetup.token}`)}
+              className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 text-xs sm:text-sm px-3 py-2 transition-all duration-200 transform hover:scale-105"
+            >
+              {copiedToken === meetup.token ? (
+                <>
+                  <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 animate-bounce" />
+                  <span className="hidden sm:inline">Gekopieerd!</span>
+                  <span className="sm:hidden">✓</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                  <span className="hidden sm:inline">Delen</span>
+                  <span className="sm:hidden">📋</span>
+                </>
+              )}
+            </Button>
             {meetup.chosenDate && meetup.chosenTime && (
-                       <Button
-                         size="sm"
-                         variant="outline"
-                         onClick={() => addToCalendar(meetup)}
-                         className="border-green-300 text-green-700 hover:bg-green-50 text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
-                       >
-                         <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                         <span className="hidden sm:inline">Kalender</span>
-                         <span className="sm:hidden">📅</span>
-                       </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => addToCalendar(meetup)}
+                className="border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 text-xs sm:text-sm px-3 py-2 transition-all duration-200 transform hover:scale-105"
+              >
+                <CalendarDays className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">Kalender</span>
+                <span className="sm:hidden">📅</span>
+              </Button>
             )}
-                       <Link href={`/invite/${meetup.token}`}>
-                         <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2">
-                           <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                           <span className="hidden sm:inline">Bekijk</span>
-                           <span className="sm:hidden">👁️</span>
-                         </Button>
-                       </Link>
-                     </div>
-                  </div>
+            <Link href={`/invite/${meetup.token}`}>
+              <Button 
+                size="sm" 
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm px-3 py-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">Bekijk</span>
+                <span className="sm:hidden">👁️</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin className="w-3 h-3" />
-                        <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Users className="w-3 h-3" />
-                        <span>Door: {meetup.organizerName}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="w-3 h-3" />
-                        <span>{formatDate(meetup.createdAt)}</span>
-                      </div>
-                      {meetup.chosenDate && meetup.chosenTime && (
-                        <div className="flex items-center gap-2 text-green-600 font-medium">
-                          <Clock className="w-3 h-3" />
-                          <span>Gekozen: {meetup.chosenDate} om {meetup.chosenTime}</span>
-                        </div>
-                      )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-gray-600">
+              <MapPin className="w-3 h-3" />
+              <span>{meetup.cafe.address}, {meetup.cafe.city}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <Users className="w-3 h-3" />
+              <span>Door: {meetup.organizerName}</span>
+            </div>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Calendar className="w-3 h-3" />
+              <span>{formatDate(meetup.createdAt)}</span>
+            </div>
+            {meetup.chosenDate && meetup.chosenTime && (
+              <div className="flex items-center gap-2 text-green-600 font-medium">
+                <Clock className="w-3 h-3" />
+                <span>Gekozen: {meetup.chosenDate} om {meetup.chosenTime}</span>
+              </div>
+            )}
             {meetup.status === 'pending' && (
               <div className="flex items-center gap-2 text-yellow-600 font-medium">
                 <Clock className="w-3 h-3" />
                 <span>Verloopt: {formatDate(meetup.expiresAt)}</span>
               </div>
             )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 
   return (
     <div className="space-y-6">
+      {/* Back to Home Button */}
+      <div className="text-center mb-6">
+        <Link href="/">
+          <Button 
+            variant="outline" 
+            className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 transform hover:scale-105 flex items-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            Terug naar Home
+          </Button>
+        </Link>
+      </div>
 
       <form onSubmit={handleSearch} className="space-y-6 px-4">
         <div className="space-y-4">
-          <Label htmlFor="inviteCode" className="text-base sm:text-lg font-medium text-gray-700">
-            🔑 Vind je meetup met invite token
-          </Label>
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Search className="w-8 h-8 text-white" />
+            </div>
+            <Label htmlFor="inviteCode" className="text-xl sm:text-2xl font-bold text-gray-800">
+              🔍 Vind je Meetups
+            </Label>
+            <p className="text-gray-600 mt-2">
+              Voer je invite token in om je meetups te bekijken
+            </p>
+          </div>
+          
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-3">
             <Input
               id="inviteCode"
@@ -330,20 +355,39 @@ export function FindMyMeetups() {
               value={inviteCode}
               onChange={(e) => setInviteCode(e.target.value)}
               placeholder="Voer de invite token in (bijv. abc123def)"
-              className="flex-1 text-base sm:text-lg px-4 py-3 sm:py-4"
+              className="flex-1 text-base sm:text-lg px-4 py-3 sm:py-4 border-2 border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
               required
             />
             <Button 
               type="submit" 
               disabled={isLoading || !inviteCode.trim()}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 sm:py-4 text-base sm:text-lg font-medium touch-target"
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 sm:py-4 text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Zoeken...' : 'Zoeken'}
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Zoeken...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Zoeken
+                </>
+              )}
             </Button>
           </div>
-          <div className="text-sm sm:text-base text-gray-500 text-center space-y-2">
-            <p>🔑 De invite token vind je in je uitnodiging (email of WhatsApp)</p>
-            <p>💡 Geen account nodig - gewoon je token invoeren!</p>
+          
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Heart className="w-4 h-4 text-pink-500" />
+              <span className="text-sm font-medium text-blue-800">💡 Handige Tips</span>
+              <Heart className="w-4 h-4 text-pink-500" />
+            </div>
+            <div className="text-sm text-blue-700 space-y-1">
+              <p>🔑 De invite token vind je in je uitnodiging (email of WhatsApp)</p>
+              <p>✨ Geen account nodig - gewoon je token invoeren!</p>
+              <p>🎉 Alle meetups worden automatisch gevonden en gegroepeerd</p>
+            </div>
           </div>
         </div>
       </form>
@@ -360,17 +404,20 @@ export function FindMyMeetups() {
       {meetups.length > 0 && (
         <div className="space-y-6">
           <div className="text-center">
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">
-              {meetups.length} meetup{meetups.length !== 1 ? 's' : ''} gevonden! ☕
+            <div className="w-20 h-20 bg-gradient-to-br from-green-300 to-emerald-300 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <Coffee className="w-10 h-10 text-white" />
+            </div>
+            <h4 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+              🎉 {meetups.length} meetup{meetups.length !== 1 ? 's' : ''} gevonden!
             </h4>
             <p className="text-gray-600 text-sm">
-              Je meetups zijn gegroepeerd per status
+              Je meetups zijn gegroepeerd per status voor overzicht
             </p>
           </div>
 
           {/* Status Groups */}
           {getStatusGroups(meetups).map((group, index) => (
-            <div key={index} className={`${group.bgColor || 'bg-white'} border ${group.borderColor} rounded-lg p-4`}>
+            <div key={index} className={`${group.bgColor || 'bg-white'} border ${group.borderColor} rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-200`}>
               <div className="flex items-center gap-2 mb-3">
                 {group.icon}
                 <h5 className={`font-semibold ${group.textColor}`}>
@@ -388,24 +435,38 @@ export function FindMyMeetups() {
           ))}
 
           <div className="text-center pt-6 border-t border-amber-200 mt-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <h4 className="font-semibold text-blue-800 mb-2">💡 Account aanmaken?</h4>
-              <p className="text-sm text-blue-700 mb-3">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6 mb-4 shadow-md">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-300 to-purple-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-bold text-blue-800 mb-2 text-lg">🚀 Account aanmaken?</h4>
+              <p className="text-sm text-blue-700 mb-4">
                 Je kunt meetups bekijken en accepteren zonder account. Maar met een account kun je:
               </p>
-              <ul className="text-sm text-blue-700 text-left space-y-1 mb-3">
-                <li>• Al je meetups op één plek beheren</li>
-                <li>• Meetup details aanpassen</li>
-                <li>• Automatisch koppelen van nieuwe uitnodigingen</li>
+              <ul className="text-sm text-blue-700 text-left space-y-2 mb-4 max-w-md mx-auto">
+                <li className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  Al je meetups op één plek beheren
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  Meetup details aanpassen
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  Automatisch koppelen van nieuwe uitnodigingen
+                </li>
               </ul>
-              <div className="flex flex-col xs:flex-row gap-2 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/auth/signup">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+                    <Sparkles className="w-4 h-4 mr-2" />
                     Account Aanmaken
                   </Button>
                 </Link>
                 <Link href="/auth/signin">
-                  <Button variant="outline" className="border-blue-300 text-blue-700">
+                  <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 transform hover:scale-105">
+                    <Heart className="w-4 h-4 mr-2" />
                     Inloggen
                   </Button>
                 </Link>

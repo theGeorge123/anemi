@@ -141,13 +141,7 @@ export function StepContent({
         </div>
       )}
       
-      <div className="text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="font-medium text-blue-800 mb-1">📧 Nieuwe single email uitnodiging</p>
-        <p className="text-blue-700">
-          Je kunt nu <strong>één email</strong> opgeven om je meetup uitnodiging te versturen. 
-          Dit maakt het eenvoudiger en directer!
-        </p>
-      </div>
+
     </div>
   )
 
@@ -279,6 +273,10 @@ export function StepContent({
             }
             // Stay on the same step but show cafe selection
           }}
+          onBackToCitySelection={() => {
+            // Go back to step 2 (city selection)
+            onBack()
+          }}
         />
       </div>
     )
@@ -313,6 +311,21 @@ export function StepContent({
           }
         </p>
       </div>
+      
+      {/* Back to city selection button */}
+      <div className="flex justify-start">
+        <Button
+          onClick={() => {
+            setShowCafeSelection(false)
+            onBack()
+          }}
+          variant="outline"
+          className="text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400"
+        >
+          ← Terug naar stad kiezen
+        </Button>
+      </div>
+      
       {formData.viewType === 'map' ? (
         <MapView
           selectedCity={formData.city}
@@ -323,7 +336,11 @@ export function StepContent({
           selectedCity={formData.city}
           selectedCafeId={formData.cafeId}
           onCafeSelect={(cafeId) => onFormDataChange({ cafeId })}
-          onSkip={() => onFormDataChange({ cafeId: '' })}
+          onSkip={() => {
+            // Reset cafe selection and go back to cafe choice step
+            onFormDataChange({ cafeId: '' })
+            setShowCafeSelection(false)
+          }}
         />
       )}
     </div>

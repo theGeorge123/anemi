@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendMeetupDeclineNotification } from '@/lib/email'
 
 export async function POST(
   request: NextRequest,
@@ -56,6 +57,25 @@ export async function POST(
         declinedAt: new Date()
       }
     })
+
+    // Send email notification to organizer
+    try {
+      if (updatedInvite.organizerEmail && updatedInvite.organizerName) {
+        await sendMeetupDeclineNotification(
+          updatedInvite.organizerEmail,
+          updatedInvite.organizerName,
+          inviteeName,
+          inviteeEmail,
+          `Koffie meetup`,
+          'Cafe',
+          reason
+        )
+        console.log('✅ Decline notification email sent to organizer')
+      }
+    } catch (emailError) {
+      console.error('❌ Failed to send decline notification email:', emailError)
+      // Don't fail the entire request if email fails
+    }
 
     return NextResponse.json({
       success: true,

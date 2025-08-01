@@ -59,7 +59,7 @@ function MeetupWizardContent() {
         console.error('User not logged in');
         // Redirect to login with return URL
         if (typeof window !== 'undefined') {
-          window.location.href = `/auth/signin?redirect=${encodeURIComponent('/create')}`;
+          window.location.href = `/auth/signin?redirect=${encodeURIComponent(window.location.pathname)}`;
         }
         return;
       }

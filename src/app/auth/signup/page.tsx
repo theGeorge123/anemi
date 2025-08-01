@@ -70,7 +70,9 @@ function SignUpPageContent() {
       email: form.values.email,
       password: form.values.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: redirectUrl 
+          ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectUrl)}`
+          : `${window.location.origin}/auth/callback`
       }
     })
 

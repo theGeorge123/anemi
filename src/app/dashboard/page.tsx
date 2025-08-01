@@ -14,7 +14,7 @@ export default function Dashboard() {
     if (!loading) {
     if (!session) {
         // Redirect to signin with current page as redirect parameter
-        router.push('/auth/signin?redirect=' + encodeURIComponent('/dashboard'))
+        router.push('/auth/signin?redirect=' + encodeURIComponent(window.location.pathname))
       } else {
         setIsChecking(false)
       }

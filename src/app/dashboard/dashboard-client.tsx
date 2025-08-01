@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
-import { Home, Users, Calendar, Clock, Eye, Filter, SortAsc, SortDesc } from 'lucide-react'
+import { Home, Users, Calendar, Clock, Eye, Filter, SortAsc, SortDesc, MapPin } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MeetupInvite {
@@ -26,6 +26,7 @@ interface MeetupInvite {
   availableDates: string[]
   availableTimes: string[]
   chosenDate?: string
+  chosenTime?: string
   inviteeName?: string
   inviteeEmail?: string
   inviteeUserId?: string
@@ -86,9 +87,41 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
     }
   }
 
+  const addToCalendar = () => {
+    if (!meetup.chosenDate || !meetup.chosenTime) {
+      alert('Geen datum en tijd gekozen voor deze meetup')
+      return
+    }
+
+    const formatDate = (d: Date) => {
+      return d.toISOString().replace(/-|:|\.\d+/g, '')
+    }
+
+    const startDate = new Date(`${meetup.chosenDate}T${meetup.chosenTime}`)
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000) // 1 hour later
+
+    const calendarUrl = [
+      'https://calendar.google.com/calendar/render',
+      '?action=TEMPLATE',
+      `&text=Koffie bij ${meetup.cafe?.name || 'Cafe'}`,
+      `&details=Meetup georganiseerd door ${meetup.organizerName}%0A%0ALocatie: ${meetup.cafe?.name}%0AAdres: ${meetup.cafe?.address}, ${meetup.cafe?.city}%0A%0ABekijk details: ${process.env.NEXT_PUBLIC_SITE_URL}/invite/${meetup.token}`,
+      `&location=${meetup.cafe?.address}, ${meetup.cafe?.city}`,
+      `&dates=${formatDate(startDate)}/${formatDate(endDate)}`
+    ].join('')
+
+    window.open(calendarUrl, '_blank')
+  }
+
+  const openGoogleMaps = () => {
+    if (meetup.cafe?.address && meetup.cafe?.city) {
+      const address = encodeURIComponent(`${meetup.cafe.address}, ${meetup.cafe.city}`)
+      window.open(`https://maps.google.com/?q=${address}`, '_blank')
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl sm:max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -99,23 +132,51 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
             </Button>
           </div>
 
-          {/* Meetup Summary */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-amber-800 mb-2">
-              ☕ {meetup.cafe?.name || 'Cafe'}
-            </h3>
-            <p className="text-sm text-amber-700">
-              📅 {formatDate(meetup.createdAt)} • 🎫 {meetup.totalInvites || 0} uitnodigingen
-            </p>
+          {/* Meetup Summary with Cafe Info */}
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-800 mb-2 text-lg">
+                  ☕ {meetup.cafe?.name || 'Cafe'}
+                </h3>
+                <p className="text-sm text-amber-700 mb-2">
+                  📅 {formatDate(meetup.createdAt)} • 🎫 {meetup.totalInvites || 0} uitnodigingen
+                </p>
+                {meetup.cafe?.address && (
+                  <p className="text-sm text-amber-700">
+                    📍 {meetup.cafe.address}, {meetup.cafe.city}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                {meetup.chosenDate && meetup.chosenTime && (
+                  <Button
+                    onClick={addToCalendar}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    📅 Toevoegen aan Kalender
+                  </Button>
+                )}
+                <Button
+                  onClick={openGoogleMaps}
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  🗺️ Route
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Response Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
+            <Card className="border-green-200 bg-green-50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">✅ Geaccepteerd</p>
+                    <p className="text-sm text-green-700 font-medium">✅ Geaccepteerd</p>
                     <p className="text-2xl font-bold text-green-600">
                       {meetup.responses?.accepted || 0}
                     </p>
@@ -125,11 +186,11 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-red-200 bg-red-50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">❌ Afgewezen</p>
+                    <p className="text-sm text-red-700 font-medium">❌ Afgewezen</p>
                     <p className="text-2xl font-bold text-red-600">
                       {meetup.responses?.declined || 0}
                     </p>
@@ -139,11 +200,11 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-yellow-200 bg-yellow-50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">⏳ In afwachting</p>
+                    <p className="text-sm text-yellow-700 font-medium">⏳ In afwachting</p>
                     <p className="text-2xl font-bold text-yellow-600">
                       {meetup.responses?.pending || 0}
                     </p>
@@ -156,14 +217,14 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
 
           {/* Participants List */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               👥 Deelnemers ({meetup.participants?.length || 0})
             </h3>
 
             {meetup.participants && meetup.participants.length > 0 ? (
               <div className="space-y-3">
                 {meetup.participants.map((participant, index) => (
-                  <Card key={index}>
+                  <Card key={index} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -881,6 +942,20 @@ export default function DashboardClient() {
                           <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                           <span>Vervalt: {formatDate(meetup.expiresAt)}</span>
                         </div>
+                        {meetup.cafe.address && (
+                          <div className="flex items-center gap-1 sm:col-span-2 lg:col-span-1">
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="truncate">{meetup.cafe.address}, {meetup.cafe.city}</span>
+                          </div>
+                        )}
+                        {meetup.chosenDate && meetup.chosenTime && (
+                          <div className="flex items-center gap-1 sm:col-span-2 lg:col-span-1">
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" />
+                            <span className="text-green-600 font-medium">
+                              Gekozen: {formatDate(meetup.chosenDate)} om {meetup.chosenTime}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="mt-2 sm:mt-3 flex flex-wrap gap-2">
@@ -901,13 +976,55 @@ export default function DashboardClient() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingMeetup(meetup)}
-                        className="text-xs sm:text-sm"
+                        onClick={() => {
+                          setEditingMeetup(meetup)
+                          setViewResponsesModalOpen(true)
+                        }}
+                        className="text-xs sm:text-sm border-blue-300 text-blue-700 hover:bg-blue-50"
                       >
                         <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         <span className="hidden sm:inline">Bekijk Reacties</span>
                         <span className="sm:hidden">Reacties</span>
                       </Button>
+                      
+                      {meetup.chosenDate && meetup.chosenTime && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const formatDate = (d: Date) => {
+                              return d.toISOString().replace(/-|:|\.\d+/g, '')
+                            }
+                            const startDate = new Date(`${meetup.chosenDate}T${meetup.chosenTime}`)
+                            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000)
+                            const calendarUrl = [
+                              'https://calendar.google.com/calendar/render',
+                              '?action=TEMPLATE',
+                              `&text=Koffie bij ${meetup.cafe.name}`,
+                              `&details=Meetup georganiseerd door ${meetup.organizerName}%0A%0ALocatie: ${meetup.cafe.name}%0AAdres: ${meetup.cafe.address}, ${meetup.cafe.city}%0A%0ABekijk details: ${process.env.NEXT_PUBLIC_SITE_URL}/invite/${meetup.token}`,
+                              `&location=${meetup.cafe.address}, ${meetup.cafe.city}`,
+                              `&dates=${formatDate(startDate)}/${formatDate(endDate)}`
+                            ].join('')
+                            window.open(calendarUrl, '_blank')
+                          }}
+                          className="text-xs sm:text-sm border-green-300 text-green-700 hover:bg-green-50"
+                        >
+                          📅 Kalender
+                        </Button>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const address = encodeURIComponent(`${meetup.cafe.address}, ${meetup.cafe.city}`)
+                          window.open(`https://maps.google.com/?q=${address}`, '_blank')
+                        }}
+                        className="text-xs sm:text-sm border-purple-300 text-purple-700 hover:bg-purple-50"
+                      >
+                        🗺️ Route
+                      </Button>
+                      
                       <Button
                         variant="outline"
                         size="sm"
@@ -917,6 +1034,7 @@ export default function DashboardClient() {
                         <span className="hidden sm:inline">Bewerken</span>
                         <span className="sm:hidden">Edit</span>
                       </Button>
+                      
                       <Button
                         variant="outline"
                         size="sm"

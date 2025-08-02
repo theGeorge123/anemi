@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus, AlertTriangle, CheckCircle, XCircle, Clock as ClockIcon, Home, Search, Sparkles, Coffee, Heart, Share2, CalendarDays } from 'lucide-react'
+import { Calendar, MapPin, Clock, Users, ExternalLink, Copy, Check, Plus, AlertTriangle, CheckCircle, XCircle, Clock as ClockIcon, Search, Sparkles, Coffee, Heart, Share2, CalendarDays } from 'lucide-react'
 import Link from 'next/link'
 import { errorService, useErrorService } from '@/lib/error-service'
 import { ErrorDisplay } from '@/components/ErrorDisplay'
@@ -321,19 +321,6 @@ export function FindMyMeetups() {
 
   return (
     <div className="space-y-6">
-      {/* Back to Home Button */}
-      <div className="text-center mb-6">
-        <Link href="/">
-          <Button 
-            variant="outline" 
-            className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 transform hover:scale-105 flex items-center gap-2"
-          >
-            <Home className="w-4 h-4" />
-            Terug naar Home
-          </Button>
-        </Link>
-      </div>
-
       <form onSubmit={handleSearch} className="space-y-6 px-4">
         <div className="space-y-4">
           <div className="text-center mb-6">

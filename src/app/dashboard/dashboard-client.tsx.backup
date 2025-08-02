@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -124,162 +124,194 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                📊 Reacties voor {meetup.cafe?.name}
-              </h2>
-              <p className="text-sm text-gray-600">
-                Bekijk alle reacties en details van je meetup
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="shrink-0"
-            >
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              📊 Reacties voor Meetup
+            </h2>
+            <Button onClick={onClose} variant="outline" size="sm" className="text-xs sm:text-sm">
               ✕ Sluiten
             </Button>
           </div>
 
-          {/* Meetup Details */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-3">📋 Meetup Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Cafe:</span> {meetup.cafe?.name}
+          {/* Meetup Summary with Cafe Info */}
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-800 mb-2 text-lg">
+                  ☕ {meetup.cafe?.name || 'Cafe'}
+                </h3>
+                <p className="text-sm text-amber-700 mb-2">
+                  📅 {formatDate(meetup.createdAt)} • 🎫 {meetup.totalInvites || 0} uitnodigingen
+                </p>
+                {meetup.cafe?.address && (
+                  <p className="text-sm text-amber-700">
+                    📍 {meetup.cafe.address}, {meetup.cafe.city}
+                  </p>
+                )}
               </div>
-              <div>
-                <span className="font-medium">Adres:</span> {meetup.cafe?.address}, {meetup.cafe?.city}
+              <div className="flex flex-col gap-2">
+                {meetup.chosenDate && meetup.chosenTime && (
+                  <Button
+                    onClick={addToCalendar}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    📅 Toevoegen aan Kalender
+                  </Button>
+                )}
+                <Button
+                  onClick={openGoogleMaps}
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                >
+                  🗺️ Route
+                </Button>
               </div>
-              <div>
-                <span className="font-medium">Organisator:</span> {meetup.organizerName}
-              </div>
-              <div>
-                <span className="font-medium">Status:</span> {meetup.status}
-              </div>
-              {meetup.chosenDate && meetup.chosenTime && (
-                <div className="sm:col-span-2">
-                  <span className="font-medium">Gekozen datum:</span> {formatDate(meetup.chosenDate)} om {formatTime(meetup.chosenTime)}
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Confirmed Date and Time Section */}
-          {meetup.chosenDate && meetup.chosenTime && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                ✅ Bevestigde Datum & Tijd
-              </h3>
-              <div className="text-green-700">
-                <div className="text-lg font-medium">
-                  {formatDate(meetup.chosenDate)} om {formatTime(meetup.chosenTime)}
-                </div>
-                <div className="text-sm mt-1">
-                  Locatie: {meetup.cafe?.name} - {meetup.cafe?.address}, {meetup.cafe?.city}
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Response Statistics */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">✅ {meetup.responses?.accepted || 0}</div>
-              <div className="text-sm text-green-700">Geaccepteerd</div>
-            </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">⏳ {meetup.responses?.pending || 0}</div>
-              <div className="text-sm text-yellow-700">In Afwachting</div>
-            </div>
-            <div className="text-center p-4 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">❌ {meetup.responses?.declined || 0}</div>
-              <div className="text-sm text-red-700">Afgewezen</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-700 font-medium">✅ Geaccepteerd</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {meetup.responses?.accepted || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-red-700 font-medium">❌ Afgewezen</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {meetup.responses?.declined || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-red-600" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-yellow-200 bg-yellow-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-yellow-700 font-medium">⏳ In afwachting</p>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {meetup.responses?.pending || 0}
+                    </p>
+                  </div>
+                  <Users className="w-8 h-8 text-yellow-600" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Participants List */}
-          {meetup.participants && meetup.participants.length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">👥 Deelnemers</h3>
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              👥 Deelnemers ({meetup.participants?.length || 0})
+            </h3>
+
+            {meetup.participants && meetup.participants.length > 0 ? (
               <div className="space-y-3">
                 {meetup.participants.map((participant, index) => (
-                  <div key={index} className={`p-4 rounded-lg border ${
-                    participant.status === 'accepted' ? 'bg-green-50 border-green-200' :
-                    participant.status === 'declined' ? 'bg-red-50 border-red-200' :
-                    'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-3 h-3 rounded-full ${
-                            participant.status === 'accepted' ? 'bg-green-500' :
-                            participant.status === 'declined' ? 'bg-red-500' :
-                            'bg-yellow-500'
-                          }`}></div>
-                          <span className="font-medium text-gray-900">{participant.name}</span>
-                          <span className="text-sm text-gray-600">({participant.email})</span>
-                          <Badge className={`text-xs ${
-                            participant.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                            participant.status === 'declined' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {participant.status === 'accepted' ? '✅ Geaccepteerd' :
-                             participant.status === 'declined' ? '❌ Afgewezen' :
-                             '⏳ In Afwachting'}
-                          </Badge>
-                        </div>
-                        
-                        {/* Gekozen datum en tijd voor geaccepteerde participants */}
-                        {participant.status === 'accepted' && participant.chosenDate && participant.chosenTime && (
-                          <div className="ml-5 mb-2">
-                            <div className="flex items-center gap-2 text-green-700">
-                              <Calendar className="w-4 h-4" />
-                              <span className="font-medium">Gekozen:</span>
-                              <span>{formatDate(participant.chosenDate)} om {participant.chosenTime}</span>
+                  <Card key={index} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-medium text-gray-900">
+                              {participant.name || 'Anoniem'}
+                            </h4>
+                            <Badge className={getStatusColor(participant.status)}>
+                              {participant.status === 'accepted' ? '✅ Geaccepteerd' :
+                               participant.status === 'declined' ? '❌ Afgewezen' :
+                               '⏳ In afwachting'}
+                            </Badge>
+                          </div>
+                          
+                          <p className="text-sm text-gray-600 mb-2">
+                            📧 {participant.email}
+                          </p>
+
+                          {participant.responseDate && (
+                            <p className="text-xs text-gray-500">
+                              📅 Reactie op: {formatDate(participant.responseDate)}
+                            </p>
+                          )}
+
+                          {participant.chosenDate && participant.chosenTime && (
+                            <div className="mt-2 p-2 bg-blue-50 rounded-md">
+                              <p className="text-sm text-blue-800">
+                                🗓️ Voorkeur: {formatDate(participant.chosenDate)} om {formatTime(participant.chosenTime)}
+                              </p>
                             </div>
-                          </div>
-                        )}
-                        
-                        {/* Response datum */}
-                        {participant.responseDate && (
-                          <div className="ml-5 text-xs text-gray-500">
-                            {participant.status === 'accepted' ? 'Geaccepteerd' : 
-                             participant.status === 'declined' ? 'Afgewezen' : 'Gereageerd'} op: {formatDate(participant.responseDate)}
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <p>Nog geen deelnemers</p>
+              </div>
+            )}
+          </div>
+
+          {/* Date/Time Preferences */}
+          {meetup.preferences && (
+            <div className="mt-6 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                📊 Datum/Tijd Voorkeuren
+              </h3>
+
+              {/* Date Preferences */}
+              {meetup.preferences.preferredDates && Object.keys(meetup.preferences.preferredDates).length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">📅 Datum Voorkeuren</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {Object.entries(meetup.preferences.preferredDates)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([date, count]) => (
+                        <div key={date} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{formatDate(date)}</span>
+                          <Badge variant="secondary">{count} stemmen</Badge>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Time Preferences */}
+              {meetup.preferences.preferredTimes && Object.keys(meetup.preferences.preferredTimes).length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-700 mb-2">⏰ Tijd Voorkeuren</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {Object.entries(meetup.preferences.preferredTimes)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([time, count]) => (
+                        <div key={time} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                          <span className="text-sm">{time}</span>
+                          <Badge variant="secondary">{count} stemmen</Badge>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
-            {meetup.chosenDate && meetup.chosenTime && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={addToCalendar}
-                className="border-green-300 text-green-700 hover:bg-green-50"
-              >
-                📅 Toevoegen aan Kalender
-              </Button>
-            )}
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openGoogleMaps}
-              className="border-purple-300 text-purple-700 hover:bg-purple-50"
-            >
-              🗺️ Route
-            </Button>
-          </div>
         </div>
       </div>
     </div>
@@ -287,55 +319,81 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
 }
 
 export default function DashboardClient() {
-  const { supabase } = useSupabase()
+  const { supabase, session } = useSupabase()
   const [meetups, setMeetups] = useState<MeetupInvite[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingMeetup, setEditingMeetup] = useState<MeetupInvite | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [viewResponsesModalOpen, setViewResponsesModalOpen] = useState(false)
+  
+  // Sorting and filtering state
   const [sortBy, setSortBy] = useState<'date' | 'status' | 'responses'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
-  const fetchMeetups = useCallback(async () => {
-    try {
+
+  useEffect(() => {
+    if (!session) {
+      console.log('❌ No session available')
+      setError('🔐 Please sign in to view your meetups')
+      setIsLoading(false)
+      return
+    }
+
+    const fetchMeetups = async () => {
       setIsLoading(true)
       setError(null)
 
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        setError('Je moet ingelogd zijn om je meetups te bekijken')
+      try {
+        console.log('🔍 Fetching meetups for user:', session.user.email)
+
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        const accessToken = currentSession?.access_token
+
+        if (!accessToken) {
+          throw new Error('🔐 No access token available. Please sign in again.')
+        }
+
+        console.log('🔑 Access token length:', accessToken.length)
+
+        const response = await fetch('/api/meetups', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to fetch meetups')
+        }
+
+        const data = await response.json()
+        console.log('📊 Fetched meetups:', data.meetups.length)
+        setMeetups(data.meetups)
+        
+        // Clear any previous errors if successful
+        setError(null)
+      } catch (error) {
+        console.error('❌ Error fetching meetups:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch meetups'
+        
+        // Only set error if it's a real error, not just no meetups
+        if (!errorMessage.includes('No meetups found') && !errorMessage.includes('empty')) {
+          setError(errorMessage)
+        } else {
+          // If it's just no meetups, don't show an error
+          setMeetups([])
+          setError(null)
+        }
+      } finally {
         setIsLoading(false)
-        return
       }
-
-      const response = await fetch('/api/meetups', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to fetch meetups')
-      }
-
-      const data = await response.json()
-      setMeetups(data.meetups || [])
-    } catch (error) {
-      console.error('Error fetching meetups:', error)
-      setError('Er ging iets mis bij het laden van je meetups')
-    } finally {
-      setIsLoading(false)
     }
-  }, [supabase])
 
-  useEffect(() => {
     fetchMeetups()
-  }, [fetchMeetups])
+  }, [session, supabase])
 
   const handleEditMeetup = (meetup: MeetupInvite) => {
     setEditingMeetup(meetup)
@@ -344,32 +402,41 @@ export default function DashboardClient() {
 
   const handleSaveMeetup = async (meetupId: string, updates: any) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        throw new Error('No session available')
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      const accessToken = currentSession?.access_token
+
+      if (!accessToken) {
+        throw new Error('No access token available')
       }
 
       const response = await fetch(`/api/meetups/${meetupId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updates),
+        body: JSON.stringify(updates)
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to update meetup')
       }
 
-      // Refresh meetups
-      await fetchMeetups()
+      const result = await response.json()
+
+      // Refresh meetups list
+      const updatedMeetups = meetups.map(meetup => 
+        meetup.id === meetupId 
+          ? { ...meetup, ...updates }
+          : meetup
+      )
+      setMeetups(updatedMeetups)
       setIsEditModalOpen(false)
       setEditingMeetup(null)
     } catch (error) {
       console.error('Error updating meetup:', error)
-      alert('Er ging iets mis bij het bijwerken van de meetup')
+      // Handle error - could show a toast
     }
   }
 
@@ -379,71 +446,72 @@ export default function DashboardClient() {
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        throw new Error('No session available')
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      const accessToken = currentSession?.access_token
+
+      if (!accessToken) {
+        throw new Error('No access token available')
       }
 
       const response = await fetch(`/api/meetups/${meetupId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
       })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
+        const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to delete meetup')
       }
 
-      // Refresh meetups
-      await fetchMeetups()
-      setIsEditModalOpen(false)
-      setEditingMeetup(null)
+      // Remove meetup from list
+      setMeetups(meetups.filter(meetup => meetup.id !== meetupId))
     } catch (error) {
       console.error('Error deleting meetup:', error)
-      alert('Er ging iets mis bij het verwijderen van de meetup')
+      // Handle error - could show a toast
     }
   }
 
   const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      active: { label: 'Actief', className: 'bg-green-100 text-green-800' },
-      pending: { label: 'In Afwachting', className: 'bg-yellow-100 text-yellow-800' },
-      completed: { label: 'Voltooid', className: 'bg-blue-100 text-blue-800' },
-      cancelled: { label: 'Geannuleerd', className: 'bg-red-100 text-red-800' }
+    switch (status) {
+      case 'pending':
+        return <Badge variant="secondary">⏳ Wachtend</Badge>
+      case 'accepted':
+        return <Badge variant="default">✅ Geaccepteerd</Badge>
+      case 'confirmed':
+        return <Badge variant="default">📅 Bevestigd</Badge>
+      case 'declined':
+        return <Badge variant="destructive">❌ Afgewezen</Badge>
+      default:
+        return <Badge variant="outline">{status}</Badge>
     }
-
-    const config = statusConfig[status as keyof typeof statusConfig] || { label: status, className: 'bg-gray-100 text-gray-800' }
-
-    return (
-      <Badge className={config.className}>
-        {config.label}
-      </Badge>
-    )
   }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('nl-NL', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     })
   }
 
   const getInviteLink = (token: string) => {
-    return `${window.location.origin}/invite/${token}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    return `${baseUrl}/invite/${token}`
   }
 
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
-      alert('Link gekopieerd naar klembord!')
+      console.log('✅ Link copied to clipboard')
     } catch (err) {
-      console.error('Failed to copy:', err)
+      console.error('❌ Failed to copy link:', err)
     }
   }
 
+  // Sorting and filtering functions
   const getSortedAndFilteredMeetups = () => {
     let filteredMeetups = [...meetups]
 
@@ -451,6 +519,8 @@ export default function DashboardClient() {
     if (statusFilter !== 'all') {
       filteredMeetups = filteredMeetups.filter(meetup => meetup.status === statusFilter)
     }
+
+
 
     // Apply sorting
     filteredMeetups.sort((a, b) => {
@@ -492,6 +562,8 @@ export default function DashboardClient() {
       setSortOrder('desc')
     }
   }
+
+
 
   if (error) {
     const isAuthError = error.includes('token') || error.includes('authorization') || error.includes('Invalid') || error.includes('expired')
@@ -622,6 +694,66 @@ export default function DashboardClient() {
               </Card>
             </div>
 
+            {/* Popular Preferences */}
+            {meetups.some(m => m.preferences) && (
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Populaire Voorkeuren</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Popular Dates */}
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-3">📅 Meest Gekozen Datums</h4>
+                      <div className="space-y-2">
+                        {Object.entries(
+                          meetups.reduce((acc, meetup) => {
+                            if (meetup.preferences?.preferredDates) {
+                              Object.entries(meetup.preferences.preferredDates).forEach(([date, count]) => {
+                                acc[date] = (acc[date] || 0) + count
+                              })
+                            }
+                            return acc
+                          }, {} as { [date: string]: number })
+                        )
+                          .sort(([,a], [,b]) => b - a)
+                          .slice(0, 3)
+                          .map(([date, count]) => (
+                            <div key={date} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <span className="text-sm text-gray-600">{date}</span>
+                              <Badge variant="secondary">{count} stemmen</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Popular Times */}
+                    <div>
+                      <h4 className="font-medium text-gray-700 mb-3">🕐 Meest Gekozen Tijden</h4>
+                      <div className="space-y-2">
+                        {Object.entries(
+                          meetups.reduce((acc, meetup) => {
+                            if (meetup.preferences?.preferredTimes) {
+                              Object.entries(meetup.preferences.preferredTimes).forEach(([time, count]) => {
+                                acc[time] = (acc[time] || 0) + count
+                              })
+                            }
+                            return acc
+                          }, {} as { [time: string]: number })
+                        )
+                          .sort(([,a], [,b]) => b - a)
+                          .slice(0, 3)
+                          .map(([time, count]) => (
+                            <div key={time} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <span className="text-sm text-gray-600">{time}</span>
+                              <Badge variant="secondary">{count} stemmen</Badge>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Additional Insights */}
             <Card className="mb-6">
               <CardContent className="p-6">
@@ -692,6 +824,7 @@ export default function DashboardClient() {
                 >
                   In Afwachting ({meetups.filter(m => (m.responses?.pending || 0) > 0).length})
                 </Button>
+
               </div>
             </div>
             
@@ -778,24 +911,10 @@ export default function DashboardClient() {
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-green-600" />
                           <div>
-                            <p className="text-xs text-gray-500">Bevestigd</p>
+                            <p className="text-xs text-gray-500">Gekozen</p>
                             <p className="text-sm font-medium text-green-700">
                               {formatDate(meetup.chosenDate)} om {meetup.chosenTime}
                             </p>
-                            {/* Toon wie de datum heeft gekozen */}
-                            {meetup.participants && meetup.participants.find(p => 
-                              p.status === 'accepted' && 
-                              p.chosenDate === meetup.chosenDate && 
-                              p.chosenTime === meetup.chosenTime
-                            ) && (
-                              <p className="text-xs text-gray-500 mt-1">
-                                Gekozen door: {meetup.participants.find(p => 
-                                  p.status === 'accepted' && 
-                                  p.chosenDate === meetup.chosenDate && 
-                                  p.chosenTime === meetup.chosenTime
-                                )?.name}
-                              </p>
-                            )}
                           </div>
                         </div>
                       )}
@@ -825,112 +944,94 @@ export default function DashboardClient() {
                   {meetup.participants && meetup.participants.filter(p => p.status === 'accepted').length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-900 mb-2">✅ Geaccepteerd door:</h4>
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         {meetup.participants
                           .filter(p => p.status === 'accepted')
                           .map((participant, index) => (
-                            <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="font-medium text-gray-900">{participant.name}</span>
-                                <span className="text-gray-500 text-sm">({participant.email})</span>
-                              </div>
-                              
-                              {/* Gekozen datum en tijd */}
-                              {participant.chosenDate && participant.chosenTime && (
-                                <div className="ml-4 text-sm">
-                                  <div className="flex items-center gap-1 text-green-700">
-                                    <Calendar className="w-3 h-3" />
-                                    <span className="font-medium">Gekozen:</span>
-                                    <span>{formatDate(participant.chosenDate)} om {participant.chosenTime}</span>
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {/* Response datum */}
-                              {participant.responseDate && (
-                                <div className="ml-4 text-xs text-gray-500 mt-1">
-                                  Geaccepteerd op: {formatDate(participant.responseDate)}
-                                </div>
-                              )}
+                            <div key={index} className="flex items-center gap-2 text-sm">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span className="font-medium text-gray-900">{participant.name}</span>
+                              <span className="text-gray-500">({participant.email})</span>
                             </div>
                           ))}
                       </div>
                     </div>
                   )}
-                  
-                  {/* Actions */}
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditingMeetup(meetup)
-                        setViewResponsesModalOpen(true)
-                      }}
-                      className="text-xs sm:text-sm"
-                    >
-                      <span className="hidden sm:inline">Bekijk Reacties</span>
-                      <span className="sm:hidden">Reacties</span>
-                    </Button>
-                    
-                    {meetup.chosenDate && meetup.chosenTime && (
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          const formatDate = (d: Date) => {
-                            return d.toISOString().replace(/-|:|\.\d+/g, '')
-                          }
-                          const startDate = new Date(`${meetup.chosenDate}T${meetup.chosenTime}`)
-                          const endDate = new Date(startDate.getTime() + 60 * 60 * 1000)
-                          const calendarUrl = [
-                            'https://calendar.google.com/calendar/render',
-                            '?action=TEMPLATE',
-                            `&text=Koffie bij ${meetup.cafe.name}`,
-                            `&details=Meetup georganiseerd door ${meetup.organizerName}%0A%0ALocatie: ${meetup.cafe.name}%0AAdres: ${meetup.cafe.address}, ${meetup.cafe.city}%0A%0ABekijk details: ${process.env.NEXT_PUBLIC_SITE_URL}/invite/${meetup.token}`,
-                            `&location=${meetup.cafe.address}, ${meetup.cafe.city}`,
-                            `&dates=${formatDate(startDate)}/${formatDate(endDate)}`
-                          ].join('')
-                          window.open(calendarUrl, '_blank')
+                          setEditingMeetup(meetup)
+                          setViewResponsesModalOpen(true)
                         }}
-                        className="text-xs sm:text-sm border-green-300 text-green-700 hover:bg-green-50"
+                        className="text-xs sm:text-sm border-blue-300 text-blue-700 hover:bg-blue-50"
                       >
-                        📅 Kalender
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        <span className="hidden sm:inline">Bekijk Reacties</span>
+                        <span className="sm:hidden">Reacties</span>
                       </Button>
-                    )}
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const address = encodeURIComponent(`${meetup.cafe.address}, ${meetup.cafe.city}`)
-                        window.open(`https://maps.google.com/?q=${address}`, '_blank')
-                      }}
-                      className="text-xs sm:text-sm border-purple-300 text-purple-700 hover:bg-purple-50"
-                    >
-                      🗺️ Route
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEditMeetup(meetup)}
-                      className="text-xs sm:text-sm"
-                    >
-                      <span className="hidden sm:inline">Bewerken</span>
-                      <span className="sm:hidden">Edit</span>
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(getInviteLink(meetup.token))}
-                      className="text-xs sm:text-sm"
-                    >
-                      <span className="hidden sm:inline">Kopieer Link</span>
-                      <span className="sm:hidden">Link</span>
-                    </Button>
+                      
+                      {meetup.chosenDate && meetup.chosenTime && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const formatDate = (d: Date) => {
+                              return d.toISOString().replace(/-|:|\.\d+/g, '')
+                            }
+                            const startDate = new Date(`${meetup.chosenDate}T${meetup.chosenTime}`)
+                            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000)
+                            const calendarUrl = [
+                              'https://calendar.google.com/calendar/render',
+                              '?action=TEMPLATE',
+                              `&text=Koffie bij ${meetup.cafe.name}`,
+                              `&details=Meetup georganiseerd door ${meetup.organizerName}%0A%0ALocatie: ${meetup.cafe.name}%0AAdres: ${meetup.cafe.address}, ${meetup.cafe.city}%0A%0ABekijk details: ${process.env.NEXT_PUBLIC_SITE_URL}/invite/${meetup.token}`,
+                              `&location=${meetup.cafe.address}, ${meetup.cafe.city}`,
+                              `&dates=${formatDate(startDate)}/${formatDate(endDate)}`
+                            ].join('')
+                            window.open(calendarUrl, '_blank')
+                          }}
+                          className="text-xs sm:text-sm border-green-300 text-green-700 hover:bg-green-50"
+                        >
+                          📅 Kalender
+                        </Button>
+                      )}
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const address = encodeURIComponent(`${meetup.cafe.address}, ${meetup.cafe.city}`)
+                          window.open(`https://maps.google.com/?q=${address}`, '_blank')
+                        }}
+                        className="text-xs sm:text-sm border-purple-300 text-purple-700 hover:bg-purple-50"
+                      >
+                        🗺️ Route
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditMeetup(meetup)}
+                        className="text-xs sm:text-sm"
+                      >
+                        <span className="hidden sm:inline">Bewerken</span>
+                        <span className="sm:hidden">Edit</span>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(getInviteLink(meetup.token))}
+                        className="text-xs sm:text-sm"
+                      >
+                        <span className="hidden sm:inline">Kopieer Link</span>
+                        <span className="sm:hidden">Link</span>
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

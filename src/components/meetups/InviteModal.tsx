@@ -21,8 +21,16 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
   const [emailSent, setEmailSent] = useState(false)
   
   const inviteUrl = typeof window !== 'undefined' ? `${window.location.origin}/invite/${inviteCode}` : ''
-  const whatsappMessage = `Hey! ☕ Ik heb een meetup gemaakt via Anemi. Wil je meedoen? Hier is de link: ${inviteUrl}`
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`
+  const whatsappMessage = `Hey! ☕ Ik heb een koffie meetup gemaakt via Anemi Meets! 
+
+Wil je meedoen? Klik op deze link om je voorkeuren in te vullen:
+${inviteUrl}
+
+Tot koffie! ☕`
+  
+  // Try multiple WhatsApp URL formats for better compatibility
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}`
+  const whatsappUrlFallback = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`
 
   const copyToClipboard = async () => {
     try {
@@ -36,7 +44,32 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
 
   const handleWhatsAppShare = () => {
     if (typeof window !== 'undefined') {
-      window.open(whatsappUrl, '_blank')
+      try {
+        // Check if we're on mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        
+        // Try the primary WhatsApp URL first
+        const whatsappWindow = window.open(whatsappUrl, '_blank')
+        
+        // If the window didn't open, try the fallback URL
+        if (!whatsappWindow || whatsappWindow.closed) {
+          setTimeout(() => {
+            window.open(whatsappUrlFallback, '_blank')
+          }, 100)
+        }
+              } catch (error) {
+          console.error('Error opening WhatsApp:', error)
+          // Fallback: copy the message to clipboard
+          try {
+            navigator.clipboard.writeText(whatsappMessage).then(() => {
+              alert('✅ WhatsApp bericht gekopieerd naar klembord! Je kunt het nu handmatig delen.')
+            }).catch(() => {
+              alert('📋 Kopieer deze link handmatig: ' + inviteUrl)
+            })
+          } catch (clipboardError) {
+            alert('📋 Kopieer deze link handmatig: ' + inviteUrl)
+          }
+        }
     }
   }
 
@@ -135,11 +168,11 @@ export function InviteModal({ inviteCode, isOpen, onClose }: InviteModalProps) {
             <div className="space-y-2 sm:space-y-3">
               <Button
                 onClick={handleWhatsAppShare}
-                className="w-full bg-green-500 hover:bg-green-600 text-white h-10 sm:h-auto"
+                className="w-full bg-green-500 hover:bg-green-600 text-white h-10 sm:h-auto transition-all duration-200 hover:scale-105"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Deel via WhatsApp</span>
-                <span className="sm:hidden">WhatsApp</span>
+                <span className="hidden sm:inline">📱 Deel via WhatsApp</span>
+                <span className="sm:hidden">📱 WhatsApp</span>
               </Button>
 
               <Button

@@ -34,6 +34,92 @@ export default function FindMeetupsPage() {
           </div>
         </div>
 
+        {/* App Uitleg Sectie */}
+        <div className="mb-12">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-8 border-2 border-amber-200 shadow-lg">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Coffee className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                ☕ Echte Connecties Beginnen met een Kopje Koffie
+              </h2>
+              <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                In een wereld vol digitale interacties verlangen we naar <strong>echte verbindingen</strong>. 
+                Anemi Meets maakt het eenvoudig om betekenisvolle ontmoetingen te organiseren.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center p-6 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🤝</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Echte Connecties</h3>
+                <p className="text-sm text-gray-600">
+                  Ga voorbij de oppervlakkige likes en shares. Bouw echte vriendschappen en professionele netwerken.
+                </p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">☕</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Koffie als Katalysator</h3>
+                <p className="text-sm text-gray-600">
+                  Een kopje koffie is de perfecte setting voor open gesprekken en spontane ontmoetingen.
+                </p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-xl border border-amber-200 shadow-sm">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">🎯</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Eenvoudig Organiseren</h3>
+                <p className="text-sm text-gray-600">
+                  Geen gedoe met groepsapps of eindeloze discussies. Gewoon een link delen en klaar.
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-6 border border-amber-300">
+              <h3 className="text-xl font-bold text-amber-800 mb-3 text-center">
+                🌟 Waarom Anemi Meets?
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="space-y-2">
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Vergroot je netwerk met betekenisvolle ontmoetingen</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Ontdek nieuwe cafes en plekken in je stad</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Geen gedoe met account aanmaken of inloggen</span>
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Perfect voor zowel vrienden als zakelijke connecties</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Automatische herinneringen en updates</span>
+                  </p>
+                  <p className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold">•</span>
+                    <span>Veilig en privacy-vriendelijk</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Find My Meetups Component */}
         <div className="bg-white rounded-2xl shadow-lg border-2 border-amber-200 p-6 sm:p-8">
           <Suspense fallback={

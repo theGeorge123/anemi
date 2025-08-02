@@ -5,12 +5,10 @@ import { EmailInput } from './EmailInput'
 import { CitySelector } from './CitySelector'
 import { DatePicker } from './DatePicker'
 import { TimeSelector } from './TimeSelector'
-import { DateTimePreferences } from './DateTimePreferences'
-import { PriceSelector } from './PriceSelector'
+import { CafeChoiceStep } from './CafeChoiceStep'
 import { CafeSelector } from './CafeSelector'
 import { ViewSelector } from './ViewSelector'
 import MapView from './MapView'
-import { CafeChoiceStep } from './CafeChoiceStep'
 import { StepNavigation } from './StepNavigation'
 import { type FormData } from './formValidation'
 import { type City } from '@/constants/cities'
@@ -36,7 +34,6 @@ export function StepContent({
   onFinish,
   onTotalStepsChange
 }: StepContentProps) {
-  const [showDateTimePreferences, setShowDateTimePreferences] = useState(false)
   const [showCafeChoice, setShowCafeChoice] = useState(false)
   const [showCafeSelection, setShowCafeSelection] = useState(false)
   const [totalSteps, setTotalSteps] = useState(5)
@@ -58,7 +55,7 @@ export function StepContent({
 
   // Check if we should show date/time preferences step
   const shouldShowDateTimePreferences = () => {
-    return formData.dates.length > 1 || formData.times.length > 1
+    return false // Always false since we removed this functionality
   }
 
   // Check if we should show cafe selection step
@@ -68,13 +65,9 @@ export function StepContent({
 
   // Get the actual step content based on current step and user choices
   const getActualStep = () => {
-    if (currentStep === 4 && shouldShowDateTimePreferences()) {
-      return 'dateTimePreferences'
-    } else if (currentStep === 4 && !shouldShowDateTimePreferences()) {
+    if (currentStep === 4) {
       return 'cafeChoice'
-    } else if (currentStep === 5 && shouldShowDateTimePreferences()) {
-      return 'cafeChoice'
-    } else if (currentStep === 5 && !shouldShowDateTimePreferences()) {
+    } else if (currentStep === 5) {
       return 'summary'
     }
     return currentStep
@@ -87,23 +80,6 @@ export function StepContent({
       case 1: return formData.name.trim() && formData.email.trim()
       case 2: return formData.city.trim()
       case 3: return formData.dates.length > 0 && formData.times.length > 0
-      case 'dateTimePreferences': 
-        // Enhanced validation: check if each selected date has at least one time selected
-        const hasValidDateTimePreferences = () => {
-          // If no dates are selected, validation fails
-          if (formData.dates.length === 0) return false
-          
-          // Check if each selected date has at least one time preference
-          const dateTimeKeys = Object.keys(formData.dateTimePreferences)
-          const selectedDates = formData.dates
-          
-          // All selected dates must have time preferences
-          return selectedDates.every(date => {
-            const timesForDate = formData.dateTimePreferences[date] || []
-            return timesForDate.length > 0
-          })
-        }
-        return hasValidDateTimePreferences()
       case 'cafeChoice': 
         // Always require cafeId regardless of selection method (random or manual)
         return !!formData.cafeId
@@ -187,51 +163,6 @@ export function StepContent({
           />
         </div>
       </div>
-
-      {formData.dates.length > 0 && formData.times.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800 mb-3">
-            <strong>💡 Wil je verschillende tijden per datum specificeren?</strong>
-          </p>
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => {
-                setShowDateTimePreferences(true)
-                onNext()
-              }}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              Ja, dat wil ik
-            </Button>
-            <Button 
-              onClick={() => {
-                setShowDateTimePreferences(false)
-                onNext()
-              }}
-              variant="outline"
-              size="sm"
-            >
-              Nee, alle data dezelfde tijden
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-
-  const renderDateTimePreferences = () => (
-    <div className="space-y-6 animate-fadeIn">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">🗓️ Tijden per datum</h3>
-        <p className="text-gray-600">Specificeer welke tijden voor elke datum werken</p>
-      </div>
-      <DateTimePreferences
-        dates={formData.dates}
-        availableTimes={formData.times}
-        dateTimePreferences={formData.dateTimePreferences}
-        onPreferencesChange={(preferences) => onFormDataChange({ dateTimePreferences: preferences })}
-      />
     </div>
   )
 
@@ -252,11 +183,10 @@ export function StepContent({
           onCafeSelect={(cafeId) => {
             console.log('🎯 Random cafe selected:', cafeId)
             console.log('🎯 Current step:', currentStep)
-            console.log('🎯 Should show date/time preferences:', shouldShowDateTimePreferences())
             onFormDataChange({ cafeId })
             // If user accepts random cafe, check if we should finish or continue
-            // If we're at step 5 (final step) or if no date/time preferences, finish
-            if (currentStep >= 5 || !shouldShowDateTimePreferences()) {
+            // If we're at step 5 (final step), finish
+            if (currentStep >= 5) {
               console.log('🎯 Calling onFinish()')
               onFinish()
             } else {
@@ -400,19 +330,6 @@ export function StepContent({
             <div className="text-xs">
               <span>{formData.times.join(', ')}</span>
             </div>
-            {Object.keys(formData.dateTimePreferences).length > 0 && (
-              <>
-                <p className="font-medium text-gray-900 mb-2 mt-3">Specifieke Tijden per Datum:</p>
-                {Object.entries(formData.dateTimePreferences).map(([date, times]) => (
-                  <div key={date} className="text-xs">
-                    <span className="font-medium">
-                      {new Date(date).toLocaleDateString('nl-NL', { weekday: 'short', month: 'short', day: 'numeric' })}:
-                    </span>
-                    <span className="ml-2">{times.join(', ')}</span>
-                  </div>
-                ))}
-              </>
-            )}
           </div>
         </div>
       </div>
@@ -426,7 +343,6 @@ export function StepContent({
       case 1: return renderStep1()
       case 2: return renderStep2()
       case 3: return renderStep3()
-      case 'dateTimePreferences': return renderDateTimePreferences()
       case 'cafeChoice': return renderCafeChoice()
       case 'summary': return renderSummary()
       default: return renderSummary()
@@ -451,20 +367,6 @@ export function StepContent({
         if (formData.dates.length === 0) return 'Selecteer minimaal 1 datum'
         if (formData.times.length === 0) return 'Selecteer minimaal 1 tijd'
         return '✅ Data en tijden geselecteerd!'
-        
-      case 'dateTimePreferences':
-        const incompleteDates = formData.dates.filter(date => {
-          const timesForDate = formData.dateTimePreferences[date] || []
-          return timesForDate.length === 0
-        })
-        
-        if (incompleteDates.length > 0) {
-          const dateLabels = incompleteDates.map(date => 
-            new Date(date).toLocaleDateString('nl-NL', { weekday: 'short', month: 'short', day: 'numeric' })
-          )
-          return `⚠️ Selecteer tijden voor: ${dateLabels.join(', ')}`
-        }
-        return '✅ Alle datums hebben tijden geselecteerd!'
         
       case 'cafeChoice':
         if (!formData.cafeId) return 'Selecteer een cafe of kies voor willekeurig'

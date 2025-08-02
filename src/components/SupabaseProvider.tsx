@@ -34,7 +34,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           const result = await Promise.race([
             client.auth.getSession(),
             new Promise<never>((_, reject) => 
-              setTimeout(() => reject(new Error('Session timeout')), 5000)
+              setTimeout(() => reject(new Error('Session timeout')), 2000)
             )
           ])
           

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useToaster } from '@/components/ui/toaster'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { 
   Home, 
   User, 
@@ -18,7 +19,9 @@ import {
   Coffee,
   MapPin,
   Mail,
-  Phone
+  Phone,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react'
 
 interface UserProfile {
@@ -35,10 +38,13 @@ interface UserProfile {
 export default function SettingsClient() {
   const { session, supabase, user } = useSupabase()
   const { addToast } = useToaster()
+  const router = useRouter()
   
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
   // Form states - only essential fields
   const [bio, setBio] = useState('')
@@ -141,6 +147,53 @@ export default function SettingsClient() {
         description: 'Kon niet uitloggen',
         type: 'error'
       })
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleting(true)
+      
+      // Delete user profile first
+      if (session?.user?.id) {
+        const { error: profileError } = await supabase
+          .from('UserProfile')
+          .delete()
+          .eq('userId', session.user.id)
+
+        if (profileError) {
+          console.error('Error deleting profile:', profileError)
+        }
+      }
+
+      // Delete user account
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(
+        session?.user?.id || ''
+      )
+
+      if (deleteError) {
+        throw new Error(deleteError.message)
+      }
+
+      addToast({
+        title: 'Account Verwijderd',
+        description: 'Je account is succesvol verwijderd',
+        type: 'success'
+      })
+
+      // Redirect to home page
+      router.push('/')
+
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      addToast({
+        title: 'Fout',
+        description: 'Kon account niet verwijderen',
+        type: 'error'
+      })
+    } finally {
+      setDeleting(false)
+      setShowDeleteConfirm(false)
     }
   }
 
@@ -286,6 +339,15 @@ export default function SettingsClient() {
                 Uitloggen
               </Button>
               
+              <Button
+                onClick={() => setShowDeleteConfirm(true)}
+                variant="outline"
+                className="border-red-500 text-red-700 hover:bg-red-50 hover:border-red-600"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Account Verwijderen
+              </Button>
+              
               <Link href="/legal/privacy">
                 <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
                   <User className="w-4 h-4 mr-2" />
@@ -293,15 +355,34 @@ export default function SettingsClient() {
                 </Button>
               </Link>
             </div>
+            
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-yellow-800">
+                  <p className="font-medium mb-1">⚠️ Let op bij account verwijderen:</p>
+                  <ul className="text-xs space-y-1">
+                    <li>• Je profielgegevens worden permanent verwijderd</li>
+                    <li>• Je meetups en uitnodigingen blijven bestaan</li>
+                    <li>• Deze actie kan niet ongedaan worden gemaakt</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         {/* Save Button */}
-        <div className="flex justify-end">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+          <div className="text-sm text-gray-600">
+            <p>💡 Wijzigingen worden automatisch opgeslagen</p>
+            <p className="text-xs">Klik op &quot;Profiel Opslaan&quot; om je wijzigingen te bewaren</p>
+          </div>
+          
           <Button
             onClick={saveSettings}
             disabled={saving}
-            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+            className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {saving ? (
               <>
@@ -316,6 +397,62 @@ export default function SettingsClient() {
             )}
           </Button>
         </div>
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Account Verwijderen</h3>
+                  <p className="text-sm text-gray-600">Deze actie kan niet ongedaan worden gemaakt</p>
+                </div>
+              </div>
+              
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <h4 className="font-medium text-red-800 mb-2">⚠️ Wat er gebeurt:</h4>
+                <ul className="text-sm text-red-700 space-y-1">
+                  <li>• Je profielgegevens worden permanent verwijderd</li>
+                  <li>• Je kunt niet meer inloggen met dit account</li>
+                  <li>• Je meetups blijven bestaan maar zonder jouw naam</li>
+                  <li>• Deze actie kan niet ongedaan worden gemaakt</li>
+                </ul>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={deleting}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Annuleren
+                </Button>
+                <Button
+                  onClick={handleDeleteAccount}
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  disabled={deleting}
+                >
+                  {deleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Verwijderen...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Verwijder Account
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

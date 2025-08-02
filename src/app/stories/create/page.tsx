@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Coffee, Save, Eye, X, Plus, ArrowLeft, Users, Heart, Share2, Lightbulb } from 'lucide-react'
+import { Coffee, Save, Eye, X, Plus, ArrowLeft, Users, Heart, Share2, Lightbulb, User } from 'lucide-react'
 import { useSupabase } from '@/components/SupabaseProvider'
 
 
@@ -22,6 +22,7 @@ export default function CreateStoryPage() {
   
   const [formData, setFormData] = useState({
     title: '',
+    name: '',
     content: '',
     excerpt: '',
     tags: [] as string[],
@@ -191,6 +192,28 @@ export default function CreateStoryPage() {
                   />
                   <p className="text-sm text-gray-600 mt-2">
                     Maak een pakkende titel die anderen inspireert om je verhaal te lezen
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Name */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="w-5 h-5 text-amber-600" />
+                    Naam van de Persoon
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Input
+                    type="text"
+                    placeholder="Bijv: 'Sarah' of 'Mijn collega'"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="text-lg"
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    Optioneel: de naam van de persoon uit je verhaal
                   </p>
                 </CardContent>
               </Card>

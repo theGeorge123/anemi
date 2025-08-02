@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, Share2, Users } from 'lucide-react'
+import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, Share2, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/SupabaseProvider'
@@ -12,6 +12,7 @@ import { useSupabase } from '@/components/SupabaseProvider'
 interface Story {
   id: string
   title: string
+  name?: string
   excerpt?: string
   content: string
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
@@ -28,7 +29,7 @@ interface Story {
     nickname?: string
     image?: string
   }
-
+ 
   _count: {
     likes: number
     comments: number
@@ -137,7 +138,12 @@ function StoryCard({ story }: { story: Story }) {
             <span>{story.author.nickname || story.author.name}</span>
           </div>
           
-
+          {story.name && (
+            <div className="flex items-center gap-1">
+              <Coffee className="w-4 h-4" />
+              <span>Over {story.name}</span>
+            </div>
+          )}
           
           {story.publishedAt && (
             <div className="flex items-center gap-1">
@@ -281,9 +287,23 @@ function StoriesList() {
 }
 
 export default function StoriesPage() {
+  const router = useRouter()
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-cream-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Terug naar Home
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">

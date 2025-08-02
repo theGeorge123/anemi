@@ -13,6 +13,7 @@ import { useSupabase } from '@/components/SupabaseProvider'
 interface Story {
   id: string
   title: string
+  name?: string
   excerpt?: string
   content: string
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
@@ -29,7 +30,7 @@ interface Story {
     nickname?: string
     image?: string
   }
-
+ 
   _count: {
     likes: number
     comments: number
@@ -223,8 +224,8 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-cream-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
+        {/* Back Buttons */}
+        <div className="mb-6 flex gap-3">
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -232,6 +233,14 @@ export default function StoryPage({ params }: { params: { id: string } }) {
           >
             <ArrowLeft className="w-4 h-4" />
             Terug naar verhalen
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Terug naar Home
           </Button>
         </div>
 
@@ -260,7 +269,12 @@ export default function StoryPage({ params }: { params: { id: string } }) {
                 <span>{story.author.nickname || story.author.name}</span>
               </div>
               
-
+              {story.name && (
+                <div className="flex items-center gap-1">
+                  <Coffee className="w-4 h-4" />
+                  <span>Over {story.name}</span>
+                </div>
+              )}
               
               {story.publishedAt && (
                 <div className="flex items-center gap-1">

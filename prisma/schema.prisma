@@ -370,6 +370,7 @@ model UserProfile {
 model Story {
   id          String   @id @default(cuid())
   title       String
+  name        String?  // Optional name for the story
   content     String   @db.Text
   excerpt     String?  @db.Text
   status      StoryStatus @default(DRAFT)

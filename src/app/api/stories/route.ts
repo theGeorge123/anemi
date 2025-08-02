@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       title,
+      name,
       content,
       excerpt,
       images = [],
@@ -118,6 +119,7 @@ export async function POST(request: NextRequest) {
     const story = await prisma.story.create({
       data: {
         title,
+        name: name || null,
         content,
         excerpt,
         images,

@@ -47,16 +47,13 @@ export async function POST(request: NextRequest) {
     )
     
     const { data: invite, error: inviteError } = await supabase
-      .from('invites')
+      .from('MeetupInvite')
       .select(`
         *,
-        meetups (
-          organizer_name,
-          organizer_email,
-          city,
-          available_dates,
-          available_times,
-          cafes (name, address)
+        cafe: cafeId (
+          name,
+          address,
+          city
         )
       `)
       .eq('token', inviteCode)
@@ -95,17 +92,17 @@ export async function POST(request: NextRequest) {
         const result = await sendInviteEmail({
           to: email,
           cafe: {
-            name: invite.meetups.cafes?.name || 'Gekozen café',
-            address: invite.meetups.cafes?.address || 'Adres volgt',
+            name: invite.cafe?.name || 'Gekozen café',
+            address: invite.cafe?.address || 'Adres volgt',
             priceRange: '€€',
             rating: 4.5,
             openHours: '09:00-18:00',
           },
-          dates: invite.meetups.available_dates || [],
-          times: invite.meetups.available_times || [],
+          dates: invite.availableDates || [],
+          times: invite.availableTimes || [],
           token: inviteCode,
           inviteLink: `${process.env.NEXT_PUBLIC_SITE_URL}/invite/${inviteCode}`,
-          organizerName: invite.meetups.organizer_name,
+          organizerName: invite.organizerName,
         })
         
         console.log(`✅ Email sent successfully to: ${email}`)

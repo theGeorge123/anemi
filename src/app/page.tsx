@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin, Search, Info, Star, MessageCircle, Clock, Globe } from 'lucide-react';
+import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin, Search, Info, Star, MessageCircle, Clock, Globe, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense, lazy } from 'react';
 import { LoginStatus } from '@/components/LoginStatus';
@@ -61,9 +61,44 @@ export default function HomePage() {
           }>
             <LoginStatus />
           </Suspense>
-          
-          {/* Find My Meetups section for non-logged in users */}
-          <div className="mt-12 sm:mt-16 p-4 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl border-2 border-amber-200 shadow-lg mx-2 sm:mx-0">
+        </div>
+      </div>
+
+      {/* Bekijk Verhalen Sectie */}
+      <div className="px-4 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="p-4 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl border-2 border-amber-200 shadow-lg">
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-md">
+                <span className="text-2xl sm:text-3xl">📖</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-3 sm:mb-4 px-2">
+                Coffee Meeting Verhalen
+              </h3>
+              <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6 leading-relaxed px-4">
+                Ontdek inspirerende verhalen van echte ontmoetingen
+              </p>
+              <p className="text-amber-700 font-medium text-base sm:text-lg px-4">
+                Lees ervaringen van anderen en deel je eigen verhaal →
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+                <Link href="/stories">
+                  <Coffee className="w-5 h-5 mr-2" />
+                  Bekijk Verhalen
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Find My Meetups section for non-logged in users */}
+      <div className="px-4 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="p-4 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl border-2 border-amber-200 shadow-lg">
             <div className="text-center mb-6 sm:mb-8">
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-md">
                 <span className="text-2xl sm:text-3xl">🔍</span>
@@ -107,126 +142,111 @@ export default function HomePage() {
           {/* Header */}
           <div className="text-center mb-12 sm:mb-16 lg:mb-20">
             <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-lg">
-              <Info className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
+              <Coffee className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-amber-700" />
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-foreground mb-4 sm:mb-6 leading-tight">
-              Meer Informatie Over{' '}
-              <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                Anemi Meets
-              </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+              Meer Informatie
             </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              Ontdek hoe wij de behoefte aan echte connecties vergroten, beginnend met een kopje koffie
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Ontdek hoe Anemi Meets je helpt om echte connecties te maken over een kopje koffie
             </p>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-12 sm:mb-16 lg:mb-20">
+          {/* Feature Grid */}
+          <div className="grid gap-6 sm:gap-8 lg:gap-10 sm:grid-cols-2 lg:grid-cols-3 mb-12 sm:mb-16 lg:mb-20">
             {/* Feature 1 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 Echte Connecties
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                In een digitale wereld vergeten we soms de waarde van face-to-face ontmoetingen. 
-                Anemi Meets maakt het eenvoudig om echte connecties te maken over een kopje koffie.
+              <p className="text-gray-600 leading-relaxed">
+                Maak betekenisvolle ontmoetingen mogelijk door mensen te verbinden over gedeelde interesses en lokale koffieplekken.
               </p>
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 Lokale Ontdekkingen
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                Ontdek geweldige cafés in je stad die je misschien nog niet kende. 
-                Van verborgen pareltjes tot populaire hotspots - wij helpen je de perfecte plek te vinden.
+              <p className="text-gray-600 leading-relaxed">
+                Ontdek verborgen parels in je stad met onze uitgebreide database van lokale koffieplekken en cafés.
               </p>
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 Flexibele Planning
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                Kies uit meerdere data en tijden die voor iedereen werken. 
-                Geen gedoe meer met eindeloze WhatsApp berichten om een tijd af te spreken.
+              <p className="text-gray-600 leading-relaxed">
+                Plan ontmoetingen die voor iedereen werken met flexibele datum- en tijdselectie opties.
               </p>
             </div>
 
             {/* Feature 4 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
                 Eenvoudige Communicatie
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                Stuur één uitnodiging en laat iedereen direct reageren. 
-                Geen groepsapps meer nodig - alles gebeurt op één plek.
+              <p className="text-gray-600 leading-relaxed">
+                Deel uitnodigingen via WhatsApp of directe links voor naadloze communicatie met je gasten.
               </p>
             </div>
 
             {/* Feature 5 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
-                Persoonlijke Ervaring
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+                Persoonlijke Ervaringen
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                Elke meetup is uniek en persoonlijk. Van de cafe keuze tot de timing - 
-                alles wordt aangepast aan jouw voorkeuren en die van je vrienden.
+              <p className="text-gray-600 leading-relaxed">
+                Deel je coffee meeting verhalen en inspireer anderen met echte ervaringen en connecties.
               </p>
             </div>
 
             {/* Feature 6 */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-3 sm:mb-4">
-                Nederlandse Steden
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+                Veilige Ontmoetingen
               </h3>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-                Momenteel actief in Amsterdam, Rotterdam, Utrecht, Den Haag en Rhoon. 
-                Meer steden komen eraan! Suggesties zijn altijd welkom.
+              <p className="text-gray-600 leading-relaxed">
+                Ontmoet mensen in openbare, vertrouwde locaties met transparante communicatie en duidelijke afspraken.
               </p>
             </div>
           </div>
 
           {/* Call to Action */}
           <div className="text-center">
-            <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-3xl p-8 sm:p-12 lg:p-16 border-2 border-amber-200 shadow-lg">
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-4 sm:mb-6">
-                Klaar om te Herverbinden? ☕
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-8 sm:p-12 border-2 border-amber-200 shadow-lg">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
+                Klaar om te beginnen?
               </h3>
-              <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto">
-                Start vandaag nog met het plannen van je eerste koffie meetup en ervaar het verschil van echte connecties.
+              <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
+                Start je eerste coffee meeting en maak echte connecties
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-                <Button asChild size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <div className="flex justify-center">
+                <Button asChild size="lg" className="text-lg px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
                   <Link href="/create">
-                    <Coffee className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                    <Users className="w-5 h-5 mr-2" />
                     Start een Meetup
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
-                  <Link href="/contact">
-                    <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-                    Contact
                   </Link>
                 </Button>
               </div>

@@ -35,44 +35,32 @@ export async function GET(request: NextRequest) {
       where.authorId = authorId
     }
 
-    // Get stories with author and meetup info
-    const stories = await prisma.story.findMany({
-      where,
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            nickname: true,
-            image: true
-          }
-        },
-        meetup: {
-          select: {
-            id: true,
-            organizerName: true,
-            cafe: {
-              select: {
-                name: true,
-                city: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            likes: true,
-            comments: true
-          }
-        }
-      },
-      orderBy: {
-        publishedAt: 'desc'
-      },
-      skip,
-      take: limit
-    })
+                    // Get stories with author info
+                const stories = await prisma.story.findMany({
+                  where,
+                  include: {
+                    author: {
+                      select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        nickname: true,
+                        image: true
+                      }
+                    },
+                    _count: {
+                      select: {
+                        likes: true,
+                        comments: true
+                      }
+                    }
+                  },
+                  orderBy: {
+                    publishedAt: 'desc'
+                  },
+                  skip,
+                  take: limit
+                })
 
     // Get total count for pagination
     const total = await prisma.story.count({ where })
@@ -116,7 +104,6 @@ export async function POST(request: NextRequest) {
       excerpt,
       images = [],
       tags = [],
-      meetupId,
       status = 'DRAFT'
     } = body
 
@@ -137,7 +124,6 @@ export async function POST(request: NextRequest) {
         tags,
         status: status as any,
         authorId: user.id,
-        meetupId: meetupId || null,
         publishedAt: status === 'PUBLISHED' ? new Date() : null
       },
       include: {
@@ -148,18 +134,6 @@ export async function POST(request: NextRequest) {
             email: true,
             nickname: true,
             image: true
-          }
-        },
-        meetup: {
-          select: {
-            id: true,
-            organizerName: true,
-            cafe: {
-              select: {
-                name: true,
-                city: true
-              }
-            }
           }
         }
       }

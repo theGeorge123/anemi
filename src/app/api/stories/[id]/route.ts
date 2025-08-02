@@ -25,19 +25,6 @@ export async function GET(
             image: true
           }
         },
-        meetup: {
-          select: {
-            id: true,
-            organizerName: true,
-            cafe: {
-              select: {
-                name: true,
-                city: true,
-                address: true
-              }
-            }
-          }
-        },
         _count: {
           select: {
             likes: true,

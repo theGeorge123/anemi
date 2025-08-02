@@ -11,14 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Coffee, Save, Eye, X, Plus, ArrowLeft, Users, Heart, Share2, Lightbulb } from 'lucide-react'
 import { useSupabase } from '@/components/SupabaseProvider'
 
-interface Meetup {
-  id: string
-  organizerName: string
-  cafe: {
-    name: string
-    city: string
-  }
-}
+
 
 export default function CreateStoryPage() {
   const router = useRouter()
@@ -32,36 +25,10 @@ export default function CreateStoryPage() {
     content: '',
     excerpt: '',
     tags: [] as string[],
-    meetupId: '',
     status: 'DRAFT' as 'DRAFT' | 'PUBLISHED'
   })
   
   const [newTag, setNewTag] = useState('')
-  const [meetups, setMeetups] = useState<Meetup[]>([])
-
-  const fetchMeetups = useCallback(async () => {
-    try {
-      const response = await fetch('/api/meetups', {
-        headers: {
-          'Authorization': `Bearer ${user?.id}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setMeetups(data.meetups || [])
-      }
-    } catch (error) {
-      console.error('Error fetching meetups:', error)
-    }
-  }, [user?.id])
-
-  // Fetch user's meetups
-  useEffect(() => {
-    if (user) {
-      fetchMeetups()
-    }
-  }, [user, fetchMeetups])
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
@@ -317,29 +284,7 @@ export default function CreateStoryPage() {
                 </CardContent>
               </Card>
 
-              {/* Meetup Link */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Link aan Meetup</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <select
-                    value={formData.meetupId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, meetupId: e.target.value }))}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="">Geen meetup linken</option>
-                    {meetups.map((meetup) => (
-                      <option key={meetup.id} value={meetup.id}>
-                        {meetup.organizerName} - {meetup.cafe.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-600 mt-2">
-                    Optioneel: link aan een bestaande coffee meeting
-                  </p>
-                </CardContent>
-              </Card>
+              
 
               {/* Actions */}
               <Card>

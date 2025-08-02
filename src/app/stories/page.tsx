@@ -28,14 +28,7 @@ interface Story {
     nickname?: string
     image?: string
   }
-  meetup?: {
-    id: string
-    organizerName: string
-    cafe: {
-      name: string
-      city: string
-    }
-  }
+
   _count: {
     likes: number
     comments: number
@@ -144,12 +137,7 @@ function StoryCard({ story }: { story: Story }) {
             <span>{story.author.nickname || story.author.name}</span>
           </div>
           
-          {story.meetup && (
-            <div className="flex items-center gap-1">
-              <Coffee className="w-4 h-4" />
-              <span>{story.meetup.cafe.name}</span>
-            </div>
-          )}
+
           
           {story.publishedAt && (
             <div className="flex items-center gap-1">

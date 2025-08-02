@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, Share2, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 interface Story {
   id: string
@@ -43,11 +44,17 @@ interface Story {
 
 function StoryCard({ story }: { story: Story }) {
   const router = useRouter()
+  const { user } = useSupabase()
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(story._count.likes)
   const [viewCount, setViewCount] = useState(story.viewCount)
 
   const handleLike = async () => {
+    if (!user) {
+      alert('Je moet ingelogd zijn om een verhaal te liken')
+      return
+    }
+
     try {
       const response = await fetch(`/api/stories/${story.id}/like`, {
         method: isLiked ? 'DELETE' : 'POST',
@@ -60,10 +67,13 @@ function StoryCard({ story }: { story: Story }) {
         setIsLiked(!isLiked)
         setLikeCount(isLiked ? likeCount - 1 : likeCount + 1)
       } else {
-        console.error('Failed to like/unlike story')
+        const errorData = await response.json()
+        console.error('Failed to like/unlike story:', errorData)
+        alert(errorData.error || 'Fout bij het liken van het verhaal')
       }
     } catch (error) {
       console.error('Error liking story:', error)
+      alert('Er is een fout opgetreden bij het liken van het verhaal')
     }
   }
 
@@ -159,7 +169,12 @@ function StoryCard({ story }: { story: Story }) {
             </div>
             <button
               onClick={handleLike}
-              className="flex items-center gap-1 hover:text-red-500 transition-colors"
+              className={`flex items-center gap-1 transition-colors ${
+                user 
+                  ? 'hover:text-red-500 cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+              title={user ? 'Like dit verhaal' : 'Log in om te liken'}
             >
               <Heart className={`w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
               <span>{likeCount}</span>

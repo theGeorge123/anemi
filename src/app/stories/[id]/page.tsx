@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, ArrowLeft, Send, Share2, Users, ThumbsUp } from 'lucide-react'
+import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, ArrowLeft, Send, Share2, Users, ThumbsUp, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 interface Story {
   id: string
@@ -58,6 +59,7 @@ interface Comment {
 
 export default function StoryPage({ params }: { params: { id: string } }) {
   const router = useRouter()
+  const { user } = useSupabase()
   const [story, setStory] = useState<Story | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
   const [isLiked, setIsLiked] = useState(false)
@@ -103,6 +105,11 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   }, [params.id])
 
   const handleLike = async () => {
+    if (!user) {
+      alert('Je moet ingelogd zijn om een verhaal te liken')
+      return
+    }
+
     try {
       const response = await fetch(`/api/stories/${params.id}/like`, {
         method: isLiked ? 'DELETE' : 'POST',
@@ -115,15 +122,23 @@ export default function StoryPage({ params }: { params: { id: string } }) {
         setIsLiked(!isLiked)
         setLikeCount(isLiked ? likeCount - 1 : likeCount + 1)
       } else {
-        console.error('Failed to like/unlike story')
+        const errorData = await response.json()
+        console.error('Failed to like/unlike story:', errorData)
+        alert(errorData.error || 'Fout bij het liken van het verhaal')
       }
     } catch (error) {
       console.error('Error liking story:', error)
+      alert('Er is een fout opgetreden bij het liken van het verhaal')
     }
   }
 
   const handleComment = async () => {
     if (!newComment.trim()) return
+
+    if (!user) {
+      alert('Je moet ingelogd zijn om een reactie te plaatsen')
+      return
+    }
 
     setSubmittingComment(true)
     try {
@@ -142,10 +157,13 @@ export default function StoryPage({ params }: { params: { id: string } }) {
         setComments(prev => [data.comment, ...prev])
         setNewComment('')
       } else {
-        console.error('Failed to post comment')
+        const errorData = await response.json()
+        console.error('Failed to post comment:', errorData)
+        alert(errorData.error || 'Fout bij het plaatsen van reactie')
       }
     } catch (error) {
       console.error('Error posting comment:', error)
+      alert('Er is een fout opgetreden bij het plaatsen van je reactie')
     } finally {
       setSubmittingComment(false)
     }
@@ -292,7 +310,12 @@ export default function StoryPage({ params }: { params: { id: string } }) {
                 </div>
                 <button
                   onClick={handleLike}
-                  className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                  className={`flex items-center gap-1 transition-colors ${
+                    user 
+                      ? 'hover:text-red-500 cursor-pointer' 
+                      : 'opacity-50 cursor-not-allowed'
+                  }`}
+                  title={user ? 'Like dit verhaal' : 'Log in om te liken'}
                 >
                   <Heart className={`w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
                   <span>{likeCount} likes</span>
@@ -329,28 +352,45 @@ export default function StoryPage({ params }: { params: { id: string } }) {
           </CardHeader>
           <CardContent>
             {/* Add Comment */}
-            <div className="mb-6 p-4 bg-amber-50 rounded-lg">
-              <Textarea
-                placeholder="Wat vind je van dit verhaal? Deel je gedachten..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="mb-3"
-                rows={3}
-              />
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-600">
-                  💡 Je reactie helpt anderen om geïnspireerd te raken
+            {user ? (
+              <div className="mb-6 p-4 bg-amber-50 rounded-lg">
+                <Textarea
+                  placeholder="Wat vind je van dit verhaal? Deel je gedachten..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="mb-3"
+                  rows={3}
+                />
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-600">
+                    💡 Je reactie helpt anderen om geïnspireerd te raken
+                  </p>
+                  <Button
+                    onClick={handleComment}
+                    disabled={submittingComment || !newComment.trim()}
+                    className="flex items-center gap-2"
+                  >
+                    <Send className="w-4 h-4" />
+                    {submittingComment ? 'Versturen...' : 'Reactie plaatsen'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <LogIn className="w-5 h-5 text-blue-600" />
+                  <h4 className="font-medium text-blue-800">Inloggen vereist</h4>
+                </div>
+                <p className="text-sm text-blue-700 mb-4">
+                  Log in om je reactie te plaatsen en deel je gedachten met de community
                 </p>
-                <Button
-                  onClick={handleComment}
-                  disabled={submittingComment || !newComment.trim()}
-                  className="flex items-center gap-2"
-                >
-                  <Send className="w-4 h-4" />
-                  {submittingComment ? 'Versturen...' : 'Reactie plaatsen'}
+                <Button asChild size="sm">
+                  <Link href="/auth/signin">
+                    Inloggen om te reageren
+                  </Link>
                 </Button>
               </div>
-            </div>
+            )}
 
             {/* Comments List */}
             <div className="space-y-4">

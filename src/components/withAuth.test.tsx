@@ -1,77 +1,60 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { useRouter } from 'next/navigation'
+import { render, screen, waitFor } from '@testing-library/react'
+import { useRouter, usePathname } from 'next/navigation'
 import { useSupabase } from './SupabaseProvider'
 import { withAuth } from './withAuth'
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}))
+jest.mock('next/navigation')
+jest.mock('./SupabaseProvider')
 
-// Mock Supabase
-jest.mock('./SupabaseProvider', () => ({
-  useSupabase: jest.fn(),
-}))
+const mockUseRouter = useRouter as jest.Mock
+const mockUsePathname = usePathname as jest.Mock
+const mockUseSupabase = useSupabase as jest.Mock
 
-// Test component
 const TestComponent = () => <div>Protected Content</div>
 
 describe('withAuth HOC', () => {
-  const mockRouter = {
-    replace: jest.fn(),
-  }
+  let mockReplace: jest.Mock
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+    mockReplace = jest.fn()
+    mockUseRouter.mockReturnValue({ replace: mockReplace })
+    mockUsePathname.mockReturnValue('/dashboard')
   })
 
-  it('renders protected component when authenticated', () => {
-    ;(useSupabase as jest.Mock).mockReturnValue({
+  it('shows loading state when Supabase is loading', () => {
+    mockUseSupabase.mockReturnValue({ loading: true, session: null })
+    const ProtectedComponent = withAuth(TestComponent)
+    render(<ProtectedComponent />)
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('redirects to login when not authenticated', async () => {
+    mockUseSupabase.mockReturnValue({ loading: false, session: null })
+    const ProtectedComponent = withAuth(TestComponent)
+    render(<ProtectedComponent />)
+    
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/auth/signin?redirect=/dashboard')
+    })
+  })
+
+  it('does not redirect when on an auth page', () => {
+    mockUsePathname.mockReturnValue('/auth/signin')
+    mockUseSupabase.mockReturnValue({ loading: false, session: null })
+    const ProtectedComponent = withAuth(TestComponent)
+    render(<ProtectedComponent />)
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  it('renders component when authenticated', () => {
+    mockUseSupabase.mockReturnValue({
+      loading: false,
       session: { user: { id: 'test-user' } },
-      client: { auth: {} },
     })
-
     const ProtectedComponent = withAuth(TestComponent)
     render(<ProtectedComponent />)
-    
-    expect(screen.getByText('Protected Content')).toBeTruthy()
-  })
-
-  it('redirects to login when not authenticated', () => {
-    ;(useSupabase as jest.Mock).mockReturnValue({
-      session: null,
-      client: { auth: {} },
-    })
-
-    const ProtectedComponent = withAuth(TestComponent)
-    render(<ProtectedComponent />)
-    
-    expect(mockRouter.replace).toHaveBeenCalledWith('/login')
-  })
-
-  it('shows loading when client is not available', () => {
-    ;(useSupabase as jest.Mock).mockReturnValue({
-      session: null,
-      client: null,
-    })
-
-    const ProtectedComponent = withAuth(TestComponent)
-    render(<ProtectedComponent />)
-    
-    expect(screen.getByText('Loading...')).toBeTruthy()
-  })
-
-  it('does not redirect when client is not available', () => {
-    ;(useSupabase as jest.Mock).mockReturnValue({
-      session: null,
-      client: null,
-    })
-
-    const ProtectedComponent = withAuth(TestComponent)
-    render(<ProtectedComponent />)
-    
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(screen.getByText('Protected Content')).toBeInTheDocument()
   })
 }) 

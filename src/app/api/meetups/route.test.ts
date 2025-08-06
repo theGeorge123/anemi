@@ -1,5 +1,14 @@
-import { NextRequest } from 'next/server'
 import { GET } from './route'
+import { NextResponse } from 'next/server'
+
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn((data, options) => ({
+      json: async () => data,
+      status: options?.status || 200,
+    })),
+  },
+}))
 import { prisma } from '@/lib/prisma'
 
 // Mock Prisma

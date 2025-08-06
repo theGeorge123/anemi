@@ -29,9 +29,9 @@ function SignUpPageContent() {
   }, {
     email: [Validators.required, Validators.email],
     password: [Validators.required, Validators.minLength(8)],
-    confirmPassword: [Validators.required, (value: string) => {
-      if (value !== form.values.password) {
-        return '❌ Passwords do not match'
+    confirmPassword: [Validators.required, (value: string, values: any) => {
+      if (value !== values.password) {
+        return 'Wachtwoorden komen niet overeen.'
       }
       return true
     }],
@@ -115,6 +115,7 @@ function SignUpPageContent() {
       console.error('Signup error:', err)
       // Don't show toast if we already set a specific error
       if (!specificError) {
+        setSpecificError(err.message)
         console.error('Registration error:', err)
       }
     },

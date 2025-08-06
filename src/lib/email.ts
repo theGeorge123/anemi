@@ -105,7 +105,7 @@ export async function sendEmail(options: EmailOptions) {
     // Check if emails are disabled
     if (process.env.DISABLE_EMAILS === 'true') {
       console.log('📧 Email disabled (DISABLE_EMAILS=true), skipping email to:', options.to);
-      return { id: 'disabled', to: options.to };
+      return { success: true, data: { id: 'disabled', to: options.to } };
     }
 
     // Validate required environment variables
@@ -136,16 +136,17 @@ export async function sendEmail(options: EmailOptions) {
     }
 
     console.log('✅ Email sent successfully:', { id: data?.id, to: options.to });
-    return data;
+    return { success: true, data };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('❌ Failed to send email:', {
-      error: error instanceof Error ? error.message : error,
+      error: errorMessage,
       to: options.to,
       subject: options.subject,
       hasResendKey: !!process.env.RESEND_API_KEY,
       hasEmailFrom: !!process.env.EMAIL_FROM
     });
-    throw error;
+    return { success: false, error: errorMessage };
   }
 }
 

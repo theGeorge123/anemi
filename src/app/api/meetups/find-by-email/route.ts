@@ -31,22 +31,14 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({
-      meetups: meetups.map(meetup => ({
-        id: meetup.id,
-        token: meetup.token,
-        organizerName: meetup.organizerName,
-        organizerEmail: meetup.organizerEmail,
-        status: meetup.status,
-        createdAt: meetup.createdAt,
-        expiresAt: meetup.expiresAt,
-        cafe: meetup.cafe,
-        availableDates: meetup.availableDates,
-        availableTimes: meetup.availableTimes,
-        chosenDate: meetup.chosenDate,
-        chosenTime: meetup.chosenTime,
-        inviteeName: meetup.inviteeName,
-        inviteeEmail: meetup.inviteeEmail
-      }))
+      meetups: meetups.map(meetup => {
+        const { createdAt, expiresAt, ...rest } = meetup;
+        return {
+          ...rest,
+          createdAt: createdAt.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+        };
+      }),
     })
   } catch (error) {
     console.error('❌ Error finding meetups by email:', error)

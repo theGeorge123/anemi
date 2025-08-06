@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useFormValidation<T extends Record<string, any>>(
   initialValues: T,
@@ -17,7 +17,7 @@ export function useFormValidation<T extends Record<string, any>>(
     fieldsToValidate.forEach(field => {
       const fieldRules = validationRules[field] || [];
       for (const rule of fieldRules) {
-        const result = rule(values[field]);
+        const result = rule(values[field], values);
         if (result !== true) {
           newErrors[field] = result as string;
           isValid = false;
@@ -30,6 +30,12 @@ export function useFormValidation<T extends Record<string, any>>(
     setErrors(newErrors);
     return isValid;
   };
+
+  useEffect(() => {
+    if (touched.confirmPassword) {
+      validate('confirmPassword');
+    }
+  }, [values.password]);
 
   const handleChange = (field: keyof T) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;

@@ -1,17 +1,17 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act, waitFor } from '@testing-library/react'
 import { SupabaseProvider, useSupabase } from './SupabaseProvider'
 
 // Mock Supabase client
 jest.mock('@/lib/supabase-browser', () => ({
-  supabase: {
+  getSupabaseClient: jest.fn(() => ({
     auth: {
       onAuthStateChange: jest.fn(() => ({
         data: { subscription: { unsubscribe: jest.fn() } },
       })),
       getSession: jest.fn(() => Promise.resolve({ data: { session: null } })),
     },
-  },
+  })),
 }))
 
 // Test component to use the hook
@@ -26,25 +26,33 @@ const TestComponent = () => {
 }
 
 describe('SupabaseProvider', () => {
-  it('renders children', () => {
-    render(
-      <SupabaseProvider>
-        <div>Test content</div>
-      </SupabaseProvider>
-    )
+  it('renders children', async () => {
+    await act(async () => {
+      render(
+        <SupabaseProvider>
+          <div>Test content</div>
+        </SupabaseProvider>
+      )
+    })
     
-    expect(screen.getByText('Test content')).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getByText('Test content')).toBeTruthy()
+    })
   })
 
-  it('provides context to children', () => {
-    render(
-      <SupabaseProvider>
-        <TestComponent />
-      </SupabaseProvider>
-    )
+  it('provides context to children', async () => {
+    await act(async () => {
+      render(
+        <SupabaseProvider>
+          <TestComponent />
+        </SupabaseProvider>
+      )
+    })
     
-    expect(screen.getByTestId('session')).toBeTruthy()
-    expect(screen.getByTestId('client')).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getByTestId('session')).toBeTruthy()
+      expect(screen.getByTestId('client')).toBeTruthy()
+    })
   })
 
   it('throws error when useSupabase is used outside provider', () => {
@@ -53,7 +61,7 @@ describe('SupabaseProvider', () => {
     
     expect(() => {
       render(<TestComponent />)
-    }).toThrow('useSupabase must be used within SupabaseProvider')
+    }).toThrow('useSupabase must be used within a SupabaseProvider')
     
     consoleSpy.mockRestore()
   })

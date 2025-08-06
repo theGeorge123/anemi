@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server'
 import { POST } from './route'
 import { prisma } from '@/lib/prisma'
 
@@ -13,17 +12,30 @@ jest.mock('@/lib/prisma', () => ({
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>
 
+import { NextResponse } from 'next/server'
+
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn((data, options) => ({
+      json: async () => data,
+      status: options?.status || 200,
+    })),
+  },
+}))
+
+const createRequest = (body: any) => {
+  return {
+    json: async () => body,
+  } as unknown as Request
+}
+
 describe('/api/meetups/find-by-email', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it('should return 400 when email is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({}),
-    })
-
+    const request = createRequest({})
     const response = await POST(request)
     const data = await response.json()
 
@@ -32,11 +44,7 @@ describe('/api/meetups/find-by-email', () => {
   })
 
   it('should return 400 when email is empty', async () => {
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({ email: '' }),
-    })
-
+    const request = createRequest({ email: '' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -71,11 +79,7 @@ describe('/api/meetups/find-by-email', () => {
 
     ;(mockPrisma.meetupInvite.findMany as jest.Mock).mockResolvedValue(mockMeetups)
 
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({ email: 'jane@example.com' }),
-    })
-
+    const request = createRequest({ email: 'jane@example.com' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -87,8 +91,8 @@ describe('/api/meetups/find-by-email', () => {
       organizerName: 'John Doe',
       organizerEmail: 'john@example.com',
       status: 'pending',
-      createdAt: expect.any(String),
-      expiresAt: expect.any(String),
+      createdAt: mockMeetups[0].createdAt.toISOString(),
+      expiresAt: mockMeetups[0].expiresAt.toISOString(),
       cafe: {
         id: 'cafe1',
         name: 'Coffee Shop',
@@ -123,11 +127,7 @@ describe('/api/meetups/find-by-email', () => {
   it('should handle database errors gracefully', async () => {
     ;(mockPrisma.meetupInvite.findMany as jest.Mock).mockRejectedValue(new Error('Database error'))
 
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({ email: 'test@example.com' }),
-    })
-
+    const request = createRequest({ email: 'test@example.com' })
     const response = await POST(request)
     const data = await response.json()
 
@@ -139,11 +139,7 @@ describe('/api/meetups/find-by-email', () => {
     const mockMeetups: any[] = []
     ;(mockPrisma.meetupInvite.findMany as jest.Mock).mockResolvedValue(mockMeetups)
 
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({ email: '  TEST@EXAMPLE.COM  ' }),
-    })
-
+    const request = createRequest({ email: '  TEST@EXAMPLE.COM  ' })
     await POST(request)
 
     expect(mockPrisma.meetupInvite.findMany).toHaveBeenCalledWith({
@@ -166,11 +162,7 @@ describe('/api/meetups/find-by-email', () => {
   it('should return empty array when no meetups found', async () => {
     ;(mockPrisma.meetupInvite.findMany as jest.Mock).mockResolvedValue([])
 
-    const request = new NextRequest('http://localhost:3000/api/meetups/find-by-email', {
-      method: 'POST',
-      body: JSON.stringify({ email: 'nonexistent@example.com' }),
-    })
-
+    const request = createRequest({ email: 'nonexistent@example.com' })
     const response = await POST(request)
     const data = await response.json()
 

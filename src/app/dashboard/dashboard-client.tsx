@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { EditMeetupModal } from '@/components/meetups/EditMeetupModal'
-import { Home, Users, Calendar, Clock, Eye, Filter, SortAsc, SortDesc, MapPin } from 'lucide-react'
+import { Home, Users, Calendar, Clock, Eye, Filter, SortAsc, SortDesc, MapPin, Edit, Trash2, Eye as EyeIcon, Heart, MessageCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 interface MeetupInvite {
@@ -282,6 +282,218 @@ function ViewResponsesModal({ meetup, isOpen, onClose }: ViewResponsesModalProps
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+interface Story {
+  id: string
+  title: string
+  name?: string
+  excerpt?: string
+  content: string
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+  featured: boolean
+  viewCount: number
+  likeCount: number
+  images: string[]
+  tags: string[]
+  publishedAt?: string
+  createdAt: string
+  author: {
+    id: string
+    name: string
+    nickname?: string
+    image?: string
+  }
+  _count: {
+    likes: number
+    comments: number
+  }
+}
+
+function StoriesSection() {
+  const [stories, setStories] = useState<Story[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const response = await fetch('/api/stories?authorId=me&limit=10', {
+          cache: 'no-store'
+        })
+        
+        if (!response.ok) {
+          setError('Failed to fetch stories')
+          return
+        }
+        
+        const data = await response.json()
+        setStories(data.stories || [])
+      } catch (error) {
+        console.error('Error fetching stories:', error)
+        setError('Failed to fetch stories')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStories()
+  }, [])
+
+  const handleDelete = async (storyId: string) => {
+    if (!confirm('Weet je zeker dat je dit verhaal wilt verwijderen?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/stories/${storyId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setStories(prev => prev.filter(story => story.id !== storyId))
+        alert('Verhaal succesvol verwijderd!')
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || 'Fout bij het verwijderen van het verhaal')
+      }
+    } catch (error) {
+      console.error('Error deleting story:', error)
+      alert('Er is een fout opgetreden bij het verwijderen van het verhaal')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto mb-4"></div>
+        <p className="text-gray-600">Verhalen laden...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-600 mb-4">Er is een fout opgetreden bij het laden van je verhalen.</p>
+        <Button onClick={() => window.location.reload()}>
+          Opnieuw proberen
+        </Button>
+      </div>
+    )
+  }
+
+  if (stories.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-4xl mb-4">📝</div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Nog geen verhalen</h3>
+        <p className="text-gray-600 mb-6">
+          Deel je eerste coffee meeting verhaal en inspireer anderen!
+        </p>
+        <Button asChild>
+          <Link href="/stories/create">
+            Schrijf je eerste verhaal
+          </Link>
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {stories.map((story) => (
+        <Card key={story.id} className="hover:shadow-lg transition-shadow duration-200">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+                  <Link 
+                    href={`/stories/${story.id}`}
+                    className="hover:text-amber-600 transition-colors"
+                  >
+                    {story.title}
+                  </Link>
+                </h3>
+                {story.excerpt && (
+                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                    {story.excerpt}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-1 ml-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                >
+                  <Link href={`/stories/${story.id}`}>
+                    <EyeIcon className="w-3 h-3" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                >
+                  <Link href={`/stories/${story.id}`}>
+                    <Edit className="w-3 h-3" />
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(story.id)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+              <div className="flex items-center gap-1">
+                <EyeIcon className="w-3 h-3" />
+                <span>{story.viewCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Heart className="w-3 h-3" />
+                <span>{story._count.likes}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <MessageCircle className="w-3 h-3" />
+                <span>{story._count.comments}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <Badge 
+                variant={story.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                className="text-xs"
+              >
+                {story.status === 'PUBLISHED' ? 'Gepubliceerd' : 'Concept'}
+              </Badge>
+              
+              {story.tags.length > 0 && (
+                <div className="flex gap-1">
+                  {story.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                  {story.tags.length > 2 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{story.tags.length - 2}
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   )
 }
@@ -959,6 +1171,23 @@ export default function DashboardClient() {
             </Button>
           </div>
         )}
+
+        {/* Stories Section */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">📝 Mijn Verhalen</h2>
+              <p className="text-gray-600 mt-1">Beheer je coffee meeting verhalen</p>
+            </div>
+            <Button asChild className="bg-amber-600 hover:bg-amber-700">
+              <Link href="/stories/create">
+                ✍️ Nieuw Verhaal
+              </Link>
+            </Button>
+          </div>
+          
+          <StoriesSection />
+        </div>
 
         {/* Edit Modal */}
         {isEditModalOpen && editingMeetup && (

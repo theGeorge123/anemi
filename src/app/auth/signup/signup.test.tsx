@@ -119,7 +119,8 @@ describe('SignUpPage', () => {
     fireEvent.change(screen.getByLabelText('Bevestig Wachtwoord'), { target: { value: 'password123' } })
     fireEvent.click(screen.getByRole('button', { name: 'Account Aanmaken' }))
     
-    const errorMessage = await screen.findByText(/Dit email adres is al geregistreerd/i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('📧 Dit email adres is al geregistreerd. Probeer in te loggen of gebruik een ander email adres.')).toBeInTheDocument()
+    })
   })
 }) 

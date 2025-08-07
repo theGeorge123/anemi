@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, ArrowLeft, Send, Share2, Users, ThumbsUp, LogIn } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, ArrowLeft, Send, Share2, Users, ThumbsUp, LogIn, Edit, Trash2, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/SupabaseProvider'
@@ -62,6 +63,20 @@ export default function StoryPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
   const [newComment, setNewComment] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
+  
+  // Edit functionality
+  const [isEditing, setIsEditing] = useState(false)
+  const [editData, setEditData] = useState({
+    title: '',
+    name: '',
+    content: '',
+    excerpt: '',
+    tags: [] as string[],
+    status: 'DRAFT' as 'DRAFT' | 'PUBLISHED'
+  })
+  const [newTag, setNewTag] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -72,6 +87,16 @@ export default function StoryPage({ params }: { params: { id: string } }) {
           setStory(data.story)
           setLikeCount(data.story._count.likes)
           setViewCount(data.story.viewCount)
+          
+          // Initialize edit data
+          setEditData({
+            title: data.story.title,
+            name: data.story.name || '',
+            content: data.story.content,
+            excerpt: data.story.excerpt || '',
+            tags: data.story.tags,
+            status: data.story.status
+          })
         } else {
           console.error('Failed to fetch story')
         }
@@ -187,6 +212,82 @@ export default function StoryPage({ params }: { params: { id: string } }) {
     }
   }
 
+  // Edit functionality
+  const addTag = () => {
+    if (newTag.trim() && !editData.tags.includes(newTag.trim())) {
+      setEditData(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }))
+      setNewTag('')
+    }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setEditData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }))
+  }
+
+  const handleSaveEdit = async () => {
+    if (!story) return
+    
+    setSaving(true)
+    try {
+      const response = await fetch(`/api/stories/${params.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editData),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setStory(data.story)
+        setIsEditing(false)
+        alert('Verhaal succesvol bijgewerkt!')
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || 'Fout bij het bijwerken van het verhaal')
+      }
+    } catch (error) {
+      console.error('Error updating story:', error)
+      alert('Er is een fout opgetreden bij het bijwerken van het verhaal')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!story || !confirm('Weet je zeker dat je dit verhaal wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.')) {
+      return
+    }
+    
+    setDeleting(true)
+    try {
+      const response = await fetch(`/api/stories/${params.id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        alert('Verhaal succesvol verwijderd!')
+        router.push('/stories')
+      } else {
+        const errorData = await response.json()
+        alert(errorData.error || 'Fout bij het verwijderen van het verhaal')
+      }
+    } catch (error) {
+      console.error('Error deleting story:', error)
+      alert('Er is een fout opgetreden bij het verwijderen van het verhaal')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const isAuthor = user && story && user.id === story.author.id
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-cream-50 to-orange-50">
@@ -249,18 +350,78 @@ export default function StoryPage({ params }: { params: { id: string } }) {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <CardTitle className="text-3xl mb-4">{story.title}</CardTitle>
-                {story.excerpt && (
-                  <CardDescription className="text-lg mb-4">
-                    {story.excerpt}
-                  </CardDescription>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <Input
+                      value={editData.title}
+                      onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                      className="text-2xl font-bold"
+                      placeholder="Titel van je verhaal"
+                    />
+                    <Input
+                      value={editData.name}
+                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Naam van de persoon (optioneel)"
+                    />
+                    <Textarea
+                      value={editData.excerpt}
+                      onChange={(e) => setEditData(prev => ({ ...prev, excerpt: e.target.value }))}
+                      placeholder="Korte samenvatting (optioneel)"
+                      rows={2}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <CardTitle className="text-3xl mb-4">{story.title}</CardTitle>
+                    {story.excerpt && (
+                      <CardDescription className="text-lg mb-4">
+                        {story.excerpt}
+                      </CardDescription>
+                    )}
+                  </>
                 )}
               </div>
-              {story.featured && (
-                <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                  ⭐ Featured
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {story.featured && (
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    ⭐ Featured
+                  </Badge>
+                )}
+                {isAuthor && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(!isEditing)}
+                      className="flex items-center gap-2"
+                    >
+                      {isEditing ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+                      {isEditing ? 'Annuleren' : 'Bewerken'}
+                    </Button>
+                    {isEditing && (
+                      <Button
+                        onClick={handleSaveEdit}
+                        disabled={saving}
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <Save className="w-4 h-4" />
+                        {saving ? 'Opslaan...' : 'Opslaan'}
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {deleting ? 'Verwijderen...' : 'Verwijderen'}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="flex items-center gap-6 text-sm text-gray-500">
@@ -286,21 +447,94 @@ export default function StoryPage({ params }: { params: { id: string } }) {
           </CardHeader>
           
           <CardContent>
-            <div className="prose prose-lg max-w-none mb-8">
-              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                {story.content}
+            {isEditing ? (
+              <div className="space-y-4">
+                <Textarea
+                  value={editData.content}
+                  onChange={(e) => setEditData(prev => ({ ...prev, content: e.target.value }))}
+                  placeholder="Vertel je verhaal..."
+                  rows={12}
+                  className="resize-none"
+                />
+                
+                {/* Tags */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Tags</label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="text"
+                      placeholder="Voeg een tag toe..."
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          addTag()
+                        }
+                      }}
+                    />
+                    <Button type="button" onClick={addTag} size="sm">
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {editData.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:text-red-500"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Status */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Status</label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={editData.status === 'DRAFT' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setEditData(prev => ({ ...prev, status: 'DRAFT' }))}
+                    >
+                      Concept
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={editData.status === 'PUBLISHED' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setEditData(prev => ({ ...prev, status: 'PUBLISHED' }))}
+                    >
+                      Gepubliceerd
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            {/* Tags */}
-            {story.tags.length > 0 && (
-              <div className="flex gap-2 mb-6">
-                {story.tags.map((tag) => (
-                  <Badge key={tag} variant="outline">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
+            ) : (
+              <>
+                <div className="prose prose-lg max-w-none mb-8">
+                  <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                    {story.content}
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                {story.tags.length > 0 && (
+                  <div className="flex gap-2 mb-6">
+                    {story.tags.map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
             
             {/* Social Actions */}

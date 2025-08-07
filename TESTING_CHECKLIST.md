@@ -1,386 +1,228 @@
-# 🧪 Comprehensive Testing Checklist
+# Testing Checklist for Anemi
 
-## User Types to Test
+## 🧪 Stories Feature Testing
 
-### 1. 🔐 Logged-in User (Organizer)
-### 2. 📧 Non-logged-in User (Invitee)
-### 3. 🆕 New User (Signing up)
-### 4. 👤 Existing User (Logging in)
+### ✅ Core Stories Functionality
+- [ ] **Stories Listing Page** (`/stories`)
+  - [ ] View all published stories
+  - [ ] Story cards display correctly (title, excerpt, author, stats)
+  - [ ] Like/unlike stories (requires login)
+  - [ ] Share stories functionality
+  - [ ] View count increments
+  - [ ] Tags display correctly
+  - [ ] Featured stories badge
+  - [ ] Empty state when no stories
 
----
+- [ ] **Individual Story Page** (`/stories/[id]`)
+  - [ ] Story content displays correctly
+  - [ ] Author information shows
+  - [ ] Like/unlike functionality
+  - [ ] Comment system works
+  - [ ] Share functionality
+  - [ ] View count increments
+  - [ ] Tags display
+  - [ ] Edit/delete buttons for author
+  - [ ] Edit mode works (title, content, excerpt, tags, status)
+  - [ ] Delete confirmation and functionality
 
-## 🔐 Logged-in User (Organizer) Tests
+- [ ] **Create Story Page** (`/stories/create`)
+  - [ ] Form validation (title, content required)
+  - [ ] Tag management (add/remove)
+  - [ ] Draft vs Published status
+  - [ ] Preview functionality
+  - [ ] Save as draft
+  - [ ] Publish story
+  - [ ] Redirect to story page after creation
 
-### ✅ Account & Authentication
-- [ ] **Sign Up Flow**
-  - [ ] Navigate to `/auth/signup`
-  - [ ] Fill in email, password, name
-  - [ ] Verify email verification works
-  - [ ] Check welcome email is received
-  - [ ] Confirm account is created in database
+- [ ] **Dashboard Stories Section**
+  - [ ] User's stories display in dashboard
+  - [ ] Story management (view, edit, delete)
+  - [ ] Story status badges
+  - [ ] Quick stats (views, likes, comments)
+  - [ ] Tags display
+  - [ ] Empty state for new users
 
-- [ ] **Sign In Flow**
-  - [ ] Navigate to `/auth/signin`
-  - [ ] Enter valid credentials
-  - [ ] Verify redirect to dashboard
-  - [ ] Check session persistence
+### ✅ API Endpoints Testing
+- [ ] **GET /api/stories**
+  - [ ] Returns published stories
+  - [ ] Pagination works
+  - [ ] Filtering by status
+  - [ ] Filtering by featured
+  - [ ] Filtering by tag
+  - [ ] Filtering by author (including `authorId=me`)
 
-- [ ] **Account Management**
-  - [ ] Access dashboard at `/dashboard`
-  - [ ] View user stats and meetups
-  - [ ] Check profile information
-  - [ ] Test logout functionality
+- [ ] **POST /api/stories**
+  - [ ] Creates new story
+  - [ ] Validates required fields
+  - [ ] Sets author correctly
+  - [ ] Handles draft vs published status
 
-### ✅ Meetup Creation Flow
-- [ ] **Create New Meetup**
-  - [ ] Navigate to `/create`
-  - [ ] Select city (Amsterdam, Rotterdam, etc.)
-  - [ ] Choose cafe from list
-  - [ ] Set available dates (multiple dates)
-  - [ ] Set available times (multiple times)
-  - [ ] Enter invitee email
-  - [ ] Submit meetup creation
-  - [ ] Verify meetup appears in dashboard
-  - [ ] Check invite email is sent to invitee
+- [ ] **GET /api/stories/[id]**
+  - [ ] Returns individual story
+  - [ ] Increments view count
+  - [ ] Includes author and stats
 
-- [ ] **Meetup Management**
-  - [ ] View meetup details in dashboard
-  - [ ] Edit meetup information
-  - [ ] Delete meetup
-  - [ ] Verify cancellation email is sent
-  - [ ] Check meetup is removed from database
+- [ ] **PUT /api/stories/[id]**
+  - [ ] Updates story (author only)
+  - [ ] Validates ownership
+  - [ ] Handles status changes
+  - [ ] Sets publishedAt when publishing
 
-### ✅ Dashboard Features
-- [ ] **Meetup List**
-  - [ ] View all created meetups
-  - [ ] See meetup status (pending, accepted, confirmed)
-  - [ ] Check organizer badge is shown
-  - [ ] Verify meetup details are correct
+- [ ] **DELETE /api/stories/[id]**
+  - [ ] Soft deletes story (author only)
+  - [ ] Validates ownership
 
-- [ ] **Participant Meetups**
-  - [ ] Accept an invite from another user
-  - [ ] Verify participant badge is shown
-  - [ ] Check meetup appears in dashboard
+- [ ] **POST /api/stories/[id]/like**
+  - [ ] Creates like (authenticated users)
+  - [ ] Prevents duplicate likes
+  - [ ] Updates story like count
 
----
+- [ ] **DELETE /api/stories/[id]/like**
+  - [ ] Removes like
+  - [ ] Updates story like count
 
-## 📧 Non-logged-in User (Invitee) Tests
+- [ ] **GET /api/stories/[id]/comments**
+  - [ ] Returns story comments
+  - [ ] Includes author information
+  - [ ] Handles pagination
 
-### ✅ Invite Reception
-- [ ] **Receive Invite Email**
-  - [ ] Check invite email is received
-  - [ ] Verify email contains correct meetup details
-  - [ ] Test invite link works
-  - [ ] Confirm email design looks good
+- [ ] **POST /api/stories/[id]/comments**
+  - [ ] Creates new comment (authenticated users)
+  - [ ] Validates content
+  - [ ] Includes author information
 
-- [ ] **Invite Page Access**
-  - [ ] Navigate to invite URL `/invite/[token]`
-  - [ ] Verify page loads correctly
-  - [ ] Check meetup details are displayed
-  - [ ] Test responsive design on mobile
+### ✅ Database Testing
+- [ ] **Story Model**
+  - [ ] All fields save correctly
+  - [ ] Soft delete works
+  - [ ] Relationships work (author, likes, comments)
+  - [ ] Indexes perform well
 
-### ✅ Meetup Response Flow
-- [ ] **Accept Meetup**
-  - [ ] Click "Accept" button
-  - [ ] Select preferred date and time
-  - [ ] Submit acceptance
-  - [ ] Verify confirmation email is sent
-  - [ ] Check calendar invite is generated
-  - [ ] Test "Add to Calendar" functionality
+- [ ] **StoryLike Model**
+  - [ ] Unique constraint works
+  - [ ] Cascade delete works
+  - [ ] Relationship to story and user
 
-- [ ] **Decline Meetup**
-  - [ ] Click "Decline" button
-  - [ ] Provide decline reason
-  - [ ] Submit decline
-  - [ ] Verify decline notification is sent
+- [ ] **StoryComment Model**
+  - [ ] Soft delete works
+  - [ ] Reply functionality works
+  - [ ] Cascade delete works
 
-### ✅ Account Integration
-- [ ] **Sign Up from Invite**
-  - [ ] Click "Sign Up" on invite page
-  - [ ] Complete signup process
-  - [ ] Verify redirect back to invite page
-  - [ ] Check user is logged in
-  - [ ] Confirm meetup appears in dashboard
+### ✅ User Experience Testing
+- [ ] **Authentication**
+  - [ ] Login required for creating stories
+  - [ ] Login required for liking stories
+  - [ ] Login required for commenting
+  - [ ] Author-only actions (edit/delete)
 
-- [ ] **Sign In from Invite**
-  - [ ] Click "Sign In" on invite page
-  - [ ] Enter existing credentials
-  - [ ] Verify redirect back to invite page
-  - [ ] Check meetup appears in dashboard
+- [ ] **Responsive Design**
+  - [ ] Mobile-friendly story cards
+  - [ ] Mobile-friendly story pages
+  - [ ] Mobile-friendly create form
+  - [ ] Mobile-friendly dashboard
 
-### ✅ Find My Meetups Feature
-- [ ] **Email Search**
-  - [ ] Go to homepage
-  - [ ] Use "Find My Meetups" feature
-  - [ ] Enter email address
-  - [ ] View meetups for that email
-  - [ ] Test copy invite link functionality
-  - [ ] Verify "Add to Calendar" works
-  - [ ] Check responsive design
+- [ ] **Error Handling**
+  - [ ] Network errors
+  - [ ] Validation errors
+  - [ ] Permission errors
+  - [ ] Not found errors
 
----
-
-## 🆕 New User (Signing up) Tests
-
-### ✅ Registration Process
-- [ ] **Sign Up Form**
-  - [ ] Navigate to `/auth/signup`
-  - [ ] Test form validation
-  - [ ] Check password requirements
-  - [ ] Verify email format validation
-  - [ ] Test duplicate email handling
-
-- [ ] **Email Verification**
-  - [ ] Check verification email is sent
-  - [ ] Click verification link
-  - [ ] Verify account is activated
-  - [ ] Test verification page design
-
-- [ ] **Welcome Experience**
-  - [ ] Check welcome email is received
-  - [ ] Verify email design and content
-  - [ ] Test onboarding flow
-  - [ ] Confirm redirect to dashboard
-
-### ✅ First-time User Experience
-- [ ] **Dashboard Onboarding**
-  - [ ] Check empty state design
-  - [ ] Test "Create Meetup" CTA
-  - [ ] Verify helpful tips are shown
-  - [ ] Test navigation to create page
-
-- [ ] **Feature Discovery**
-  - [ ] Test tooltips and help text
-  - [ ] Check feature explanations
-  - [ ] Verify intuitive navigation
-
----
-
-## 👤 Existing User (Logging in) Tests
-
-### ✅ Authentication
-- [ ] **Sign In Process**
-  - [ ] Navigate to `/auth/signin`
-  - [ ] Test with valid credentials
-  - [ ] Test with invalid credentials
-  - [ ] Check error handling
-  - [ ] Verify session management
-
-- [ ] **Password Reset**
-  - [ ] Click "Forgot Password"
-  - [ ] Enter email address
-  - [ ] Check reset email is sent
-  - [ ] Test reset link functionality
-  - [ ] Verify password can be changed
-
-### ✅ Session Management
-- [ ] **Session Persistence**
-  - [ ] Refresh page while logged in
-  - [ ] Close and reopen browser
-  - [ ] Test session timeout
-  - [ ] Verify logout clears session
-
-- [ ] **Protected Routes**
-  - [ ] Try accessing dashboard without login
-  - [ ] Verify redirect to signin
-  - [ ] Test auth guard functionality
-
----
-
-## 🌐 General Functionality Tests
-
-### ✅ Responsive Design
-- [ ] **Mobile Testing**
-  - [ ] Test on mobile viewport
-  - [ ] Check touch targets are adequate
-  - [ ] Verify navigation works
-  - [ ] Test form inputs on mobile
-
-- [ ] **Tablet Testing**
-  - [ ] Test on tablet viewport
-  - [ ] Check layout adapts properly
-  - [ ] Verify touch interactions
-
-- [ ] **Desktop Testing**
-  - [ ] Test on desktop viewport
-  - [ ] Check hover states
-  - [ ] Verify keyboard navigation
-
-### ✅ Email Functionality
-- [ ] **Email Testing**
-  - [ ] Go to `/debug-email`
-  - [ ] Test all email types
-  - [ ] Verify emails are received
-  - [ ] Check email formatting
-  - [ ] Test email links work
-
-### ✅ Error Handling
-- [ ] **Network Errors**
-  - [ ] Test offline functionality
-  - [ ] Check error messages
-  - [ ] Verify retry mechanisms
-
-- [ ] **Form Validation**
-  - [ ] Test required field validation
-  - [ ] Check input format validation
-  - [ ] Verify error message display
-
-### ✅ Performance
-- [ ] **Loading States**
-  - [ ] Check loading spinners
-  - [ ] Test skeleton screens
-  - [ ] Verify smooth transitions
-
+### ✅ Performance Testing
 - [ ] **Page Load Times**
-  - [ ] Test initial page load
-  - [ ] Check navigation speed
-  - [ ] Verify image optimization
+  - [ ] Stories listing loads quickly
+  - [ ] Individual story pages load quickly
+  - [ ] Dashboard loads quickly
+
+- [ ] **Database Performance**
+  - [ ] Queries are optimized
+  - [ ] No N+1 queries
+  - [ ] Proper indexing
+
+### ✅ Security Testing
+- [ ] **Authorization**
+  - [ ] Users can only edit their own stories
+  - [ ] Users can only delete their own stories
+  - [ ] Users can only like once per story
+  - [ ] Users can only comment when authenticated
+
+- [ ] **Input Validation**
+  - [ ] Story content is sanitized
+  - [ ] Comment content is sanitized
+  - [ ] Tags are validated
+  - [ ] No SQL injection
+
+### ✅ Integration Testing
+- [ ] **With Existing Features**
+  - [ ] Dashboard integration
+  - [ ] User profile integration
+  - [ ] Navigation integration
+  - [ ] Email integration (if applicable)
+
+### 🎯 Test Scenarios
+
+#### Scenario 1: New User Creates First Story
+1. Sign up/login
+2. Go to `/stories/create`
+3. Fill out form with title, content, tags
+4. Save as draft
+5. Edit and publish
+6. Verify story appears in listing
+7. Verify story appears in dashboard
+
+#### Scenario 2: User Engages with Stories
+1. Browse stories listing
+2. Like a story
+3. View individual story
+4. Add a comment
+5. Share story
+6. Verify view count increases
+
+#### Scenario 3: Author Manages Stories
+1. Go to dashboard
+2. View own stories
+3. Edit a story
+4. Change status from draft to published
+5. Delete a story
+6. Verify changes reflect everywhere
+
+#### Scenario 4: Community Interaction
+1. Multiple users create stories
+2. Users like and comment on each other's stories
+3. Verify like counts update
+4. Verify comment threads work
+5. Verify author permissions work correctly
 
 ---
 
-## 🔧 Technical Tests
+## 🚀 Quick Test Commands
 
-### ✅ Database Operations
-- [ ] **CRUD Operations**
-  - [ ] Test meetup creation
-  - [ ] Verify meetup updates
-  - [ ] Check meetup deletion
-  - [ ] Test user data persistence
+```bash
+# Test API endpoints
+curl http://localhost:3000/api/stories
+curl http://localhost:3000/api/stories/story1
+curl http://localhost:3000/api/stories/story1/comments
 
-- [ ] **Data Integrity**
-  - [ ] Verify foreign key constraints
-  - [ ] Check soft deletes work
-  - [ ] Test data validation
+# Test database
+npx prisma studio
 
-### ✅ API Endpoints
-- [ ] **Authentication APIs**
-  - [ ] Test signup endpoint
-  - [ ] Verify signin endpoint
-  - [ ] Check email verification
-  - [ ] Test password reset
+# Run tests
+npm run test
 
-- [ ] **Meetup APIs**
-  - [ ] Test meetup creation
-  - [ ] Verify meetup updates
-  - [ ] Check meetup deletion
-  - [ ] Test invite acceptance
-
-- [ ] **Email APIs**
-  - [ ] Test all email endpoints
-  - [ ] Verify email delivery
-  - [ ] Check error handling
-
-### ✅ Security
-- [ ] **Authentication Security**
-  - [ ] Test password hashing
-  - [ ] Verify JWT tokens
-  - [ ] Check session security
-  - [ ] Test CSRF protection
-
-- [ ] **Data Security**
-  - [ ] Verify RLS policies
-  - [ ] Check input sanitization
-  - [ ] Test SQL injection prevention
-  - [ ] Verify XSS protection
-
----
-
-## 📱 Browser Compatibility
-
-### ✅ Modern Browsers
-- [ ] **Chrome** (latest)
-- [ ] **Firefox** (latest)
-- [ ] **Safari** (latest)
-- [ ] **Edge** (latest)
-
-### ✅ Mobile Browsers
-- [ ] **iOS Safari**
-- [ ] **Chrome Mobile**
-- [ ] **Samsung Internet**
-
----
-
-## 🚀 Deployment Tests
-
-### ✅ Production Environment
-- [ ] **Environment Variables**
-  - [ ] Verify all env vars are set
-  - [ ] Check API keys are working
-  - [ ] Test database connections
-
-- [ ] **Domain & SSL**
-  - [ ] Test HTTPS redirect
-  - [ ] Verify SSL certificate
-  - [ ] Check domain configuration
-
-### ✅ Monitoring
-- [ ] **Error Tracking**
-  - [ ] Test error logging
-  - [ ] Verify monitoring alerts
-  - [ ] Check performance metrics
-
----
-
-## 📋 Test Results Template
-
-```
-## Test Session: [Date]
-
-### User Type: [Logged-in/Non-logged-in/New/Existing]
-- [ ] All tests passed
-- [ ] Issues found: [List issues]
-- [ ] Notes: [Additional notes]
-
-### Email Testing
-- [ ] All emails working
-- [ ] Issues: [List email issues]
-- [ ] Tested on: [Email provider]
-
-### Browser Testing
-- [ ] Chrome: ✅/❌
-- [ ] Firefox: ✅/❌
-- [ ] Safari: ✅/❌
-- [ ] Mobile: ✅/❌
-
-### Performance
-- [ ] Page load times acceptable
-- [ ] Mobile performance good
-- [ ] No major bottlenecks
-
-### Security
-- [ ] Authentication secure
-- [ ] Data protection working
-- [ ] No vulnerabilities found
+# Check for TypeScript errors
+npx tsc --noEmit
 ```
 
----
+## 📊 Success Criteria
 
-## 🎯 Priority Testing Order
-
-1. **High Priority** (Core functionality)
-   - User registration/login
-   - Meetup creation
-   - Invite acceptance
-   - Email delivery
-
-2. **Medium Priority** (User experience)
-   - Dashboard functionality
-   - Responsive design
-   - Error handling
-   - Performance
-
-3. **Low Priority** (Nice to have)
-   - Advanced features
-   - Browser compatibility
-   - Monitoring setup
+- [ ] All stories functionality works end-to-end
+- [ ] No console errors
+- [ ] All API endpoints return correct responses
+- [ ] Database operations work correctly
+- [ ] User permissions work correctly
+- [ ] UI is responsive and accessible
+- [ ] Performance is acceptable (< 2s page loads)
+- [ ] Security is maintained (no unauthorized access)
 
 ---
 
-## 🚨 Common Issues to Watch For
-
-- **Email not received**: Check spam folder, verify Resend API key
-- **Invite links broken**: Verify token generation and validation
-- **Mobile layout issues**: Test on actual devices
-- **Database errors**: Check RLS policies and constraints
-- **Authentication issues**: Verify JWT token handling
-- **Performance problems**: Monitor page load times and API response times 
+**Status: ✅ COMPLETE** - Stories feature is fully implemented and ready for testing! 

@@ -32,7 +32,22 @@ export async function GET(request: NextRequest) {
     }
 
     if (authorId) {
-      where.authorId = authorId
+      if (authorId === 'me') {
+        // Get current user's stories
+        const supabase = createRouteHandlerClient({ cookies })
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 401 }
+          )
+        }
+        
+        where.authorId = user.id
+      } else {
+        where.authorId = authorId
+      }
     }
 
                     // Get stories with author info

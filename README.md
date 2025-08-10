@@ -19,7 +19,7 @@ cp env.example .env.local
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see your app!
+Visit [http://localhost:3000](http://localhost:3000) to see your app! The map is available at [http://localhost:3000/map](http://localhost:3000/map).
 
 ## 📚 Documentation
 
@@ -102,6 +102,8 @@ Create a `.env.local` file with the following variables:
 ```env
 # Database
 DATABASE_URL="your-supabase-database-url"
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
 
 # Authentication
 NEXTAUTH_URL="http://localhost:3000"
@@ -112,6 +114,7 @@ RESEND_API_KEY="your-resend-api-key"
 
 # Maps
 GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
+NEXT_PUBLIC_MAPTILER_KEY="your-maptiler-key"
 
 # Optional
 NEXT_PUBLIC_GA_ID="your-google-analytics-id"

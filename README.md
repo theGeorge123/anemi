@@ -165,6 +165,8 @@ npm run e2e
 - Environment variable protection
 - Regular security audits
 
+For vulnerability reporting guidelines, see [SECURITY.md](SECURITY.md).
+
 ## 📱 PWA Features
 
 - Offline functionality
@@ -174,18 +176,7 @@ npm run e2e
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow the [Cursor Rules](.cursorrules) for code quality
-- Write tests for new features
-- Update documentation as needed
-- Follow conventional commit messages
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on developing and submitting pull requests.
 
 ## 📄 License
 

@@ -1,44 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendInviteEmail } from '@/lib/email'
+import { SendInviteEmailSchema } from '@/lib/validation'
+import { rateLimit } from '@/lib/rate-limit'
+import { ERR } from '@/lib/errors'
 
 export async function POST(request: NextRequest) {
   try {
+    const rate = await rateLimit(request, 20, 60_000)
+    if (!rate.success) {
+      return NextResponse.json({ error: ERR.RATE_LIMIT }, { status: 429 })
+    }
+
     const body = await request.json()
-    const { inviteCode, email, emails } = body
-
-    // Support both single email and multiple emails (legacy)
-    let emailList: string[] = []
-    
-    if (email && typeof email === 'string') {
-      // Single email (new preferred method)
-      emailList = [email]
-    } else if (emails && Array.isArray(emails)) {
-      // Multiple emails (legacy support)
-      emailList = emails
+    const parsed = SendInviteEmailSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: ERR.INVALID_INPUT }, { status: 400 })
     }
 
-    if (!inviteCode || emailList.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid request: inviteCode and email required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate emails
-    const validEmails = emailList.filter((email: string) => 
-      email && typeof email === 'string' && email.includes('@') && email.length > 3
-    )
-
-    if (validEmails.length === 0) {
-      return NextResponse.json(
-        { error: 'No valid email address provided' },
-        { status: 400 }
-      )
-    }
+    const { inviteCode, email, emails } = parsed.data
+    const emailList = email ? [email] : emails!
 
     // Log for debugging
-    console.log('📧 Sending invite emails:', { inviteCode, validEmails })
+    console.log('📧 Sending invite emails:', { inviteCode, emailList })
 
     // Get invite details from database
     const supabase = createClient(
@@ -70,22 +54,13 @@ export async function POST(request: NextRequest) {
     if (!process.env.RESEND_API_KEY) {
       console.warn('⚠️  RESEND_API_KEY not configured, email functionality disabled')
       return NextResponse.json(
-        { 
-          error: 'Email service not configured',
-          message: 'Email functionality is currently disabled. Please configure RESEND_API_KEY environment variable.',
-          success: false,
-          debug: {
-            hasResendKey: !!process.env.RESEND_API_KEY,
-            hasEmailFrom: !!process.env.EMAIL_FROM,
-            node_env: process.env.NODE_ENV
-          }
-        },
+        { error: ERR.INTERNAL, message: 'Email service not configured' },
         { status: 503 }
       )
     }
 
     // Send emails to all recipients
-    const emailPromises = validEmails.map(async (email: string) => {
+    const emailPromises = emailList.map(async (email: string) => {
       try {
         console.log(`📤 Attempting to send email to: ${email}`)
         
@@ -135,8 +110,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error in send-invite API:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: ERR.INTERNAL },
       { status: 500 }
     )
   }
-} 
+}

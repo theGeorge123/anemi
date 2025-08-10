@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 export function useFormValidation<T extends Record<string, any>>(
   initialValues: T,
-  validationRules: Record<keyof T, ((value: any) => string | true)[]>
+  validationRules: Record<keyof T, ((value: any, values: T) => string | true)[]>
 ) {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Record<keyof T, string>>({} as Record<keyof T, string>);

@@ -36,7 +36,17 @@ export const inviteConfirmSchema = z.object({
   chosenDate: z.string().min(1, 'Date is required')
 })
 
+// Validation for send-invite email payload
+export const SendInviteEmailSchema = z.object({
+  inviteCode: z.string().min(1, 'inviteCode is required'),
+  email: z.string().email().optional(),
+  emails: z.array(z.string().email()).optional()
+}).refine(data => data.email || (data.emails && data.emails.length > 0), {
+  message: 'At least one email is required'
+});
+
 // Type exports
 export type ShuffleCafeInput = z.infer<typeof shuffleCafeSchema>
 export type SendInviteInput = z.infer<typeof sendInviteSchema>
-export type InviteConfirmInput = z.infer<typeof inviteConfirmSchema> 
+export type InviteConfirmInput = z.infer<typeof inviteConfirmSchema>
+export type SendInviteEmailInput = z.infer<typeof SendInviteEmailSchema>

@@ -4,6 +4,7 @@ import maplibregl, { Map, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { createClient } from "@supabase/supabase-js";
 import { ANEMI } from "@/theme/anemi";
+import { MapPin, Coffee, AlertTriangle, Loader2 } from "lucide-react";
 
 type Cafe = {
   id: string;
@@ -37,12 +38,18 @@ export default function AnemiMap() {
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const [cafes, setCafes] = useState<Cafe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mapError, setMapError] = useState<string | null>(null);
   const [city, setCity] = useState<string>("All");
   const [onlyVerified, setOnlyVerified] = useState<boolean>(false);
 
   const styleUrl = useMemo(() => {
-    // MapTiler Dataviz Light (clean, neutral). Create a free key and set NEXT_PUBLIC_MAPTILER_KEY
-    return `https://api.maptiler.com/maps/dataviz/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`;
+    // Try MapTiler first, fallback to OpenStreetMap if no key
+    const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
+    if (maptilerKey) {
+      return `https://api.maptiler.com/maps/dataviz/style.json?key=${maptilerKey}`;
+    }
+    // Fallback to OpenStreetMap (free, no API key needed)
+    return "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
   }, []);
 
   const centerNL: [number, number] = useMemo(() => [5.2913, 52.1326], []);
@@ -87,271 +94,294 @@ export default function AnemiMap() {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [cafes]);
 
-    // Init / update map
-    useEffect(() => {
-      if (!nodeRef.current || mapRef.current) return;
-    const map = new maplibregl.Map({
-      container: nodeRef.current,
-      style: styleUrl,
-      center: centerNL,
-      zoom: 6.8,
-      attributionControl: false,
-      pitchWithRotate: false,
-      dragRotate: false,
-    });
-    mapRef.current = map;
-
-    // Minimal brand UI
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-
-    map.on("load", () => {
-      map.addSource("cafes", {
-        type: "geojson",
-        data: geo,
-        cluster: true,
-        clusterRadius: 50,
-        clusterMaxZoom: 13,
+  // Init / update map
+  useEffect(() => {
+    if (!nodeRef.current || mapRef.current) return;
+    
+    try {
+      const map = new maplibregl.Map({
+        container: nodeRef.current,
+        style: styleUrl,
+        center: centerNL,
+        zoom: 6.8,
+        attributionControl: false,
+        pitchWithRotate: false,
+        dragRotate: false,
       });
+      
+      mapRef.current = map;
 
-      // Cluster circles
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "cafes",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-color": [
-            "step",
-            ["get", "point_count"],
-            ANEMI.tealSoft,
-            25,
-            "#A9DBD6",
-            75,
-            ANEMI.teal,
-          ],
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            14,
-            25,
-            18,
-            75,
-            24,
-          ],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
+      // Minimal brand UI
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
 
-      // Cluster counts
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "cafes",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["Noto Sans Regular"],
-          "text-size": 12,
-        },
-        paint: { "text-color": ANEMI.ink },
-      });
+      map.on("load", () => {
+        map.addSource("cafes", {
+          type: "geojson",
+          data: geo,
+          cluster: true,
+          clusterRadius: 50,
+          clusterMaxZoom: 13,
+        });
 
-      // Unclustered points (verified vs not)
-      map.addLayer({
-        id: "unclustered-point",
-        type: "circle",
-        source: "cafes",
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-radius": 7,
-          "circle-color": [
-            "case",
-            ["get", "verified"],
-            ANEMI.verified, // green for verified
-            ANEMI.teal, // teal for normal
-          ],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
+        // Cluster circles
+        map.addLayer({
+          id: "clusters",
+          type: "circle",
+          source: "cafes",
+          filter: ["has", "point_count"],
+          paint: {
+            "circle-color": [
+              "step",
+              ["get", "point_count"],
+              ANEMI.tealSoft,
+              25,
+              "#A9DBD6",
+              75,
+              ANEMI.teal,
+            ],
+            "circle-radius": [
+              "step",
+              ["get", "point_count"],
+              14,
+              25,
+              18,
+              75,
+              24,
+            ],
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#ffffff",
+          },
+        });
 
-      // Popups
-      const popup = new Popup({ closeButton: true, closeOnClick: true, maxWidth: "320px" });
+        // Cluster counts
+        map.addLayer({
+          id: "cluster-count",
+          type: "symbol",
+          source: "cafes",
+          filter: ["has", "point_count"],
+          layout: {
+            "text-field": ["get", "point_count_abbreviated"],
+            "text-font": ["Noto Sans Regular"],
+            "text-size": 12,
+          },
+          paint: { "text-color": ANEMI.ink },
+        });
 
-      map.on("click", "clusters", (e) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        if (!features || features.length === 0) return;
-        
-        const firstFeature = features[0];
-        if (!firstFeature || !firstFeature.properties) return;
-        
-        const clusterId = firstFeature.properties.cluster_id;
-        if (!clusterId) return;
-        
-        const source: any = map.getSource("cafes");
-        source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
-          if (err) return;
-          map.easeTo({ center: (firstFeature.geometry as any).coordinates, zoom });
+        // Unclustered points (verified vs not)
+        map.addLayer({
+          id: "unclustered-point",
+          type: "circle",
+          source: "cafes",
+          filter: ["!", ["has", "point_count"]],
+          paint: {
+            "circle-radius": 7,
+            "circle-color": [
+              "case",
+              ["get", "verified"],
+              ANEMI.verified, // green for verified
+              ANEMI.teal, // teal for normal
+            ],
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#ffffff",
+          },
+        });
+
+        // Popups
+        map.on("click", "unclustered-point", (e) => {
+          if (!e.features?.[0]) return;
+          const coordinates = (e.features[0].geometry as any).coordinates.slice();
+          const properties = e.features[0].properties;
+
+          const popup = new Popup()
+            .setLngLat(coordinates)
+            .setHTML(`
+              <div class="p-3 max-w-xs">
+                <h3 class="font-semibold text-lg text-gray-900 mb-2">${properties.name}</h3>
+                <p class="text-sm text-gray-600 mb-2">${properties.city}</p>
+                ${properties.verified ? '<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mb-2">✓ Geverifieerd</span>' : ''}
+                ${properties.badges && properties.badges.length > 0 ? `
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    ${properties.badges.map((badge: string) => `<span class="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">${badge}</span>`).join('')}
+                  </div>
+                ` : ''}
+                ${properties.owner_quote ? `<p class="text-sm text-gray-700 italic">"${properties.owner_quote}"</p>` : ''}
+              </div>
+            `);
+
+          map.getCanvas().style.cursor = "";
+          popup.addTo(map);
+        });
+
+        map.on("mouseenter", "unclustered-point", () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+
+        map.on("mouseleave", "unclustered-point", () => {
+          map.getCanvas().style.cursor = "";
+        });
+
+        // Cluster click
+        map.on("click", "clusters", (e) => {
+          if (!e.features?.[0]) return;
+          const clusterId = e.features[0].properties?.cluster_id;
+          const mapboxSource = map.getSource("cafes") as any;
+          mapboxSource.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
+            if (err) return;
+            if (e.features?.[0]) {
+              map.easeTo({
+                center: (e.features[0].geometry as any).coordinates,
+                zoom: zoom,
+              });
+            }
+          });
         });
       });
 
-      map.on("click", "unclustered-point", (e) => {
-        const f = e.features?.[0];
-        if (!f) return;
-        const p = f.properties as any;
-        const coords = (f.geometry as any).coordinates.slice();
-
-        const badges = JSON.parse(p.badges || "[]") as string[];
-        const badgeHtml = badges
-          .map(
-            (b: string) =>
-              `<span style="font-size:11px;padding:2px 8px;border:1px solid #E6ECF2;border-radius:999px;margin-right:6px;">${b}</span>`
-          )
-          .join("");
-
-        const check = p.verified === true || p.verified === "true";
-        const photo = p.photo_url
-          ? `<img src="${p.photo_url}" style="width:100%;border-radius:12px;margin-top:8px;">`
-          : "";
-
-        const card = `
-          <div style="font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter; color:${ANEMI.ink};">
-            <div style="background:${ANEMI.sand};border-radius:14px;padding:12px;box-shadow:${ANEMI.shadow}">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div style="width:10px;height:10px;border-radius:50%;background:${check ? ANEMI.verified : ANEMI.teal};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-                <div style="font-weight:600">${p.name}${check ? " ✔︎" : ""}</div>
-              </div>
-              <div style="font-size:12px;color:${ANEMI.muted};margin-top:4px;">${p.city || ""}</div>
-              ${photo}
-              ${p.owner_quote ? `<div style="font-size:12px;fontStyle:italic;margin-top:8px;">“${p.owner_quote}”</div>` : ""}
-              ${badges.length ? `<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;">${badgeHtml}</div>` : ""}
-              <a href="/cafe/${p.id}" style="display:inline-block;margin-top:10px;font-size:12px;padding:8px 12px;border-radius:12px;background:${ANEMI.teal};color:white;text-decoration:none;">Bekijk café</a>
-            </div>
-          </div>
-        `;
-
-        popup.setLngLat(coords).setHTML(card).addTo(map);
+      map.on("error", (e) => {
+        console.error("Map error:", e);
+        setMapError("Er ging iets mis bij het laden van de kaart");
       });
 
-      map.on("mouseenter", "unclustered-point", () => (map.getCanvas().style.cursor = "pointer"));
-      map.on("mouseleave", "unclustered-point", () => (map.getCanvas().style.cursor = ""));
-    });
+    } catch (error) {
+      console.error("Failed to initialize map:", error);
+      setMapError("Kon de kaart niet laden");
+    }
+  }, [styleUrl, centerNL, geo]);
 
-      return () => map.remove();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [styleUrl, centerNL]);
-
-  // Update source on filter change
+  // Update map data when geo changes
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-    const src = map.getSource("cafes") as any;
-    if (src) src.setData(geo);
+    if (!mapRef.current) return;
+    
+    const source = mapRef.current.getSource("cafes") as any;
+    if (source) {
+      source.setData(geo);
+    }
   }, [geo]);
 
-  return (
-    <div>
-      {/* Filter bar */}
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          marginBottom: 12,
-          alignItems: "center",
-        }}
-      >
-        <span style={{ fontSize: 13, color: ANEMI.muted }}>Filters:</span>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {cities.map((c) => (
-            <button
-              key={c}
-              onClick={() => setCity(c)}
-              style={{
-                fontSize: 13,
-                padding: "8px 12px",
-                borderRadius: 999,
-                border: `1px solid ${c === city ? ANEMI.teal : "#E6ECF2"}`,
-                background: c === city ? ANEMI.tealSoft : "#fff",
-              }}
-            >
-              {c}
-            </button>
-          ))}
-          <label
-            style={{
-              fontSize: 13,
-              padding: "8px 12px",
-              borderRadius: 999,
-              border: "1px solid #E6ECF2",
-              background: onlyVerified ? ANEMI.tealSoft : "#fff",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              cursor: "pointer",
-            }}
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-72 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border-2 border-amber-200">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-amber-600 animate-spin mx-auto mb-4" />
+          <p className="text-lg font-medium text-amber-800">Kaart laden...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (mapError) {
+    return (
+      <div className="flex items-center justify-center h-72 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-200">
+        <div className="text-center">
+          <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+          <p className="text-lg font-medium text-red-800 mb-2">Kaart kon niet laden</p>
+          <p className="text-sm text-red-600 mb-4">{mapError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
-            <input
-              type="checkbox"
-              checked={onlyVerified}
-              onChange={(e) => setOnlyVerified(e.target.checked)}
-            />
-            Verified
-          </label>
+            Opnieuw proberen
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-full border border-amber-200 shadow-sm">
+          <MapPin className="w-6 h-6 text-amber-600" />
+          <div>
+            <div className="font-semibold text-amber-800">Interactieve Kaart</div>
+            <div className="text-sm text-amber-600">{cafes.length} cafés gevonden</div>
+          </div>
         </div>
       </div>
 
-      {/* Map */}
-      <div ref={nodeRef} style={containerStyle} />
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 justify-center">
+        {/* City Filter */}
+        <select
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="px-4 py-2 border border-amber-300 rounded-lg bg-white text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+        >
+          {cities.map((c) => (
+            <option key={c} value={c}>
+              {c === "All" ? "Alle Steden" : c}
+            </option>
+          ))}
+        </select>
 
-      {/* Legend */}
-      <div style={{ display: "flex", gap: 16, marginTop: 10, alignItems: "center" }}>
-        <span style={{ fontSize: 12, color: ANEMI.muted }}>Legenda:</span>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 12,
-            color: ANEMI.muted,
-          }}
-        >
-          <i
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              background: ANEMI.verified,
-              display: "inline-block",
-              border: "2px solid #fff",
-              boxShadow: "0 1px 2px rgba(0,0,0,.2)",
-            }}
+        {/* Verified Filter */}
+        <label className="flex items-center gap-2 px-4 py-2 border border-amber-300 rounded-lg bg-white text-amber-800 cursor-pointer hover:bg-amber-50">
+          <input
+            type="checkbox"
+            checked={onlyVerified}
+            onChange={(e) => setOnlyVerified(e.target.checked)}
+            className="w-4 h-4 text-amber-600 focus:ring-amber-500 border-amber-300 rounded"
           />
-          Verified café
-        </span>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: 12,
-            color: ANEMI.muted,
-          }}
-        >
-          <i
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              background: ANEMI.teal,
-              display: "inline-block",
-              border: "2px solid #fff",
-              boxShadow: "0 1px 2px rgba(0,0,0,.2)",
-            }}
-          />
-          Alle cafés
-        </span>
+          Alleen geverifieerde cafés
+        </label>
+      </div>
+
+      {/* Map Container */}
+      <div className="relative">
+        <div ref={nodeRef} style={containerStyle} />
+        
+        {/* Map Legend */}
+        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-amber-200">
+          <div className="text-sm font-medium text-gray-800 mb-2">Legenda</div>
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span>Geverifieerde cafés</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+              <span>Normale cafés</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span>Clusters (meerdere cafés)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg p-4 border border-amber-200 text-center">
+          <Coffee className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-amber-800">{cafes.length}</div>
+          <div className="text-sm text-amber-600">Totaal cafés</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border border-amber-200 text-center">
+          <MapPin className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+          <div className="text-2xl font-bold text-amber-800">{cities.length - 1}</div>
+          <div className="text-sm text-amber-600">Steden</div>
+        </div>
+        <div className="bg-white rounded-lg p-4 border border-amber-200 text-center">
+          <div className="w-8 h-8 bg-green-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+            <span className="text-white text-sm font-bold">✓</span>
+          </div>
+          <div className="text-2xl font-bold text-amber-800">
+            {cafes.filter(c => c.verified).length}
+          </div>
+          <div className="text-sm text-amber-600">Geverifieerd</div>
+        </div>
       </div>
     </div>
   );

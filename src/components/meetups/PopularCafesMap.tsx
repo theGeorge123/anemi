@@ -128,9 +128,25 @@ export default function PopularCafesMap({ city, limit = 6 }: PopularCafesMapProp
           <TrendingUp className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-orange-500" />
           Betekenisvolle Locaties in {city}
         </CardTitle>
-        <p className="text-sm xs:text-base sm:text-lg text-amber-700 max-w-3xl mx-auto">
-          Ontdek waar je je herverbindingen kunt plannen - cafés waar anderen al betekenisvolle momenten hebben gedeeld
+        <p className="text-sm text-gray-600 mb-4">
+          Ontdek waar je je meetups kunt plannen - cafés waar anderen al betekenisvolle momenten hebben gedeeld
         </p>
+        
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button asChild size="sm" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <Link href="/map">
+              <MapPin className="w-4 h-4 mr-2" />
+              Bekijk Kaart
+            </Link>
+          </Button>
+          
+          <Button asChild variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+            <Link href="/create">
+              <Coffee className="w-4 h-4 mr-2" />
+              Plan een Meetup
+            </Link>
+          </Button>
+        </div>
       </CardHeader>
       
       <CardContent className="space-y-4 sm:space-y-6">

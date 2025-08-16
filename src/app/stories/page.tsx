@@ -264,17 +264,51 @@ function StoriesList() {
 
   if (stories.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Coffee className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-600 mb-2">Nog geen verhalen</h3>
-        <p className="text-gray-500 mb-6">
-          Deel je eerste coffee meeting verhaal en inspireer anderen!
-        </p>
-        <Button asChild>
-          <Link href="/stories/create">
-            Schrijf je eerste verhaal
-          </Link>
-        </Button>
+      <div className="text-center py-8 sm:py-12 px-4">
+        <div className="max-w-md mx-auto">
+          {/* Empty State Icon */}
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Coffee className="w-10 h-10 sm:w-12 sm:h-12 text-amber-600" />
+          </div>
+          
+          {/* Empty State Text */}
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
+            Nog geen verhalen
+          </h3>
+          <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed">
+            Wees de eerste om je meetup verhaal te delen! Inspireer anderen met jouw ervaringen.
+          </p>
+          
+          {/* Call to Action */}
+          <div className="space-y-3">
+            <Button asChild size="lg" className="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Link href="/stories/create" className="flex items-center justify-center gap-2">
+                <Coffee className="w-5 h-5" />
+                Schrijf je eerste verhaal
+              </Link>
+            </Button>
+            
+            <p className="text-sm text-gray-500">
+              Het duurt maar 5 minuten om je verhaal te delen
+            </p>
+          </div>
+          
+          {/* Benefits */}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="text-2xl mb-2">📝</div>
+              <div className="text-xs font-medium text-amber-800">Eenvoudig schrijven</div>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="text-2xl mb-2">🌟</div>
+              <div className="text-xs font-medium text-amber-800">Inspireer anderen</div>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="text-2xl mb-2">☕</div>
+              <div className="text-xs font-medium text-amber-800">Deel je ervaring</div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

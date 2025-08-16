@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Coffee, Users, Calendar, TrendingUp, MapPin } from 'lucide-react'
@@ -119,85 +119,52 @@ export default function MeetupStats({ city, month }: MeetupStatsProps) {
   return (
     <Card className="w-full bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-amber-800">
-          <Coffee className="w-6 h-6" />
-          Herverbindingen in {city}
+        <CardTitle className="text-lg sm:text-xl font-bold text-amber-800 mb-2">
+          Meetups in {city}
         </CardTitle>
-        <p className="text-sm text-amber-700">
-          Zie hoeveel mensen al bezig zijn met het herverbinden
-        </p>
+        <CardDescription className="text-sm text-amber-600 mb-4">
+          Bekijk de statistieken van meetups in {city}
+        </CardDescription>
       </CardHeader>
       
       <CardContent>
-        {/* Main Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* This Month */}
-          <div className="text-center p-4 bg-white rounded-lg border border-amber-200">
-            <div className="text-3xl font-bold text-amber-600 mb-2">
-              {stats.meetupsThisMonth}
-            </div>
-            <div className="text-sm text-amber-700 font-medium">
-              Herverbindingen {currentMonth}
-            </div>
-            <div className="text-xs text-amber-600 mt-1">
-              in {city}
-            </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="text-2xl font-bold text-amber-800">{stats.meetupsThisMonth}</div>
+            <div className="text-xs text-amber-600">Meetups {currentMonth}</div>
           </div>
-
-          {/* Total */}
-          <div className="text-center p-4 bg-white rounded-lg border border-amber-200">
-            <div className="text-3xl font-bold text-amber-600 mb-2">
-              {stats.totalMeetups}
-            </div>
-            <div className="text-sm text-amber-700 font-medium">
-              Totaal herverbindingen
-            </div>
-            <div className="text-xs text-amber-600 mt-1">
-              ooit gepland
-            </div>
-          </div>
-
-          {/* Upcoming */}
-          <div className="text-center p-4 bg-white rounded-lg border border-amber-200">
-            <div className="text-3xl font-bold text-amber-600 mb-2">
-              {stats.upcomingMeetups}
-            </div>
-            <div className="text-sm text-amber-700 font-medium">
-              Komende herverbindingen
-            </div>
-            <div className="text-xs text-amber-600 mt-1">
-              volgende 30 dagen
-            </div>
+          <div className="text-center p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="text-2xl font-bold text-amber-800">{stats.totalMeetups}</div>
+            <div className="text-xs text-amber-600">Totaal meetups</div>
           </div>
         </div>
-
-        {/* Highlight Message */}
-        {stats.meetupsThisMonth > 0 && (
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
-              <TrendingUp className="w-4 h-4" />
-              <span>
-                <strong>{stats.meetupsThisMonth} herverbindingen {currentMonth} in {city}!</strong>
-              </span>
-            </div>
-          </div>
-        )}
-
+        
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild className="bg-amber-600 hover:bg-amber-700">
+        <div className="space-y-3">
+          <Button asChild size="sm" className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
             <Link href="/create">
               <Coffee className="w-4 h-4 mr-2" />
-              Plan je eigen herverbinding
+              Plan je eigen meetup
             </Link>
           </Button>
           
-          <Button variant="outline" asChild>
+          <Button asChild variant="outline" size="sm" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
             <Link href="/dashboard">
-              <Users className="w-4 h-4 mr-2" />
-              Bekijk mijn herverbindingen
+              <Calendar className="w-4 h-4 mr-2" />
+              Bekijk mijn meetups
             </Link>
           </Button>
+        </div>
+        
+        {/* Encouragement */}
+        <div className="mt-4 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 text-center">
+          <p className="text-sm text-amber-800 font-medium">
+            <strong>{stats.meetupsThisMonth} meetups {currentMonth} in {city}!</strong>
+          </p>
+          <p className="text-xs text-amber-600 mt-1">
+            Doe mee en plan je eigen ontmoeting
+          </p>
         </div>
 
         {/* Additional Info */}

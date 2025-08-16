@@ -100,20 +100,39 @@ export default function ReconnectionHero() {
           </div>
         </div>
 
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Start je Eerste Meetup
+          </h2>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Plan een ontmoeting met iemand die je al kent en bouw betekenisvolle connecties op
+          </p>
+        </div>
+
         {/* Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-600 mb-2">100+</div>
-            <div className="text-gray-600">Herverbindingen gepland</div>
+            <div className="text-gray-600">Meetups gepland</div>
           </div>
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-600 mb-2">50+</div>
-            <div className="text-gray-600">Betekenisvolle locaties</div>
+            <div className="text-gray-600">Cafés beschikbaar</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-600 mb-2">1000+</div>
-            <div className="text-gray-600">Momenten gedeeld</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">95%</div>
+            <div className="text-gray-600">Tevreden gebruikers</div>
           </div>
+        </div>
+
+        {/* CTA Button */}
+        <div className="text-center">
+          <Button asChild size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-8 py-6 text-lg">
+            <Link href="/create">
+              <Coffee className="w-6 h-6 mr-3" />
+              Start een Meetup
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

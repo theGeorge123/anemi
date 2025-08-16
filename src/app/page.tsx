@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin, Search, Info, Star, MessageCircle, Clock, Globe, Shield } from 'lucide-react';
+import { Coffee, Users, LogIn, Calendar, LogOut, Heart, MapPin, Search, Info, Star, MessageCircle, Clock, Globe, Shield, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense, lazy } from 'react';
 import { LoginStatus } from '@/components/LoginStatus';
@@ -76,13 +76,13 @@ export default function HomePage() {
                 <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl">📖</span>
               </div>
               <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-display font-bold text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-4">
-                Verhalen van Herverbinding
+                Verhalen van Meetups
               </h3>
               <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-3 sm:mb-4 md:mb-6 lg:mb-8 leading-relaxed px-2 sm:px-4">
                 Ontdek inspirerende verhalen van mensen die elkaar weer hebben ontmoet
               </p>
               <p className="text-amber-700 font-medium text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl px-2 sm:px-4">
-                Lees ervaringen van herverbinding en deel je eigen verhaal →
+                Lees ervaringen van meetups en deel je eigen verhaal →
               </p>
             </div>
             
@@ -103,10 +103,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Herverbind met je Netwerk
+              Verbind met je Netwerk
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Zie hoeveel mensen al bezig zijn met het herverbinden en ontdek waar je je eigen ontmoetingen kunt plannen
+              Zie hoeveel mensen al bezig zijn met het plannen van meetups en ontdek waar je je eigen ontmoetingen kunt organiseren
             </p>
           </div>
           
@@ -126,13 +126,13 @@ export default function HomePage() {
                 <span className="text-2xl sm:text-3xl">🔍</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-3 sm:mb-4 px-2">
-                Vind je Herverbinding
+                Vind je Meetup
               </h3>
               <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6 leading-relaxed px-4">
-                Heb je een uitnodiging ontvangen om iemand weer te ontmoeten? 
+                Heb je een uitnodiging ontvangen voor een meetup? 
               </p>
               <p className="text-amber-700 font-medium text-base sm:text-lg px-4">
-                Voer je <strong>invite token</strong> hieronder in om je herverbinding te bekijken →
+                Voer je <strong>invite token</strong> hieronder in om je meetup te bekijken →
               </p>
             </div>
             
@@ -170,7 +170,7 @@ export default function HomePage() {
               Waarom Echte Ontmoetingen?
             </h2>
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              In een wereld vol AI en digitale communicatie, zijn echte menselijke connecties waardevoller dan ooit. Herverbind met de mensen die je al kent.
+              In een wereld vol AI en digitale communicatie, zijn echte menselijke connecties waardevoller dan ooit. Plan meetups met de mensen die je al kent.
             </p>
           </div>
 
@@ -182,7 +182,7 @@ export default function HomePage() {
                 <Users className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Herverbind met Vrienden
+                Verbind met Vrienden
               </h3>
               <p className="text-gray-600 leading-relaxed">
                 Plan ontmoetingen met mensen die je al kent maar te weinig ziet. Bouw bestaande relaties sterker op door regelmatige face-to-face contacten.
@@ -198,80 +198,78 @@ export default function HomePage() {
                 Betekenisvolle Locaties
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Kies voor ontmoetingen op plekken die betekenis hebben - niet zomaar een café, maar een plek waar je samen herinneringen kunt maken.
+                Ontmoet mensen die je al kent in openbare, vertrouwde locaties. Geen zorgen over veiligheid - alleen focus op verbinding en kwaliteitstijd.
               </p>
             </div>
 
             {/* Feature 3 */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                <Share2 className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Flexibele Planning
+                Eenvoudig Delen
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Plan ontmoetingen die voor iedereen werken. Omdat je elkaar al kent, is het makkelijker om een tijd te vinden die voor iedereen past.
+                Nodig mensen uit die je al kent via WhatsApp, email of directe links. Geen ongemakkelijke eerste ontmoetingen - alleen meetups.
               </p>
             </div>
 
             {/* Feature 4 */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Eenvoudige Uitnodigingen
+                Veilige Ontmoetingen
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Nodig mensen uit die je al kent via WhatsApp, email of directe links. Geen ongemakkelijke eerste ontmoetingen - alleen herverbinding.
+                Ontmoet mensen die je al kent in openbare, vertrouwde locaties. Geen zorgen over veiligheid - alleen focus op verbinding en kwaliteitstijd.
               </p>
             </div>
 
             {/* Feature 5 */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Gedeelde Herinneringen
+                Lokale Gemeenschap
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Deel verhalen van je ontmoetingen en inspireer anderen om ook hun bestaande relaties te versterken. Bouw samen aan betekenisvolle momenten.
+                Ontdek nieuwe plekken in je eigen stad en steun lokale cafés. Bouw een sterke lokale gemeenschap op door regelmatige ontmoetingen.
               </p>
             </div>
 
             {/* Feature 6 */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
-                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Vertrouwde Ontmoetingen
+                Betekenisvolle Momenten
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Ontmoet mensen die je al kent in openbare, vertrouwde locaties. Geen zorgen over veiligheid - alleen focus op herverbinding en kwaliteitstijd.
+                Creëer herinneringen die je leven verrijken. Echte ontmoetingen leiden tot diepere vriendschappen en waardevolle ervaringen.
               </p>
             </div>
           </div>
 
-          {/* Call to Action */}
+          {/* CTA Section */}
           <div className="text-center">
             <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-8 sm:p-12 border-2 border-amber-200 shadow-lg">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
-                Klaar om te herverbinden?
+                Klaar om te Beginnen?
               </h3>
               <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
-                Start je eerste coffee meeting en herverbind met de mensen die je al kent
+                Plan je eerste meetup en ervaar het verschil dat echte ontmoetingen maken in je leven.
               </p>
-              <div className="flex justify-center">
-                <Button asChild size="lg" className="text-lg px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
-                  <Link href="/create">
-                    <Users className="w-5 h-5 mr-2" />
-                    Start een Herverbinding
-                  </Link>
-                </Button>
-              </div>
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-8 py-6 text-lg">
+                <Link href="/create">
+                  <Coffee className="w-6 h-6 mr-3" />
+                  Start een Meetup
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

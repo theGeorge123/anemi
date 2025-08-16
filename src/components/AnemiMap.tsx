@@ -181,11 +181,18 @@ export default function AnemiMap() {
 
       map.on("click", "clusters", (e) => {
         const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        const clusterId = features[0].properties?.cluster_id;
+        if (!features || features.length === 0) return;
+        
+        const firstFeature = features[0];
+        if (!firstFeature || !firstFeature.properties) return;
+        
+        const clusterId = firstFeature.properties.cluster_id;
+        if (!clusterId) return;
+        
         const source: any = map.getSource("cafes");
         source.getClusterExpansionZoom(clusterId, (err: any, zoom: number) => {
           if (err) return;
-          map.easeTo({ center: (features[0].geometry as any).coordinates, zoom });
+          map.easeTo({ center: (firstFeature.geometry as any).coordinates, zoom });
         });
       });
 

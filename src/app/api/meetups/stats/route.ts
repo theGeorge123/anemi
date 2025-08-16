@@ -62,7 +62,10 @@ export async function GET(request: NextRequest) {
     })
 
     // Get upcoming meetups (next 30 days)
-    const upcomingMeetups = await prisma.meetupInvite.count({
+    const today = new Date().toISOString().split('T')[0] || ''
+    
+    // First get all meetups with chosen dates, then filter in JavaScript
+    const meetupsWithDates = await prisma.meetupInvite.findMany({
       where: {
         cafe: {
           city: city
@@ -72,10 +75,18 @@ export async function GET(request: NextRequest) {
         },
         deletedAt: null,
         chosenDate: {
-          gte: new Date().toISOString().split('T')[0]
+          not: null
         }
+      },
+      select: {
+        chosenDate: true
       }
     })
+    
+    // Filter for upcoming meetups (chosenDate >= today)
+    const upcomingMeetups = meetupsWithDates.filter(meetup => 
+      meetup.chosenDate && meetup.chosenDate >= today
+    ).length
 
     return NextResponse.json({
       city,

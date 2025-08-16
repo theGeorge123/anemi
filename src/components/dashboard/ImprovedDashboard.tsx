@@ -50,7 +50,7 @@ interface MeetupInvite {
 }
 
 export default function ImprovedDashboard() {
-  const { user } = useSupabase()
+  const { user, supabase } = useSupabase()
   const [meetups, setMeetups] = useState<MeetupInvite[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<string>('all')

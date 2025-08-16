@@ -102,6 +102,7 @@ export default function MeetupStats({ city, month }: MeetupStatsProps) {
   // Format month for display
   const formatMonth = (monthStr: string) => {
     const [year, month] = monthStr.split('-')
+    if (!year || !month) return monthStr
     const date = new Date(parseInt(year), parseInt(month) - 1)
     return date.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
   }

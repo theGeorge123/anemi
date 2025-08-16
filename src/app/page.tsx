@@ -14,16 +14,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-cream-50 to-orange-50">
       {/* Hero Section */}
-      <div className="flex items-center justify-center px-4 py-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8 sm:mb-12">
+      <div className="flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
+        <div className="max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto text-center">
+          <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 xl:mb-16">
             {/* Hero Icon */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-lg">
-              <Coffee className="w-10 h-10 sm:w-12 sm:h-12 text-amber-700" />
+            <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 lg:mb-10 shadow-lg">
+              <Coffee className="w-8 h-8 xs:w-10 xs:h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 text-amber-700" />
             </div>
             
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2">
+            <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-display font-bold text-foreground mb-3 sm:mb-4 md:mb-6 lg:mb-8 leading-tight px-2 sm:px-4">
               Herverbind Over{' '}
               <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                 Koffie
@@ -32,31 +32,31 @@ export default function HomePage() {
             </h1>
             
             {/* Subtitle */}
-            <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-8 sm:mb-12 leading-relaxed max-w-3xl mx-auto px-4">
+            <p className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-muted-foreground mb-6 sm:mb-8 md:mb-10 lg:mb-12 leading-relaxed max-w-2xl sm:max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto px-2 sm:px-4">
               In deze digitale wereld, herverbind met de mensen die je al kent. Plan echte ontmoetingen, deel momenten, en bouw betekenisvolle relaties op - één kopje koffie tegelijk.
             </p>
           </div>
 
           {/* Login status and appropriate buttons */}
           <Suspense fallback={
-            <div className="flex flex-col gap-4 sm:flex-row sm:gap-6 justify-center items-center mb-8 sm:mb-12 px-4">
-              <Button asChild size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+            <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 justify-center items-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 px-2 sm:px-4">
+              <Button asChild size="lg" className="text-sm xs:text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-6 md:py-8 w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <Link href="/create">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  <Users className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 mr-2 sm:mr-3" />
                   Start een Herverbinding
                 </Link>
               </Button>
               
-              <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+              <Button asChild variant="outline" size="lg" className="text-sm xs:text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-6 md:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
                 <Link href="/auth/signin">
-                  <LogIn className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  <LogIn className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 mr-2 sm:mr-3" />
                   Inloggen
                 </Link>
               </Button>
               
-              <Button asChild variant="outline" size="lg" className="text-base sm:text-lg px-8 py-6 sm:px-10 sm:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
+              <Button asChild variant="outline" size="lg" className="text-sm xs:text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 lg:px-12 py-4 sm:py-6 md:py-8 w-full sm:w-auto border-2 border-amber-300 hover:bg-amber-50 hover:border-amber-400 transition-all duration-300">
                 <Link href="/auth/signup">
-                  <Calendar className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
+                  <Calendar className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 mr-2 sm:mr-3" />
                   Lid worden
                 </Link>
               </Button>
@@ -68,28 +68,28 @@ export default function HomePage() {
       </div>
 
       {/* Bekijk Verhalen Sectie */}
-      <div className="px-4 py-8 sm:py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="p-4 sm:p-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl border-2 border-amber-200 shadow-lg">
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-md">
-                <span className="text-2xl sm:text-3xl">📖</span>
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 lg:py-16">
+        <div className="max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl md:rounded-3xl border-2 border-amber-200 shadow-lg">
+            <div className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10">
+              <div className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-amber-300 to-orange-300 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6 lg:mb-8 shadow-md">
+                <span className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl">📖</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-3 sm:mb-4 px-2">
+              <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-display font-bold text-foreground mb-2 sm:mb-3 md:mb-4 lg:mb-6 px-2 sm:px-4">
                 Verhalen van Herverbinding
               </h3>
-              <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6 leading-relaxed px-4">
+              <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-3 sm:mb-4 md:mb-6 lg:mb-8 leading-relaxed px-2 sm:px-4">
                 Ontdek inspirerende verhalen van mensen die elkaar weer hebben ontmoet
               </p>
-              <p className="text-amber-700 font-medium text-base sm:text-lg px-4">
+              <p className="text-amber-700 font-medium text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl px-2 sm:px-4">
                 Lees ervaringen van herverbinding en deel je eigen verhaal →
               </p>
             </div>
             
             <div className="text-center">
-              <Button asChild size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700">
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-sm xs:text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-10 lg:px-12 py-3 sm:py-4 md:py-6 lg:py-8">
                 <Link href="/stories">
-                  <Coffee className="w-5 h-5 mr-2" />
+                  <Coffee className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mr-2" />
                   Bekijk Verhalen
                 </Link>
               </Button>

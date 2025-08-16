@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -44,211 +44,161 @@ interface PopularCafesMapProps {
   limit?: number
 }
 
-export default function PopularCafesMap({ city, limit = 10 }: PopularCafesMapProps) {
+export default function PopularCafesMap({ city, limit = 6 }: PopularCafesMapProps) {
   const [cafes, setCafes] = useState<PopularCafe[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showMap, setShowMap] = useState(false)
 
   useEffect(() => {
-    const fetchPopularCafes = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch(`/api/cafes/popular?city=${encodeURIComponent(city)}&limit=${limit}`)
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch popular cafes')
-        }
-        
-        const data = await response.json()
-        setCafes(data.cafes || [])
-      } catch (error) {
-        console.error('Error fetching popular cafes:', error)
-        setError('Failed to load popular cafes')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchPopularCafes()
   }, [city, limit])
 
-  if (loading) {
+  const fetchPopularCafes = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await fetch(`/api/cafes/popular?city=${encodeURIComponent(city)}&limit=${limit}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch popular cafes')
+      }
+      
+      const data = await response.json()
+      setCafes(data.cafes || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Coffee className="w-5 h-5" />
+      <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-amber-200 to-orange-200 rounded-full flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 xs:w-8 xs:h-8 sm:w-10 sm:h-10 text-orange-500 animate-pulse" />
+            </div>
+          </div>
+          <CardTitle className="text-lg xs:text-xl sm:text-2xl lg:text-3xl text-amber-800">
             Populaire cafés laden...
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+        <CardContent className="text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-amber-200 rounded mx-auto w-3/4"></div>
+            <div className="h-4 bg-amber-200 rounded mx-auto w-1/2"></div>
           </div>
         </CardContent>
       </Card>
     )
   }
 
-  if (error) {
+  if (error || !cafes.length) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-600">
-            <Coffee className="w-5 h-5" />
-            Fout bij laden
+      <Card className="border-red-200 bg-red-50">
+        <CardHeader className="text-center">
+          <CardTitle className="text-lg xs:text-xl sm:text-2xl text-red-800">
+            Geen cafés gevonden
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">{error}</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (cafes.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Coffee className="w-5 h-5" />
-            Geen populaire cafés gevonden
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            Er zijn nog geen populaire cafés in {city}. Wees de eerste om een café te beoordelen!
+        <CardContent className="text-center">
+          <p className="text-sm xs:text-base text-red-600">
+            {error || `Geen populaire cafés gevonden in ${city}`}
           </p>
+          <Button 
+            onClick={fetchPopularCafes} 
+            variant="outline" 
+            size="sm"
+            className="mt-3 border-red-300 text-red-700 hover:bg-red-100"
+          >
+            Opnieuw proberen
+          </Button>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-orange-500" />
-            Betekenisvolle Locaties in {city}
-          </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowMap(!showMap)}
-          >
-            {showMap ? 'Verberg kaart' : 'Toon kaart'}
-          </Button>
-        </div>
-        <p className="text-sm text-gray-600">
+    <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-lg transition-shadow duration-300">
+      <CardHeader className="text-center pb-4 sm:pb-6">
+        <CardTitle className="flex items-center justify-center gap-2 text-amber-800 text-lg xs:text-xl sm:text-2xl lg:text-3xl xl:text-4xl mb-2 sm:mb-3">
+          <TrendingUp className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-orange-500" />
+          Betekenisvolle Locaties in {city}
+        </CardTitle>
+        <p className="text-sm xs:text-base sm:text-lg text-amber-700 max-w-3xl mx-auto">
           Ontdek waar je je herverbindingen kunt plannen - cafés waar anderen al betekenisvolle momenten hebben gedeeld
         </p>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="space-y-4 sm:space-y-6">
+        {/* Map Toggle */}
+        <div className="flex justify-center">
+          <Button
+            onClick={() => setShowMap(!showMap)}
+            variant="outline"
+            size="sm"
+            className="border-amber-300 text-amber-700 hover:bg-amber-50 text-sm xs:text-base px-4 sm:px-6 py-2 sm:py-3"
+          >
+            {showMap ? 'Verberg Kaart' : 'Toon Kaart'}
+          </Button>
+        </div>
+
+        {/* Map View */}
         {showMap && (
-          <div className="mb-6">
-            <div className="text-center text-gray-600 mb-4">
-              <MapPin className="w-6 h-6 mx-auto mb-2" />
-              <p>Interactieve kaart met populaire cafés</p>
-              <p className="text-sm">Klik op markers om café details te zien</p>
-            </div>
-            <AnemiMap />
+          <div className="h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] rounded-lg overflow-hidden border border-amber-200 shadow-md">
+            <Suspense fallback={
+              <div className="w-full h-full bg-amber-100 flex items-center justify-center">
+                <div className="text-amber-600 text-sm xs:text-base">Kaart laden...</div>
+              </div>
+            }>
+              <AnemiMap />
+            </Suspense>
           </div>
         )}
 
-        <div className="space-y-4">
-          {cafes.map((cafe) => (
-            <div
-              key={cafe.id}
-              className="flex items-start gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow"
-            >
-              {/* Cafe Image */}
-              <div className="flex-shrink-0">
-                {cafe.photos && cafe.photos.length > 0 ? (
-                  <img
-                    src={cafe.photos[0]}
-                    alt={cafe.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="w-16 h-16 bg-gradient-to-br from-amber-200 to-orange-200 rounded-lg flex items-center justify-center">
-                    <Coffee className="w-8 h-8 text-amber-600" />
-                  </div>
+        {/* Cafes Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          {cafes.slice(0, limit).map((cafe) => (
+            <div key={cafe.id} className="bg-white rounded-lg border border-amber-200 p-3 sm:p-4 lg:p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="flex items-start justify-between mb-2 sm:mb-3">
+                <h3 className="font-semibold text-sm xs:text-base sm:text-lg lg:text-xl text-gray-900 flex-1 mr-2">
+                  {cafe.name}
+                </h3>
+                {cafe.trending && (
+                  <Badge variant="secondary" className="text-xs xs:text-sm bg-orange-100 text-orange-700 border-orange-200">
+                    Trending 🔥
+                  </Badge>
                 )}
               </div>
-
-              {/* Cafe Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-gray-900 truncate">
-                    {cafe.name}
-                  </h3>
-                  {cafe.trending && (
-                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 text-xs">
-                      <TrendingUp className="w-3 h-3 mr-1" />
-                      Trending
-                    </Badge>
-                  )}
+              
+              <p className="text-xs xs:text-sm sm:text-base text-gray-600 mb-2 sm:mb-3 line-clamp-2">
+                {cafe.address}
+              </p>
+              
+              <div className="flex items-center justify-between text-xs xs:text-sm">
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 xs:w-4 xs:h-4 text-amber-500 fill-current" />
+                  <span className="font-medium">{cafe.rating}</span>
+                  <span className="text-gray-500">({cafe.reviewCount})</span>
                 </div>
-
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                  {cafe.description || cafe.address}
-                </p>
-
-                {/* Stats */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-yellow-500" />
-                    <span>{cafe.rating.toFixed(1)}</span>
-                    <span>({cafe.reviewCount})</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    <span>{cafe.recentMeetups} meetups deze maand</span>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{cafe.features.slice(0, 2).join(', ')}</span>
-                  </div>
+                
+                <div className="text-gray-500">
+                  {cafe.recentMeetups} recent
                 </div>
-
-                {/* Price Range */}
-                <div className="mt-2">
-                  <Badge variant="outline" className="text-xs">
-                    {cafe.priceRange === 'BUDGET' && '€'}
-                    {cafe.priceRange === 'MODERATE' && '€€'}
-                    {cafe.priceRange === 'PREMIUM' && '€€€'}
-                    {cafe.priceRange === 'LUXURY' && '€€€€'}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex-shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                >
-                  <Link href={`/create?cafe=${cafe.id}`}>
-                    Plan Meetup
-                  </Link>
-                </Button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 text-center">
-          <Button variant="outline" asChild>
+        {/* Action Button */}
+        <div className="text-center">
+          <Button asChild className="bg-amber-600 hover:bg-amber-700 text-sm xs:text-base sm:text-lg px-6 sm:px-8 lg:px-10 py-3 sm:py-4">
             <Link href="/create">
-              Bekijk alle cafés in {city}
+              <MapPin className="w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mr-2" />
+              Plan een Herverbinding
             </Link>
           </Button>
         </div>

@@ -1,6 +1,6 @@
 # Anemi Meets ☕
 
-A modern platform for creating coffee meetups and discovering great local spots with friends.
+A modern platform for reconnecting with people you already know over coffee. In this AI-driven world, real human connections are more precious than ever. Plan meaningful meetups with friends, family, and colleagues you haven't seen in a while.
 
 ## 🚀 Quick Start
 
@@ -54,13 +54,13 @@ We have comprehensive documentation to help you get started:
 
 ## 🎨 Features
 
-- ☕ **Coffee Shop Discovery** - Find great local spots
-- 👥 **Meetup Creation** - Create and manage coffee meetups
-- 📧 **Email Invitations** - Send beautiful invitation emails
+- ☕ **Reconnection Focus** - Reconnect with people you already know
+- 👥 **Meaningful Meetups** - Create and manage coffee meetups with existing relationships
+- 📧 **Personal Invitations** - Send beautiful invitation emails to friends and colleagues
 - 📱 **Mobile-First Design** - Optimized for mobile devices
 - 🔒 **Secure Authentication** - User management and security
-- 🗺️ **Location Services** - Maps and geolocation
-- 📊 **Analytics** - Track usage and performance
+- 🗺️ **Location Services** - Maps and geolocation for meaningful meeting spots
+- 📊 **Analytics** - Track your reconnection journey
 
 ## 🔧 Development
 

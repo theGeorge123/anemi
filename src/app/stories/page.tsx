@@ -8,6 +8,8 @@ import { Coffee, Heart, MessageCircle, Eye, Calendar, MapPin, User, Share2, User
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/components/SupabaseProvider'
+import MeetupStats from '@/components/meetups/MeetupStats'
+import PopularCafesMap from '@/components/meetups/PopularCafesMap'
 
 interface Story {
   id: string
@@ -344,6 +346,15 @@ export default function StoriesPage() {
               </Link>
             </Button>
           </div>
+        </div>
+        
+        {/* Meetup Statistics and Popular Cafes */}
+        <div className="mb-12 space-y-8">
+          {/* Meetup Stats */}
+          <MeetupStats city="Amsterdam" />
+          
+          {/* Popular Cafes Map */}
+          <PopularCafesMap city="Amsterdam" limit={6} />
         </div>
         
         {/* Stories Grid */}

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/logo'
 import { useSupabase } from '@/components/SupabaseProvider'
-import { Home, Coffee, Settings, Menu, X, Search } from 'lucide-react'
+import { Home, Coffee, Settings, Menu, X, Search, MapPin } from 'lucide-react'
 import { useState } from 'react'
 
 export function Header() {
@@ -40,6 +40,12 @@ export function Header() {
           <Link href="/find-meetups" className="text-sm xl:text-base font-medium transition-colors hover:text-primary hover:scale-105 flex items-center gap-1">
             <Search className="w-4 h-4" />
             <span>Vind Meetups</span>
+          </Link>
+          
+          {/* Map Link - Always visible */}
+          <Link href="/map" className="text-sm xl:text-base font-medium transition-colors hover:text-primary hover:scale-105 flex items-center gap-1">
+            <MapPin className="w-4 h-4" />
+            <span>Kaart</span>
           </Link>
           
           {supabase && session && (
@@ -131,6 +137,12 @@ export function Header() {
               <Link href="/find-meetups" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Vind Meetups
+              </Link>
+              
+              {/* Map Link - Always visible */}
+              <Link href="/map" className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Kaart
               </Link>
               
               {supabase && session && (
